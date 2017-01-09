@@ -431,3 +431,4 @@
     };
 
 })();
+module.exports = window.UEDITOR_CONFIG;

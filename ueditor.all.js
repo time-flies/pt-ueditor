@@ -14494,7 +14494,7 @@ UE.plugin.register('copy', function () {
                             type: "text/javascript",
                             defer: "defer"
                         }, function () {
-                            initZeroClipboard();
+                            //initZeroClipboard();
                         });
                     }
                 }
@@ -29560,3 +29560,4 @@ UE.registerUI('autosave', function(editor) {
 
 
 })();
+module.exports = window.UE;
