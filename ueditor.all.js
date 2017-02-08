@@ -25161,6 +25161,7 @@ UE.ui = baidu.editor.ui = {};
         },
         render:function (holder) {
             var html = this.renderHtml();
+            console.log('shirley---->' + html);
             var el = uiUtils.createElementByHtml(html);
 
             //by xuheng 给每个node添加class
@@ -25968,7 +25969,7 @@ UE.ui = baidu.editor.ui = {};
             return '<div id="##" class="edui-box %%">' +
                 '<div '+ (this.title ? 'title="' + this.title + '"' : '') +' id="##_state" stateful><div class="%%-body">' +
                 '<div id="##_button_body" class="edui-box edui-button-body" onclick="$$._onButtonClick(event, this);">' +
-                '<div class="edui-box edui-icon"></div>' +
+                '<div class="edui-box edui-icon" style="' + this.cssRules + '"></div>' +
                 '</div>' +
                 '<div class="edui-box edui-splitborder"></div>' +
                 '<div class="edui-box edui-arrow" onclick="$$._onArrowClick();"></div>' +
