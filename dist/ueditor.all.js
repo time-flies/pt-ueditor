@@ -25161,7 +25161,6 @@ UE.ui = baidu.editor.ui = {};
         },
         render:function (holder) {
             var html = this.renderHtml();
-            console.log('shirley---->' + html);
             var el = uiUtils.createElementByHtml(html);
 
             //by xuheng 给每个node添加class
