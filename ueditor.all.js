@@ -28784,12 +28784,7 @@ UE.ui = baidu.editor.ui = {};
                     editor.ui._dialogs.linkDialog.open();
                 },
                 _onHrefButtonClick:function (url) {
-                    try {
-                        const shell = require('electron').shell;
-                        if (shell) {
-                            shell.openExternal(url);
-                        }
-                    } catch(e) {}
+                    editor.trigger('linkClick', url);
                 },
                 _onImgEditButtonClick:function (name) {
                     this.hide();
