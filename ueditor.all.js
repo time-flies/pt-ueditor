@@ -28783,6 +28783,14 @@ UE.ui = baidu.editor.ui = {};
                     this.hide();
                     editor.ui._dialogs.linkDialog.open();
                 },
+                _onHrefButtonClick:function (url) {
+                    try {
+                        const shell = require('electron').shell;
+                        if (shell) {
+                            shell.openExternal(url);
+                        }
+                    } catch(e) {}
+                },
                 _onImgEditButtonClick:function (name) {
                     this.hide();
                     editor.ui._dialogs[name] && editor.ui._dialogs[name].open();
@@ -28915,7 +28923,7 @@ UE.ui = baidu.editor.ui = {};
                                 html += '<div style="height:5px;"></div>'
                             }
                             html += popup.formatHtml(
-                                '<nobr>' + editor.getLang("anthorMsg") + ': <a target="_blank" href="' + url + '" title="' + url + '" >' + txt + '</a>' +
+                                '<nobr>' + editor.getLang("anthorMsg") + ': <a target="_blank" onclick="$$._onHrefButtonClick(\'' + url + '\');" title="' + url + '" >' + txt + '</a>' +
                                     ' <span class="edui-clickable" onclick="$$._onEditButtonClick();">' + editor.getLang("modify") + '</span>' +
                                     ' <span class="edui-clickable" onclick="$$._onRemoveButtonClick(\'unlink\');"> ' + editor.getLang("clear") + '</span></nobr>');
                             popup.showAnchor(link);
