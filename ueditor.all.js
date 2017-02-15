@@ -11928,6 +11928,8 @@ UE.plugins['link'] = function(){
                 text =   utils.html(opt.href);
 
             }
+            opt['onclick'] = 'javascript:return false;';
+
             domUtils.setAttributes( a, opt );
             start =  domUtils.findParentByTagName( rngClone.startContainer, 'a', true );
             if(start && domUtils.isInNodeEndBoundary(rngClone,start)){
