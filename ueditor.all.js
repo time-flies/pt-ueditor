@@ -27834,6 +27834,9 @@ UE.ui = baidu.editor.ui = {};
                     showText:false
                 });
                 editorui.buttons[cmd] = ui;
+                if (cmd === 'underline' || cmd === 'strikethrough') {
+                    return ui;
+                }
                 editor.addListener('selectionchange', function (type, causeByUi, uiReady) {
                     var state = editor.queryCommandState(cmd);
                     if (state == -1) {
@@ -27925,9 +27928,9 @@ UE.ui = baidu.editor.ui = {};
                     }
                 });
                 editorui.buttons[cmd] = ui;
-                editor.addListener('selectionchange', function () {
-                    ui.setDisabled(editor.queryCommandState(cmd) == -1);
-                });
+                // editor.addListener('selectionchange', function () {
+                //     ui.setDisabled(editor.queryCommandState(cmd) == -1);
+                // });
                 return ui;
             };
         }(ci);
