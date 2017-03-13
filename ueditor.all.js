@@ -21990,11 +21990,11 @@ UE.plugins['contextmenu'] = function () {
                             cmdName:'justify',
                             value:'center'
                         },
-                        {
-                            label:lang.justifyjustify,
-                            cmdName:'justify',
-                            value:'justify'
-                        }
+                        // {
+                        //     label:lang.justifyjustify,
+                        //     cmdName:'justify',
+                        //     value:'justify'
+                        // }
                     ]
                 },
                 '-',
