@@ -12106,6 +12106,7 @@ UE.plugins['removeformat'] = function(){
                 }
                 return !node.attributes.length;
             }
+
             function doRemove( range ) {
 
                 var bookmark1 = range.createBookmark();
@@ -12221,9 +12222,22 @@ UE.plugins['removeformat'] = function(){
                 }
             }
 
+            function isNodeView( range ) {
+                var aNode = domUtils.findParentByTagName(range.startContainer,'xnode',true);
+                if(aNode){
+                    return true;
+                }
 
-
+                aNode = domUtils.findParentByTagName(range.endContainer,'xnode',true);
+                if(aNode){
+                    return true;
+                }
+            }
+            
             range = this.selection.getRange();
+            if ( isNodeView( range ) ) {
+                return;
+            }
             doRemove( range );
             range.select();
 
@@ -13667,6 +13681,15 @@ UE.plugins['insertcode'] = function() {
     //方向键的处理
     me.addListener('keydown',function(cmd,evt){
         var me = this,keyCode = evt.keyCode || evt.which;
+        if (evt.keyCode == 13) {//回车
+            let rng = me.selection.getRange();
+            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+            if (xnode) {
+                e.stopPropagation();
+                domUtils.preventDefault(evt);
+                return;
+            }
+        }
         if(keyCode == 40){
             var rng = me.selection.getRange(),pre,start = rng.startContainer;
             if(rng.collapsed && (pre = domUtils.findParentByTagName(rng.startContainer,'pre',true)) && !pre.nextSibling){
@@ -14389,6 +14412,15 @@ UE.plugins['undo'] = function () {
 
         var me = this;
         var keyCode = evt.keyCode || evt.which;
+        if (evt.keyCode == 13) {//回车
+            let rng = me.selection.getRange();
+            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+            if (xnode) {
+                e.stopPropagation();
+                domUtils.preventDefault(evt);
+                return;
+            }
+        }
         if (!keys[keyCode] && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && !evt.altKey) {
             if (inputType)
                 return;
@@ -15408,6 +15440,15 @@ UE.plugins['list'] = function () {
     }
 
     me.addListener('keydown', function (type, evt) {
+        if (evt.keyCode == 13) {//回车
+            let rng = me.selection.getRange();
+            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+            if (xnode) {
+                e.stopPropagation();
+                domUtils.preventDefault(evt);
+                return;
+            }
+        }
         function preventAndSave() {
             evt.preventDefault ? evt.preventDefault() : (evt.returnValue = false);
             me.fireEvent('contentchange');
@@ -16552,6 +16593,14 @@ UE.plugins['enterkey'] = function() {
     me.addListener('keydown', function(type, evt) {
         var keyCode = evt.keyCode || evt.which;
         if (keyCode == 13) {//回车
+            let rng = me.selection.getRange();
+            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+            if (xnode) {
+                e.stopPropagation();
+                domUtils.preventDefault(evt);
+                return;
+            }
+     
             if(me.fireEvent('beforeenterkeydown')){
                 domUtils.preventDefault(evt);
                 return;
@@ -16670,7 +16719,15 @@ UE.plugins['keystrokes'] = function() {
     me.addListener('keydown', function(type, evt) {
         var keyCode = evt.keyCode || evt.which,
             rng = me.selection.getRange();
-
+        if (evt.keyCode == 13) {//回车
+            let rng = me.selection.getRange();
+            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+            if (xnode) {
+                e.stopPropagation();
+                domUtils.preventDefault(evt);
+                return;
+            }
+        }
         //处理全选的情况
         if(!rng.collapsed && !(evt.ctrlKey || evt.shiftKey || evt.altKey || evt.metaKey) && (keyCode >= 65 && keyCode <=90
             || keyCode >= 48 && keyCode <= 57 ||
@@ -20021,6 +20078,15 @@ UE.plugins['table'] = function () {
         me.addListener('keydown', function (cmd, evt) {
             var me = this;
             var keyCode = evt.keyCode || evt.which;
+            if (evt.keyCode == 13) {//回车
+                    let rng = me.selection.getRange();
+                    let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+                    if (xnode) {
+                        e.stopPropagation();
+                        domUtils.preventDefault(evt);
+                        return;
+                    }
+                }
 
             if (keyCode == 8) {
 
@@ -20286,6 +20352,15 @@ UE.plugins['table'] = function () {
         });
         var timer;
         me.addListener('keydown', function () {
+            if (evt.keyCode == 13) {//回车
+                let rng = me.selection.getRange();
+                let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+                if (xnode) {
+                    e.stopPropagation();
+                    domUtils.preventDefault(evt);
+                    return;
+                }
+            }
             clearTimeout(timer);
             timer = setTimeout(function () {
                 var rng = me.selection.getRange(),
@@ -28761,6 +28836,15 @@ UE.ui = baidu.editor.ui = {};
             editor.addListener('keydown', function (t, evt) {
                 if (pastePop)    pastePop.dispose(evt);
                 var keyCode = evt.keyCode || evt.which;
+                if (evt.keyCode == 13) {//回车
+                    let rng = me.selection.getRange();
+                    let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+                    if (xnode) {
+                        e.stopPropagation();
+                        domUtils.preventDefault(evt);
+                        return;
+                    }
+                }
                 if(evt.altKey&&keyCode==90){
                     UE.ui.buttons['fullscreen'].onclick();
                 }
