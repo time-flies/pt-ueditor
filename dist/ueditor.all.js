@@ -7168,6 +7168,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             me.addListener('keydown', function (type, e) {
                 var keyCode = e.keyCode || e.which;
                 if (e.keyCode == 13) {//回车
+                    let rng = me.selection.getRange();
                     let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
                     if (xnode) {
                         e.stopPropagation();
@@ -22306,6 +22307,17 @@ UE.plugins['contextmenu'] = function () {
         me.fireEvent( 'beforeselectionchange' );
         if ( menu ) {
             menu.destroy();
+        }
+        if (me.selection) {
+            let rng = me.selection.getRange();
+            if (rng) {
+                let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+                if (xnode) {
+                    evt.stopPropagation();
+                    domUtils.preventDefault(evt);
+                    return;
+                }
+            }
         }
         for ( var i = 0, ti, contextItems = []; ti = items[i]; i++ ) {
             var last;
