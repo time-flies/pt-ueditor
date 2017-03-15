@@ -13685,7 +13685,7 @@ UE.plugins['insertcode'] = function() {
             let rng = me.selection.getRange();
             let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
             if (xnode) {
-                e.stopPropagation();
+                evt.stopPropagation();
                 domUtils.preventDefault(evt);
                 return;
             }
@@ -14416,7 +14416,7 @@ UE.plugins['undo'] = function () {
             let rng = me.selection.getRange();
             let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
             if (xnode) {
-                e.stopPropagation();
+                evt.stopPropagation();
                 domUtils.preventDefault(evt);
                 return;
             }
@@ -15444,7 +15444,7 @@ UE.plugins['list'] = function () {
             let rng = me.selection.getRange();
             let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
             if (xnode) {
-                e.stopPropagation();
+                evt.stopPropagation();
                 domUtils.preventDefault(evt);
                 return;
             }
@@ -16723,7 +16723,7 @@ UE.plugins['keystrokes'] = function() {
             let rng = me.selection.getRange();
             let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
             if (xnode) {
-                e.stopPropagation();
+                evt.stopPropagation();
                 domUtils.preventDefault(evt);
                 return;
             }
@@ -20082,7 +20082,7 @@ UE.plugins['table'] = function () {
                     let rng = me.selection.getRange();
                     let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
                     if (xnode) {
-                        e.stopPropagation();
+                        evt.stopPropagation();
                         domUtils.preventDefault(evt);
                         return;
                     }
@@ -20351,12 +20351,12 @@ UE.plugins['table'] = function () {
             tableCopyList = null;
         });
         var timer;
-        me.addListener('keydown', function () {
+        me.addListener('keydown', function (type, evt) {
             if (evt.keyCode == 13) {//回车
                 let rng = me.selection.getRange();
                 let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
                 if (xnode) {
-                    e.stopPropagation();
+                    evt.stopPropagation();
                     domUtils.preventDefault(evt);
                     return;
                 }
@@ -28840,7 +28840,7 @@ UE.ui = baidu.editor.ui = {};
                     let rng = me.selection.getRange();
                     let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
                     if (xnode) {
-                        e.stopPropagation();
+                        evt.stopPropagation();
                         domUtils.preventDefault(evt);
                         return;
                     }
