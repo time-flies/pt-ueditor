@@ -22383,10 +22383,16 @@ UE.plugins['contextmenu'] = function () {
         if ( menu ) {
             menu.destroy();
         }
+        let popMenuContainer = document.getElementById('pop-menu-box');
+        if (popMenuContainer) {
+            evt.stopPropagation();
+            domUtils.preventDefault(evt);
+            return;
+        }
         if (me.selection) {
-            let rng = me.selection.getRange();
-            if (rng) {
-                let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
+            let start = me.selection.getStart();
+            if (start) {
+                let xnode = domUtils.findParentByTagName(start,'xnode',true);
                 if (xnode) {
                     evt.stopPropagation();
                     domUtils.preventDefault(evt);
@@ -27930,7 +27936,7 @@ UE.ui = baidu.editor.ui = {};
                     showText:false
                 });
                 editorui.buttons[cmd] = ui;
-                if (cmd === 'underline' || cmd === 'strikethrough') {
+                if (editor.options.exceptSelection && editor.options.exceptSelection.indexOf(cmd) !== -1) {
                     return ui;
                 }
                 editor.addListener('selectionchange', function (type, causeByUi, uiReady) {
@@ -28024,9 +28030,12 @@ UE.ui = baidu.editor.ui = {};
                     }
                 });
                 editorui.buttons[cmd] = ui;
-                // editor.addListener('selectionchange', function () {
-                //     ui.setDisabled(editor.queryCommandState(cmd) == -1);
-                // });
+                if (editor.options.exceptSelection && editor.options.exceptSelection.indexOf(cmd) !== -1) {
+                    return;
+                }
+                editor.addListener('selectionchange', function () {
+                    ui.setDisabled(editor.queryCommandState(cmd) == -1);
+                });
                 return ui;
             };
         }(ci);
