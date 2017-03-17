@@ -1726,6 +1726,7 @@ var dtd = dom.dtd = (function() {
 
         //列表根元素列表
         $list: _({ul:1,ol:1,dl:1}),
+        $xnode: _({xnode: 1}),
 
         //不能认为是空的元素
         $isNotEmpty : _({table:1,ul:1,ol:1,dl:1,iframe:1,area:1,base:1,col:1,hr:1,img:1,embed:1,input:1,link:1,meta:1,param:1,h1:1,h2:1,h3:1,h4:1,h5:1,h6:1}),
@@ -12128,7 +12129,6 @@ UE.plugins['removeformat'] = function(){
 
                 }
 
-
                 bookmark = range.createBookmark();
 
                 node = bookmark.start;
@@ -12169,7 +12169,7 @@ UE.plugins['removeformat'] = function(){
                                 }
                             } else {
                                 //trace:939  不能把list上的样式去掉
-                                if(!dtd.$tableContent[current.tagName] && !dtd.$list[current.tagName]){
+                                if(!dtd.$tableContent[current.tagName] && !dtd.$list[current.tagName] && !dtd.$xnode[current.tagName]){
                                     domUtils.removeAttributes( current, removeFormatAttributes );
                                     if ( isRedundantSpan( current ) ){
                                         domUtils.remove( current, true );
