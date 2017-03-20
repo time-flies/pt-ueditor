@@ -6911,7 +6911,8 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
                     'body{margin:8px;font-family:sans-serif;font-size:16px;}' +
                     //设置段落间距
-                    'p{margin:5px 0;}</style>' +
+                    // 'p{margin:5px 0;}</style>' +
+                    'p{margin:5px 20px;min-width: 700px; max-width: 1150px}</style>' +
                     (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
                     '</head>' +
