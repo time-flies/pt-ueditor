@@ -26070,7 +26070,7 @@ UE.ui = baidu.editor.ui = {};
             this.removeState('opened');
         },
         getHtmlTpl: function (){
-            return '<div id="##" class="edui-box %%">' +
+            return '<div id="##" class="edui-box %%" onclick="$$._onArrowClick();">' +
                 '<div '+ (this.title ? 'title="' + this.title + '"' : '') +' id="##_state" stateful><div class="%%-body">' +
                 '<div id="##_button_body" class="edui-box edui-button-body" onclick="$$._onButtonClick(event, this);">' +
                 '<div class="edui-box edui-icon" style="' + this.cssRules + '"></div>' +
