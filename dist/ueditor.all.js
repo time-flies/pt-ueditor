@@ -21452,15 +21452,16 @@ UE.plugins['table'] = function () {
 
             //修正改变量
             changeValue = correctChangeValue( changeValue, cell, cells );
-
             if (cell.nextSibling) {
 
                 var i=0;
-
+                // 获取改变前的左右td的宽度
+                let leftWidth = cell.offsetWidth;
+                let rightWidth = cell.nextSibling.offsetWidth;
+                // 从新赋值
                 utils.each( cells, function( cellGroup ){
-
-                    cellGroup.left.width = (+cellGroup.left.width)+changeValue;
-                    cellGroup.right && ( cellGroup.right.width = (+cellGroup.right.width)-changeValue );
+                    cellGroup.left.width = leftWidth+changeValue;
+                    cellGroup.right && ( cellGroup.right.width = rightWidth-changeValue );
 
                 } );
 
