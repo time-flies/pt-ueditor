@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Tue Apr 18 2017 18:14:00 GMT+0800 (CST)
+ * build: Wed Apr 19 2017 09:32:57 GMT+0800 (CST)
  */
 
 (function(){
@@ -14516,7 +14516,7 @@ UE.plugin.register('copy', function () {
                             type: "text/javascript",
                             defer: "defer"
                         }, function () {
-                            initZeroClipboard();
+                            //initZeroClipboard();
                         });
                     }
                 }
@@ -15022,12 +15022,12 @@ UE.plugins['list'] = function () {
         for(var p in customStyle){
             if(p == 'dash' || p == 'dot'){
                 customCss.push('li.list-' + customStyle[p] + '{background-image:url(' + liiconpath +customStyle[p]+'.gif)}');
-                customCss.push('ul.custom_'+p+'{list-style:none;}ul.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
+                customCss.push('ul.custom_'+p+'{}ul.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
             }else{
                 for(var i= 0;i<99;i++){
                     customCss.push('li.list-' + customStyle[p] + i + '{background-image:url(' + liiconpath + 'list-'+customStyle[p] + i + '.gif)}')
                 }
-                customCss.push('ol.custom_'+p+'{list-style:none;}ol.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
+                customCss.push('ol.custom_'+p+'{}ol.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
             }
             switch(p){
                 case 'cn':
@@ -15060,7 +15060,7 @@ UE.plugins['list'] = function () {
                     customCss.push('li.list-'+p+'-paddingleft{padding-left:20px}');
             }
         }
-        customCss.push('.list-paddingleft-1{padding-left:0}');
+        customCss.push('.list-paddingleft-1{}');
         customCss.push('.list-paddingleft-2{padding-left:'+me.options.listDefaultPaddingLeft+'px}');
         customCss.push('.list-paddingleft-3{padding-left:'+me.options.listDefaultPaddingLeft*2+'px}');
         //如果不给宽度会在自定应样式里出现滚动条
@@ -29667,3 +29667,4 @@ UE.registerUI('autosave', function(editor) {
 
 })();
 module.exports = window.UE;
+
