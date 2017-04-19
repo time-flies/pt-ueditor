@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Wed Apr 19 2017 09:32:57 GMT+0800 (CST)
+ * build: Wed Apr 19 2017 10:16:29 GMT+0800 (CST)
  */
 
 (function(){
@@ -15031,33 +15031,33 @@ UE.plugins['list'] = function () {
             }
             switch(p){
                 case 'cn':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:25px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:40px}');
-                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:55px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:0px}');
                     break;
                 case 'cn1':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:30px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:40px}');
-                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:55px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:0px}');
                     break;
                 case 'cn2':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:40px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:55px}');
-                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:68px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:0px}');
                     break;
                 case 'num':
                 case 'num1':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:25px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
                     break;
                 case 'num2':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:35px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:40px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
                     break;
                 case 'dash':
-                    customCss.push('li.list-'+p+'-paddingleft{padding-left:35px}');
+                    customCss.push('li.list-'+p+'-paddingleft{padding-left:0px}');
                     break;
                 case 'dot':
-                    customCss.push('li.list-'+p+'-paddingleft{padding-left:20px}');
+                    customCss.push('li.list-'+p+'-paddingleft{padding-left:0px}');
             }
         }
         customCss.push('.list-paddingleft-1{}');
@@ -29667,4 +29667,3 @@ UE.registerUI('autosave', function(editor) {
 
 })();
 module.exports = window.UE;
-
