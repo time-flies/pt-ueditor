@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Wed Apr 19 2017 10:16:29 GMT+0800 (CST)
+ * build: Thu Apr 20 2017 11:14:45 GMT+0800 (CST)
  */
 
 (function(){
@@ -26070,10 +26070,12 @@ UE.ui = baidu.editor.ui = {};
                 '<div id="##_button_body" class="edui-box edui-button-body" onclick="$$._onButtonClick(event, this);">' +
                 '<div class="edui-box edui-icon" style="' + this.cssRules + '"></div>' +
                 '</div>' +
+                (this.tip ? '<span style="font-size: 12px; margin-left: 3px;" class="tip">' + this.tip + '</span>' : '') +
                 '<div class="edui-box edui-splitborder"></div>' +
                 '<div class="edui-box edui-arrow" onclick="$$._onArrowClick();"></div>' +
                 '</div></div></div>';
         },
+        //
         showPopup: function() {
             // 当popup往上弹出的时候，做特殊处理
             var rect = uiUtils.getClientRect(this.getDom());
