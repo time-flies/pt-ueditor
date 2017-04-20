@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Thu Apr 20 2017 11:14:45 GMT+0800 (CST)
+ * build: Thu Apr 20 2017 12:40:48 GMT+0800 (CST)
  */
 
 (function(){
@@ -19925,7 +19925,7 @@ UE.plugins['table'] = function () {
         singleClickState = 0,
         userActionStatus = null,
         //双击允许的时间范围
-        dblclickTime = 360,
+        dblclickTime = 100,
         UT = UE.UETable,
         getUETable = function (tdOrTable) {
             return UT.getUETable(tdOrTable);
@@ -26070,7 +26070,7 @@ UE.ui = baidu.editor.ui = {};
                 '<div id="##_button_body" class="edui-box edui-button-body" onclick="$$._onButtonClick(event, this);">' +
                 '<div class="edui-box edui-icon" style="' + this.cssRules + '"></div>' +
                 '</div>' +
-                (this.tip ? '<span style="font-size: 12px; margin-left: 3px;" class="tip">' + this.tip + '</span>' : '') +
+                (this.tip ? '<span style="font-size: 12px; margin-left: 3px;">' + this.tip + '</span>' : '') +
                 '<div class="edui-box edui-splitborder"></div>' +
                 '<div class="edui-box edui-arrow" onclick="$$._onArrowClick();"></div>' +
                 '</div></div></div>';
