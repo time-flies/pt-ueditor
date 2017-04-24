@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri Apr 21 2017 15:54:06 GMT+0800 (CST)
+ * build: Mon Apr 24 2017 18:31:41 GMT+0800 (CST)
  */
 
 (function(){
@@ -21958,38 +21958,6 @@ UE.plugins['tablesort'] = function () {
  * @author zhanyi
  */
 
-// 插入文件
-UE.commands['mindmap'] = {
-    execCommand: function (cmdName) {
-        this.trigger('registerFunc', 'insertChildNode', cmdName);
-    }
-};
-UE.commands['text'] = {
-    execCommand: function (cmdName) {
-        this.trigger('registerFunc', 'insertChildNode', cmdName);
-    }
-};
-UE.commands['sheet'] = {
-    execCommand: function (cmdName) {
-        this.trigger('registerFunc', 'insertChildNode', cmdName);
-    }
-};
-UE.commands['attachments'] = {
-    execCommand: function (cmdName) {
-        this.trigger('registerFunc', 'insertChildNode', cmdName);
-    }
-};
-UE.commands['folder'] = {
-    execCommand: function (cmdName) {
-        this.trigger('registerFunc', 'insertChildNode', cmdName);
-    }
-};
-UE.commands['havefiles'] = {
-    execCommand: function (cmdName) {
-        this.trigger('registerFunc', 'insertExistNode');
-    }
-};
-
 UE.plugins['contextmenu'] = function () {
     var me = this;
 
@@ -22002,34 +21970,12 @@ UE.plugins['contextmenu'] = function () {
         menu,
         items = me.options.contextMenu || [
             {
-                group: '插入文件',
-                icon: 'add_file',
-                subMenu: [
-                    {
-                        label: '思维导图',
-                        cmdName: 'mindmap'
-                    },
-                    {
-                        label: '文档',
-                        cmdName: 'text'
-                    },
-                    {
-                        label: '表格',
-                        cmdName: 'sheet'
-                    },
-                    {
-                        label: '附件',
-                        cmdName: 'attachments'
-                    },
-                    {
-                        label: '文件夹',
-                        cmdName: 'folder'
-                    },
-                    {
-                        label: '已有文件',
-                        cmdName: 'havefiles'
-                    }
-                ]
+                label: lang['copy'],
+                cmdName: 'copy'
+            },
+            {
+                label: lang['paste'],
+                cmdName: 'paste'
             },
             { label: lang['selectall'], cmdName: 'selectall' },
             {
@@ -22355,14 +22301,6 @@ UE.plugins['contextmenu'] = function () {
             {
                 label: lang.insertparagraphafter,
                 cmdName: 'insertparagraph'
-            },
-            {
-                label: lang['copy'],
-                cmdName: 'copy'
-            },
-            {
-                label: lang['paste'],
-                cmdName: 'paste'
             }
         ];
 
