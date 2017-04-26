@@ -528,18 +528,6 @@ div.edui-box {
 }
 
 /* toolbar icons */
-.edui-default  .edui-for-add_file .edui-icon {
-    /*background-position: 0 0;*/
-    background: url(../images/add_file.png) !important;
-    background-size: 20px 20px !important;
-}
-
-.edui-default  .edui-for-pasteToTruth .edui-icon {
-    /*background-position: 0 0;*/
-    background: url(../images/add_file.png) !important;
-    background-size: 20px 20px !important;
-}
-
 .edui-default .edui-for-undo .edui-icon {
     background-position: -160px 0;
 }

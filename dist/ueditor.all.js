@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Mon Apr 24 2017 18:31:41 GMT+0800 (CST)
+ * build: Wed Apr 26 2017 14:45:29 GMT+0800 (CST)
  */
 
 (function(){
@@ -22,7 +22,9 @@ window.UE = baidu.editor = {
     version:'1.5.0'
 };
 var dom = UE.dom = {};
+// weknow patch begin
 module.exports = window.UE;
+// weknow patch end
 
 // core/browser.js
 /**
@@ -18590,7 +18592,7 @@ UE.plugins['video'] = function (){
                 if (colIndex == 0) {
                     var tr = tableRow.nextSibling || tableRow.previousSibling,
                         th = tr.cells[colIndex];
-                    if (th.tagName == 'TH') {
+                    if (th && th.tagName == 'TH') {
                         th = cell.ownerDocument.createElement("th");
                         th.appendChild(cell.firstChild);
                         tableRow.insertBefore(th, cell);
@@ -18712,12 +18714,15 @@ UE.plugins['video'] = function (){
             function replaceTdToTh(rowIndex, cell, tableRow) {
                 if (rowIndex == 0) {
                     var th = cell.nextSibling || cell.previousSibling;
-                    if (th.tagName == 'TH') {
+                    // weknow patch begin
+                    // 无法插入一列
+                    if (th && th.tagName == 'TH') {
                         th = cell.ownerDocument.createElement("th");
                         th.appendChild(cell.firstChild);
                         tableRow.insertBefore(th, cell);
                         domUtils.remove(cell)
                     }
+                    // weknow patch end
                 }else{
                     if (cell.tagName == 'TH') {
                         var td = cell.ownerDocument.createElement("td");
@@ -19926,7 +19931,9 @@ UE.plugins['table'] = function () {
         singleClickState = 0,
         userActionStatus = null,
         //双击允许的时间范围
+        // weknow patch begin
         dblclickTime = 100,
+        // weknow patch end
         UT = UE.UETable,
         getUETable = function (tdOrTable) {
             return UT.getUETable(tdOrTable);
@@ -19983,7 +19990,7 @@ UE.plugins['table'] = function () {
         'defaultRows':3,
         'tdvalign':'top',
         'cursorpath':me.options.UEDITOR_HOME_URL + "themes/default/images/cursor_",
-        'tableDragable':false,
+        'tableDragable':true,
         'classList':["ue-table-interlace-color-single","ue-table-interlace-color-double"]
     });
     me.getUETable = getUETable;
@@ -20045,7 +20052,15 @@ UE.plugins['table'] = function () {
                     } else if (ut.isFullRow()) {
                         me.execCommand('deleterow')
                     } else {
-                        me.fireEvent('delcells');
+                        // weknow patch begin
+                        // 富文本里面全选表格按backspace键无法删除内容
+                        //me.fireEvent('delcells');
+                        me.fireEvent('saveScene');
+                        for (var i = 0, ci; ci = ut.selectedTds[i++];) {
+                            domUtils.fillNode(me.document, ci)
+                        }
+                        me.fireEvent('saveScene');
+                        // weknow patch end
                     }
                     domUtils.preventDefault(evt);
                 }
@@ -20362,6 +20377,7 @@ UE.plugins['table'] = function () {
                     me.fireEvent('tablemouseout', table);
                     toggleDraggableState(me, false, "", null);
                     hideDragLine(me);
+                    toggleDragButton(false, this, me);
                 };
                 table.onclick = function (evt) {
                     evt = me.window.event || evt;
@@ -20418,6 +20434,28 @@ UE.plugins['table'] = function () {
                             }
                         }
                     }
+                };
+                // 单元格双击全选单元格内容
+                table.ondblclick  = function (evt) {
+                    console.info("1---2");
+                    obj = evt.target;
+                    if (evt.target.tagName === 'TD') {
+                        obj = evt.target;
+                    } else if (evt.target.parentElement.tagName === 'TD') {
+                        obj = evt.target.parentElement;
+                    } else if (evt.target.parentElement.parentElement.tagName === 'TD') {
+                        obj = evt.target.parentElement.parentElement;
+                    } 
+                    range = me.selection.getRange();
+                    range.selectNodeContents(obj);
+                    if(domUtils.isEmptyBlock(obj)){
+                        //opera不能自动合并到元素的里边，要手动处理一下
+                        // if(browser.opera && body.firstChild && body.firstChild.nodeType == 1){
+                        //     range.setStartAtFirst(body.firstChild);
+                        // }
+                        range.collapse(true);
+                    }
+                    range.select(true);
                 };
             });
 
@@ -20745,7 +20783,7 @@ UE.plugins['table'] = function () {
             if (dragOver)return;
             dragButtonTimer = setTimeout(function () {
                 !dragOver && dragButton && dragButton.parentNode && dragButton.parentNode.removeChild(dragButton);
-            }, 2000);
+            }, 1000);
         } else {
             createDragButton(table, editor);
         }
@@ -20757,7 +20795,7 @@ UE.plugins['table'] = function () {
         if (dragButton && dragButton.parentNode)return dragButton;
         dragButton = doc.createElement("div");
         dragButton.contentEditable = false;
-        dragButton.innerHTML = "";
+        dragButton.innerHTML = "☩";
         dragButton.style.cssText = "width:15px;height:15px;background-image:url(" + editor.options.UEDITOR_HOME_URL + "dialogs/table/dragicon.png);position: absolute;cursor:move;top:" + (pos.y - 15) + "px;left:" + (pos.x) + "px;";
         domUtils.unSelectable(dragButton);
         dragButton.onmouseover = function (evt) {
@@ -20783,6 +20821,12 @@ UE.plugins['table'] = function () {
             timer = setTimeout(function () {
                 editor.fireEvent("tableClicked", table, button);
             }, 300);
+            var ut = getUETable(table),
+                start = table.rows[0].cells[0],
+                end = ut.getLastCell(),
+                range = ut.getCellsRange(start, end);
+            editor.selection.getRange().setStart(start, 0).setCursor(false, true);
+            ut.setSelected(range);
         }
 
         function doDblClick(evt) {
@@ -21978,15 +22022,18 @@ UE.plugins['contextmenu'] = function () {
                 cmdName: 'paste'
             },
             { label: lang['selectall'], cmdName: 'selectall' },
-            {
-                label: lang.cleardoc,
-                cmdName: 'cleardoc',
-                exec: function () {
-                    if (confirm(lang.confirmclear)) {
-                        this.execCommand('cleardoc');
-                    }
-                }
-            },
+            // weknow patch begin
+            // 0005305: [客户反馈]富文本右键菜单-清空文档功能去掉
+            // {
+            //     label: lang.cleardoc,
+            //     cmdName: 'cleardoc',
+            //     exec: function () {
+            //         if (confirm(lang.confirmclear)) {
+            //             this.execCommand('cleardoc');
+            //         }
+            //     }
+            // },
+            // weknow patch end
             '-',
             {
                 label: lang.unlink,
@@ -22304,6 +22351,7 @@ UE.plugins['contextmenu'] = function () {
             }
         ];
 
+    // weknow patch begin
     if (me.options.expandContextMenu) {
         if (!items) {
             items = [];
@@ -22324,6 +22372,7 @@ UE.plugins['contextmenu'] = function () {
             items.splice(index, 0, item.item);
         }
     }
+    // weknow patch end
     if (!items.length) {
         return;
     }
@@ -26033,7 +26082,9 @@ UE.ui = baidu.editor.ui = {};
                 '<div id="##_button_body" class="edui-box edui-button-body" onclick="$$._onButtonClick(event, this);">' +
                 '<div class="edui-box edui-icon" style="' + this.cssRules + '"></div>' +
                 '</div>' +
+                // weknow patch begin
                 (this.tip ? '<span style="font-size: 12px; margin-left: 3px;">' + this.tip + '</span>' : '') +
+                // weknow patch end
                 '<div class="edui-box edui-splitborder"></div>' +
                 '<div class="edui-box edui-arrow" onclick="$$._onArrowClick();"></div>' +
                 '</div></div></div>';
