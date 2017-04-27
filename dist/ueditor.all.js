@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Wed Apr 26 2017 14:45:29 GMT+0800 (CST)
+ * build: Thu Apr 27 2017 12:50:49 GMT+0800 (CST)
  */
 
 (function(){
@@ -20783,7 +20783,7 @@ UE.plugins['table'] = function () {
             if (dragOver)return;
             dragButtonTimer = setTimeout(function () {
                 !dragOver && dragButton && dragButton.parentNode && dragButton.parentNode.removeChild(dragButton);
-            }, 1000);
+            }, 2000);
         } else {
             createDragButton(table, editor);
         }
@@ -20795,7 +20795,7 @@ UE.plugins['table'] = function () {
         if (dragButton && dragButton.parentNode)return dragButton;
         dragButton = doc.createElement("div");
         dragButton.contentEditable = false;
-        dragButton.innerHTML = "☩";
+        dragButton.innerHTML = "";
         dragButton.style.cssText = "width:15px;height:15px;background-image:url(" + editor.options.UEDITOR_HOME_URL + "dialogs/table/dragicon.png);position: absolute;cursor:move;top:" + (pos.y - 15) + "px;left:" + (pos.x) + "px;";
         domUtils.unSelectable(dragButton);
         dragButton.onmouseover = function (evt) {
