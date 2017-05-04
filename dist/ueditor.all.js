@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Wed May 03 2017 18:51:48 GMT+0800 (CST)
+ * build: Thu May 04 2017 18:25:19 GMT+0800 (CST)
  */
 
 (function(){
@@ -20654,22 +20654,57 @@ UE.plugins['table'] = function () {
                 result;
             if (!cmdFun) return;
             if (ut && !commands[cmd] && !cmdFun.notNeedUndo && !me.__hasEnterExecCommand) {
-                tableCopyList = null;
-                var ut = getUETableBySelected(me);
-                if (ut) {
-                    var tds = ut.selectedTds;
-                    isFullCol = ut.isFullCol();
-                    isFullRow = ut.isFullRow();
-                    tableCopyList = [
-                        [ut.cloneCell(tds[0], null, true)]
-                    ];
-                    for (var i = 1, ci; ci = tds[i]; i++) {
-                        if (ci.parentNode !== tds[i - 1].parentNode) {
-                            tableCopyList.push([ut.cloneCell(ci, null, true)]);
+                if (cmd !== 'copy') {
+                    me.__hasEnterExecCommand = true;
+                    me.fireEvent("beforeexeccommand", cmd);
+                    tds = ut.selectedTds;
+                    var lastState = -2, lastValue = -2, value, state;
+                    for (var i = 0, td; td = tds[i]; i++) {
+                        if (isEmptyBlock(td)) {
+                            td.innerHTML = '<span>&nbsp;</span>';
+                            range.selectNode(td).select(true);
                         } else {
-                            tableCopyList[tableCopyList.length - 1].push(ut.cloneCell(ci, null, true));
+                            range.selectNode(td).select(true);
                         }
+                        state = me.queryCommandState(cmd);
+                        value = me.queryCommandValue(cmd);
+                        if (state != -1) {
+                            if (lastState !== state || lastValue !== value) {
+                                me._ignoreContentChange = true;
+                                result = oldExecCommand.apply(me, arguments);
+                                me._ignoreContentChange = false;
 
+                            }
+                            lastState = me.queryCommandState(cmd);
+                            lastValue = me.queryCommandValue(cmd);
+                            // if (domUtils.isEmptyBlock(td)) {
+                            //     domUtils.fillNode(me.document, td);
+                            // }
+                        }
+                    }
+                    range.setStart(tds[0], 0).shrinkBoundary(true).setCursor(false, true);
+                    me.fireEvent('contentchange');
+                    me.fireEvent("afterexeccommand", cmd);
+                    me.__hasEnterExecCommand = false;
+                    me._selectionChange();
+                } else {
+                    tableCopyList = null;
+                    var ut = getUETableBySelected(me);
+                    if (ut) {
+                        var tds = ut.selectedTds;
+                        isFullCol = ut.isFullCol();
+                        isFullRow = ut.isFullRow();
+                        tableCopyList = [
+                            [ut.cloneCell(tds[0], null, true)]
+                        ];
+                        for (var i = 1, ci; ci = tds[i]; i++) {
+                            if (ci.parentNode !== tds[i - 1].parentNode) {
+                                tableCopyList.push([ut.cloneCell(ci, null, true)]);
+                            } else {
+                                tableCopyList[tableCopyList.length - 1].push(ut.cloneCell(ci, null, true));
+                            }
+
+                        }
                     }
                 }
             } else {
@@ -22043,10 +22078,13 @@ UE.plugins['contextmenu'] = function () {
     var lang = me.getLang("contextMenu"),
         menu,
         items = me.options.contextMenu || [
-            {
-                label: lang['copy'],
-                cmdName: 'copy'
-            },
+            // weknow patch begin
+            // 去掉重复的
+            // {
+            //     label: lang['copy'],
+            //     cmdName: 'copy'
+            // },
+            // weknow patch end
             {
                 label: lang['paste'],
                 cmdName: 'paste'
@@ -22415,26 +22453,7 @@ UE.plugins['contextmenu'] = function () {
         if (menu) {
             menu.destroy();
         }
-        // weknow  start 
-        // 点击节点链接右键菜单 
-        var popMenuContainer = document.getElementById('pop-menu-box');
-        if (popMenuContainer) {
-            evt.stopPropagation();
-            domUtils.preventDefault(evt);
-            return;
-        }
-        if (me.selection) {
-            var start = me.selection.getStart();
-            if (start) {
-                var xnode = domUtils.findParentByTagName(start, 'xnode', true);
-                if (xnode) {
-                    evt.stopPropagation();
-                    domUtils.preventDefault(evt);
-                    return;
-                }
-            }
-        }
-        // weknow  end
+
         for (var i = 0, ti, contextItems = []; ti = items[i]; i++) {
             var last;
             (function (item) {
@@ -22453,12 +22472,16 @@ UE.plugins['contextmenu'] = function () {
                                 }
                             } else {
                                 if ((me.commands[subItem.cmdName] || UE.commands[subItem.cmdName] || subItem.query) &&
-                                    (subItem.query ? subItem.query() : me.queryCommandState(subItem.cmdName)) > -1) {
+                                    // weknow path begin
+                                    (subItem.query ? subItem.query(evt, subItem) : me.queryCommandState(subItem.cmdName)) > -1) {
+                                    // weknow path end
                                     subMenu.push({
                                         'label': subItem.label || me.getLang("contextMenu." + subItem.cmdName + (subItem.value || '')) || "",
                                         'className': 'edui-for-' + subItem.cmdName + (subItem.className ? (' edui-for-' + subItem.cmdName + '-' + subItem.className) : ''),
                                         onclick: subItem.exec ? function () {
-                                            subItem.exec.call(me);
+                                            // weknow path begin
+                                            subItem.exec.call(me, evt);
+                                            // weknow path end
                                         } : function () {
                                             me.execCommand(subItem.cmdName, subItem.value);
                                         }
@@ -22504,15 +22527,19 @@ UE.plugins['contextmenu'] = function () {
                 } else {
                     //有可能commmand没有加载右键不能出来，或者没有command也想能展示出来添加query方法
                     if ((me.commands[item.cmdName] || UE.commands[item.cmdName] || item.query) &&
-                        (item.query ? item.query.call(me) : me.queryCommandState(item.cmdName)) > -1) {
+                        // weknow patch begin
+                        (item.query ? item.query.call(me, evt, item) : me.queryCommandState(item.cmdName)) > -1) {
+                        // weknow patch end
 
                         contextItems.push({
                             'label': item.label || me.getLang("contextMenu." + item.cmdName),
                             className: 'edui-for-' + (item.icon ? item.icon : item.cmdName + (item.value || '')),
                             onclick: item.exec ? function () {
-                                item.exec.call(me);
+                                item.exec.call(me, evt);
                             } : function () {
+                                // weknow patch begin
                                 me.execCommand(item.cmdName, item.value);
+                                // weknow patch end
                             }
                         });
                     }
@@ -23005,7 +23032,15 @@ UE.plugin.register('searchreplace',function(){
         var text = node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent'];
         return text.replace(domUtils.fillChar,'')
     }
-
+    me.ready(function (){
+        me.addListener('keydown', function (cmd,evt){
+            // 搜索快捷键设置
+            var keyCode = evt.keyCode || evt.which;
+            if((evt.ctrlKey || evt.metaKey) && evt.keyCode == '70'){
+                me.getDialog('searchreplace').open()
+            }
+        })
+    })
     function findTextInString(textContent,opt,currentIndex){
         var str = opt.searchStr;
 
@@ -23201,6 +23236,9 @@ UE.plugin.register('searchreplace',function(){
             }
         }
     }
+     me.addshortcutkey({
+         "searchreplace" : "ctrl+80"
+    });
 });
 
 // plugins/customstyle.js
