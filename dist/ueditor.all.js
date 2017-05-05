@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Thu May 04 2017 18:25:19 GMT+0800 (CST)
+ * build: Fri May 05 2017 15:16:53 GMT+0800 (CST)
  */
 
 (function(){
@@ -21902,6 +21902,9 @@ UE.UETable.prototype.sortTable = function (sortByCellIndex, compareFn) {
         trArray = [],
         flag = rows[0].cells[0].tagName === "TH",
         lastRowIndex = 0;
+    if(!table.className){
+        return;
+    }
     if(this.selectedTds.length){
         var range = this.cellsRange,
             len = range.endRowIndex + 1;
