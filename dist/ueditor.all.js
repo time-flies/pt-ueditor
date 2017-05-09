@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri May 05 2017 15:16:53 GMT+0800 (CST)
+ * build: Tue May 09 2017 14:35:49 GMT+0800 (CST)
  */
 
 (function(){
@@ -14086,14 +14086,17 @@ UE.plugin.register('wordimage',function(){
                     opt = me.options,
                     src = opt.UEDITOR_HOME_URL + 'themes/default/images/spacer.gif';
                 if (attrs['src'] && /^(?:(file:\/+))/.test(attrs['src'])) {
-                    img.setAttr({
-                        width:attrs.width,
-                        height:attrs.height,
-                        alt:attrs.alt,
-                        word_img: attrs.src,
-                        src:src,
-                        'style':'background:url(' + ( flag ? opt.themePath + opt.theme + '/images/word.gif' : opt.langPath + opt.lang + '/images/localimage.png') + ') no-repeat center center;border:1px solid #ddd'
-                    })
+                    // Ueditor给本地图片做了处理,过滤掉
+                    if(attrs['src'].indexOf('images') === -1){
+                        img.setAttr({
+                            width:attrs.width,
+                            height:attrs.height,
+                            alt:attrs.alt,
+                            word_img: attrs.src,
+                            src:src,
+                            'style':'background:url(' + ( flag ? opt.themePath + opt.theme + '/images/word.gif' : opt.langPath + opt.lang + '/images/localimage.png') + ') no-repeat center center;border:1px solid #ddd'
+                        })
+                    }
                 }
             })
         }
@@ -16597,22 +16600,8 @@ UE.plugins['enterkey'] = function() {
 
                     //opera下执行formatblock会在table的场景下有问题，回车在opera原生支持很好，所以暂时在opera去掉调用这个原生的command
                     //trace:2431
-                    if (!start && !browser.opera) {
-
-                        me.document.execCommand('formatBlock', false, '<p>');
-
-                        if (browser.gecko) {
-                            range = me.selection.getRange();
-                            start = domUtils.findParentByTagName(range.startContainer, 'p', true);
-                            start && domUtils.removeDirtyAttr(start);
-                        }
-
-
-                    } else {
-                        hTag = start.tagName;
-                        start.tagName.toLowerCase() == 'p' && browser.gecko && domUtils.removeDirtyAttr(start);
-                    }
-
+                    hTag = start.tagName;
+                    start.tagName.toLowerCase() == 'p' && browser.gecko && domUtils.removeDirtyAttr(start);
                 }
 
             } else {
@@ -19924,7 +19913,7 @@ UE.plugins['table'] = function () {
         cellMinWidth = 5,
         isInResizeBuffer = false,
         //单元格边框大小
-        cellBorderWidth = 5,
+        cellBorderWidth = 12,
         //鼠标偏移距离
         offsetOfTableCell = 10,
         //记录在有限时间内的点击状态， 共有3个取值， 0, 1, 2。 0代表未初始化， 1代表单击了1次，2代表2次
@@ -20029,7 +20018,7 @@ UE.plugins['table'] = function () {
             'table.noBorderTable td,table.noBorderTable th,table.noBorderTable caption{border:1px dashed #ddd !important}' +
             //插入的表格的默认样式
             'table{margin-bottom:10px;border-collapse:collapse;display:table;}' +
-            'td,th{padding: 5px 10px;border: 1px solid #DDD;}' +
+            'td,th{padding: 8px 10px;border: 1px solid #DDD;}' +
             'caption{border:1px dashed #DDD;border-bottom:0;padding:3px;text-align:center;}' +
             'th{border-top:1px solid #BBB;background-color:#F7F7F7;}' +
             'table tr.firstRow th{border-top-width:2px;}' +
