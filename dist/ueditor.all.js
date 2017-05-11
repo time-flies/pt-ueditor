@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Tue May 09 2017 14:35:49 GMT+0800 (CST)
+ * build: Thu May 11 2017 15:24:18 GMT+0800 (CST)
  */
 
 (function(){
@@ -18809,29 +18809,86 @@ UE.plugins['video'] = function (){
             })
         },
         splitToRows:function (cell) {
+            // var cellInfo = this.getCellInfo(cell),
+            //     rowIndex = cellInfo.rowIndex,
+            //     colIndex = cellInfo.colIndex,
+            //     results = [];
+            // // 修改Cell的rowSpan
+            // cell.rowSpan = 1;
+            // results.push(cell);
+            // // 补齐单元格
+            // for (var i = rowIndex, endRow = rowIndex + cellInfo.rowSpan; i < endRow; i++) {
+            //     if (i == rowIndex)continue;
+            //     var tableRow = this.table.rows[i],
+            //         tmpCell = tableRow.insertCell(colIndex - this.getPreviewMergedCellsNum(i, colIndex));
+            //     tmpCell.colSpan = cellInfo.colSpan;
+            //     this.setCellContent(tmpCell);
+            //     tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
+            //     tmpCell.setAttribute('align', cell.getAttribute('align'));
+            //     if (cell.style.cssText) {
+            //         tmpCell.style.cssText = cell.style.cssText;
+            //     }
+            //     results.push(tmpCell);
+            // }
+            // this.update();
+            // return results;
             var cellInfo = this.getCellInfo(cell),
-                rowIndex = cellInfo.rowIndex,
-                colIndex = cellInfo.colIndex,
-                results = [];
-            // 修改Cell的rowSpan
-            cell.rowSpan = 1;
-            results.push(cell);
-            // 补齐单元格
-            for (var i = rowIndex, endRow = rowIndex + cellInfo.rowSpan; i < endRow; i++) {
-                if (i == rowIndex)continue;
-                var tableRow = this.table.rows[i],
-                    tmpCell = tableRow.insertCell(colIndex - this.getPreviewMergedCellsNum(i, colIndex));
-                tmpCell.colSpan = cellInfo.colSpan;
-                this.setCellContent(tmpCell);
-                tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                tmpCell.setAttribute('align', cell.getAttribute('align'));
-                if (cell.style.cssText) {
-                    tmpCell.style.cssText = cell.style.cssText;
+                    tr = cell.parentNode,
+                    table = this.table,
+                    map = this.buildTableMap(this.table),
+                    rowIndex = tr.rowIndex,
+                    colIndex = cellInfo.colIndex,
+                    rowSpan = cellInfo.rowSpan,
+                    newCell, newColSpan, newCellColSpan;
+
+                if (rowSpan > 1) {
+                    newRowSpan = Math.ceil(rowSpan / 2);
+                    newCellRowSpan = Math.floor(rowSpan / 2);
+                    newRowIndex = rowIndex + newRowSpan;
+                    var newCellTr = document.createElement('tr'),
+                        newCellRow = this.cellInRow(map, newRowIndex),
+                        candidateCell;
+
+                    newCell = cell.cloneNode();
+
+                    // 竖直找出要插入的单元格在哪儿
+                    for (var c = 0; c < newCellRow.length; c++) {
+                        candidateCell = newCellRow[c];
+                        // 找到第一个单元格
+                        if (candidateCell.parentNode == newCellTr.$ && c > colIndex) {
+                            newCell.insertBefore(document.createElement(candidateCell));
+                            break;
+                        } else {
+                            candidateCell = null;
+                        }
+                    }
+
+                    // 将新的单元格插入到空的行中
+                    if (!candidateCell)
+                        newCellTr.appendChild(newCell);
+                } else {
+                    newCellRowSpan = newRowSpan = 1;
+
+                    newCellTr = tr.cloneNode();
+                    newCellTr.className = '';
+                    domUtils.insertAfter(tr, newCellTr);
+                    newCell = cell.cloneNode();
+                    newCell.innerHTML = '<br>';
+                    newCellTr.appendChild(newCell);
+                    var cellsInSameRow = this.cellInRow(map, rowIndex);
+                    for (var i = 0; i < cellsInSameRow.length; i++)
+                        cellsInSameRow[i].rowSpan++;
                 }
-                results.push(tmpCell);
-            }
-            this.update();
-            return results;
+
+
+                cell.rowSpan = newRowSpan;
+                newCell.rowSpan = newCellRowSpan;
+                if (newRowSpan == 1)
+                    cell.removeAttribute('rowSpan');
+                if (newCellRowSpan == 1)
+                    newCell.removeAttribute('rowSpan');
+                this.update();
+                return newCell;
         },
         getPreviewMergedCellsNum:function (rowIndex, colIndex) {
             var indexRow = this.indexTable[rowIndex],
@@ -18845,42 +18902,68 @@ UE.plugins['video'] = function (){
             return num;
         },
         splitToCols:function (cell) {
-            var backWidth = (cell.offsetWidth / cell.colSpan - 22).toFixed(0),
+            // var backWidth = (cell.offsetWidth / cell.colSpan - 22).toFixed(0),
 
-                cellInfo = this.getCellInfo(cell),
-                rowIndex = cellInfo.rowIndex,
+            //     cellInfo = this.getCellInfo(cell),
+            //     rowIndex = cellInfo.rowIndex,
+            //     colIndex = cellInfo.colIndex,
+            //     results = [];
+            // // 修改Cell的rowSpan
+            // cell.colSpan = 1;
+            // cell.setAttribute("width", backWidth);
+            // results.push(cell);
+            // // 补齐单元格
+            // for (var j = colIndex, endCol = colIndex + cellInfo.colSpan; j < endCol; j++) {
+            //     if (j == colIndex)continue;
+            //     var tableRow = this.table.rows[rowIndex],
+            //         tmpCell = tableRow.insertCell(this.indexTable[rowIndex][j].cellIndex + 1);
+            //     tmpCell.rowSpan = cellInfo.rowSpan;
+            //     this.setCellContent(tmpCell);
+            //     tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
+            //     tmpCell.setAttribute('align', cell.getAttribute('align'));
+            //     tmpCell.setAttribute('width', backWidth);
+            //     if (cell.style.cssText) {
+            //         tmpCell.style.cssText = cell.style.cssText;
+            //     }
+            //     //处理th的情况
+            //     if (cell.tagName == 'TH') {
+            //         var th = cell.ownerDocument.createElement('th');
+            //         th.appendChild(tmpCell.firstChild);
+            //         th.setAttribute('vAlign', cell.getAttribute('vAlign'));
+            //         th.rowSpan = tmpCell.rowSpan;
+            //         tableRow.insertBefore(th, tmpCell);
+            //         domUtils.remove(tmpCell);
+            //     }
+            //     results.push(tmpCell);
+            // }
+            // this.update();
+            // return results;
+            var cellInfo = this.getCellInfo(cell),
+                tr = cell.parentNode,
+                table = this.table,
+                map = this.buildTableMap(this.table),
+                rowIndex = tr.rowIndex,
                 colIndex = cellInfo.colIndex,
-                results = [];
-            // 修改Cell的rowSpan
-            cell.colSpan = 1;
-            cell.setAttribute("width", backWidth);
-            results.push(cell);
-            // 补齐单元格
-            for (var j = colIndex, endCol = colIndex + cellInfo.colSpan; j < endCol; j++) {
-                if (j == colIndex)continue;
-                var tableRow = this.table.rows[rowIndex],
-                    tmpCell = tableRow.insertCell(this.indexTable[rowIndex][j].cellIndex + 1);
-                tmpCell.rowSpan = cellInfo.rowSpan;
-                this.setCellContent(tmpCell);
-                tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                tmpCell.setAttribute('align', cell.getAttribute('align'));
-                tmpCell.setAttribute('width', backWidth);
-                if (cell.style.cssText) {
-                    tmpCell.style.cssText = cell.style.cssText;
-                }
-                //处理th的情况
-                if (cell.tagName == 'TH') {
-                    var th = cell.ownerDocument.createElement('th');
-                    th.appendChild(tmpCell.firstChild);
-                    th.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                    th.rowSpan = tmpCell.rowSpan;
-                    tableRow.insertBefore(th, tmpCell);
-                    domUtils.remove(tmpCell);
-                }
-                results.push(tmpCell);
+                colSpan = cellInfo.colSpan,
+                newCell, newColSpan, newCellColSpan;
+            if (colSpan > 1) {
+                newColSpan = Math.ceil(colSpan / 2);
+                newCellColSpan = Math.floor(colSpan / 2);
+            } else {
+                newCellColSpan = newColSpan = 1;
+                var cellsInSameCol = this.cellInCol(map, colIndex);
+                for (var i = 0; i < cellsInSameCol.length; i++)
+                    cellsInSameCol[i].colSpan++;
             }
-            this.update();
-            return results;
+            newCell = cell.cloneNode();
+            domUtils.insertAfter(cell, newCell);
+            cell.colSpan = newColSpan;
+            newCell.colSpan = newCellColSpan;
+            if (newColSpan == 1)
+                cell.removeAttribute('colSpan');
+            if (newCellColSpan == 1)
+                newCell.removeAttribute('colSpan');
+            return newCell;           
         },
         isLastCell:function (cell, rowsNum, colsNum) {
             rowsNum = rowsNum || this.rowsNum;
@@ -18947,9 +19030,69 @@ UE.plugins['video'] = function (){
             utils.each(cells, function (cell) {
                 cell.style.backgroundColor = "";
             })
+        },
+        buildTableMap: function (table) {
+            var aRows = table.rows;
+
+            // Row and Column counters.
+            var r = -1;
+
+            var aMap = [];
+
+            for (var i = 0; i < aRows.length; i++) {
+                r++;
+                !aMap[r] && (aMap[r] = []);
+
+                var c = -1;
+
+                for (var j = 0; j < aRows[i].cells.length; j++) {
+                    var oCell = aRows[i].cells[j];
+
+                    c++;
+                    while (aMap[r][c])
+                        c++;
+
+                    var iColSpan = isNaN(oCell.colSpan) ? 1 : oCell.colSpan;
+                    var iRowSpan = isNaN(oCell.rowSpan) ? 1 : oCell.rowSpan;
+
+                    for (var rs = 0; rs < iRowSpan; rs++) {
+                        if (!aMap[r + rs])
+                            aMap[r + rs] = [];
+
+                        for (var cs = 0; cs < iColSpan; cs++) {
+                            aMap[r + rs][c + cs] = aRows[i].cells[j];
+                        }
+                    }
+
+                    c += iColSpan - 1;
+                }
+            }
+            return aMap;
+        },
+        cellInCol: function (tableMap, colIndex) {
+            var oCol = [];
+            for (var r = 0; r < tableMap.length; r++) {
+                var row = tableMap[r];
+                oCol.push(row[colIndex]);
+                // Avoid adding duplicate cells.
+                if (row[colIndex].rowSpan > 1)
+                    r += row[colIndex].rowSpan - 1;
+            }
+            return oCol;
+        },
+        cellInRow:function( tableMap, rowIndex, cell ) {
+            var oRow = tableMap[ rowIndex ];
+            if ( typeof cell == 'undefined' )
+                return oRow;
+
+            for ( var c = 0; oRow && c < oRow.length; c++ ) {
+                if ( cell.is && oRow[ c ] == cell.$ )
+                    return c;
+                else if ( c == cell )
+                    return domUtils.createElement( oRow[ c ] );
+            }
+            return cell.is ? -1 : null;
         }
-
-
     };
     function showError(e) {
     }
@@ -19508,7 +19651,7 @@ UE.plugins['video'] = function (){
             if (!cell) return -1;
             var ut = getUETable(tableItems.table);
             if (ut.selectedTds.length > 0) return -1;
-            return cell && cell.rowSpan > 1 ? 0 : -1;
+            return cell ? 0 : -1;
         },
         execCommand: function () {
             var rng = this.selection.getRange(),
@@ -19526,7 +19669,7 @@ UE.plugins['video'] = function (){
             if (!cell) return -1;
             var ut = getUETable(tableItems.table);
             if (ut.selectedTds.length > 0) return -1;
-            return cell && cell.colSpan > 1 ? 0 : -1;
+            return cell ? 0 : -1;
         },
         execCommand: function () {
             var rng = this.selection.getRange(),
@@ -20296,7 +20439,7 @@ UE.plugins['table'] = function () {
                             (needIEHack ? parseInt(domUtils.getComputedStyle(me.body, 'margin-left'), 10) * 2 : 0) - defaultValue.tableBorder * 2 - (me.options.offsetWidth || 0);
                     me.execCommand('insertHTML', '<table  ' +
                         (isFullCol && isFullRow ? 'width="' + width + '"' : '') +
-                        '>' + table.innerHTML.replace(/>\s*</g, '><').replace(/\bth\b/gi, "td") + '</table>')
+                        '>' + table.innerHTML + '</table>')
                 }
                 me.fireEvent('contentchange');
                 me.fireEvent('saveScene');
@@ -21443,7 +21586,7 @@ UE.plugins['table'] = function () {
         currentTd = domUtils.findParentByTagName(tar, "td", true) || domUtils.findParentByTagName(tar, "th", true);
         //需要判断两个TD是否位于同一个表格内
         if (startTd && currentTd &&
-            ((startTd.tagName == "TD" && currentTd.tagName == "TD") || (startTd.tagName == "TH" && currentTd.tagName == "TH")) &&
+            ((startTd.tagName == "TD" || startTd.tagName == "TH") && (currentTd.tagName == "TD" || currentTd.tagName == "TH")) &&
             domUtils.findParentByTagName(startTd, 'table') == domUtils.findParentByTagName(currentTd, 'table')) {
             var ut = getUETable(currentTd);
             if (startTd != currentTd) {
@@ -29184,7 +29327,7 @@ UE.ui = baidu.editor.ui = {};
             this.toolbars = toolbarUis;
         },
         getHtmlTpl:function () {
-            return '<div id="##" class="%%">' +
+            return '<div id="##" class="%%" style="height: 100%;">' +
                 '<div id="##_toolbarbox" class="%%-toolbarbox">' +
                 (this.toolbars.length ?
                     '<div id="##_toolbarboxouter" class="%%-toolbarboxouter"><div class="%%-toolbarboxinner">' +
@@ -29586,9 +29729,9 @@ UE.ui = baidu.editor.ui = {};
                     }
                     //编辑器最外容器设置了高度，会导致，编辑器不占位
                     //todo 先去掉，没有找到原因
-                    if(holder.style.height){
-                        holder.style.height = ''
-                    }
+                    // if(holder.style.height){
+                    //     holder.style.height = ''
+                    // }
                     editor.container.style.width = opt.initialFrameWidth + (/%$/.test(opt.initialFrameWidth) ? '' : 'px');
                     editor.container.style.zIndex = opt.zIndex;
                     oldRender.call(editor, editor.ui.getDom('iframeholder'));

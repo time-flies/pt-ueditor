@@ -182,7 +182,7 @@ div.edui-box {
 .edui-default .edui-editor-iframeholder {
     position: relative;
     /*for fix ie6 toolbarmsg under iframe bug. relative -> static */
-    /*_position: static !important;*
+    /*_position: static !important;*/
 }
 
 .edui-default .edui-editor-iframeholder textarea {
@@ -201,6 +201,9 @@ div.edui-box {
 
 .edui-default .edui-editor-bottomContainer {
     overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 .edui-default .edui-editor-bottomContainer table {
