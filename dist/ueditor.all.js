@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri May 12 2017 10:10:39 GMT+0800 (CST)
+ * build: Fri May 12 2017 17:00:40 GMT+0800 (CST)
  */
 
 (function(){
@@ -20074,7 +20074,7 @@ UE.plugins['table'] = function () {
         userActionStatus = null,
         //双击允许的时间范围
         // weknow patch begin
-        dblclickTime = 100,
+        dblclickTime = 50,
         // weknow patch end
         UT = UE.UETable,
         getUETable = function (tdOrTable) {
@@ -20132,7 +20132,7 @@ UE.plugins['table'] = function () {
         'defaultRows': 3,
         'tdvalign': 'top',
         'cursorpath': me.options.UEDITOR_HOME_URL + "themes/default/images/cursor_",
-        'tableDragable': true,
+        'tableDragable': false,
         'classList': ["ue-table-interlace-color-single", "ue-table-interlace-color-double"]
     });
     me.getUETable = getUETable;
@@ -20559,7 +20559,9 @@ UE.plugins['table'] = function () {
                     me.fireEvent('tablemouseout', table);
                     toggleDraggableState(me, false, "", null);
                     hideDragLine(me);
+                    // weknow path begin modify by shirley.jiang, 回退代码修复：0005621: [win] 文档中表格的的大小不好调节
                     toggleDragButton(false, this, me);
+                    // weknow path end
                 };
                 table.onclick = function (evt) {
                     evt = me.window.event || evt;
@@ -20811,15 +20813,10 @@ UE.plugins['table'] = function () {
                                 me._ignoreContentChange = true;
                                 result = oldExecCommand.apply(me, arguments);
                                 me._ignoreContentChange = false;
-                            }
-                            if(cmd !=='removeformat'){
-                                lastState = me.queryCommandState(cmd);
-                                lastValue = me.queryCommandValue(cmd);
+
                             }
                         }
                     }
-                    lastState = me.queryCommandState(cmd);
-                    lastValue = me.queryCommandValue(cmd);
                     range.setStart(tds[0], 0).shrinkBoundary(true).setCursor(false, true);
                     me.fireEvent('contentchange');
                     me.fireEvent("afterexeccommand", cmd);
@@ -23055,27 +23052,6 @@ UE.plugins['formatmatch'] = function(){
             return range.applyInlineStyle(list[list.length-1].tagName,null,list);
 
         }
-        function matchTds(isTd){
-            var tds = UE.UETable.getUETableBySelected(me).selectedTds,
-                range = new dom.Range(me.document);
-            for(var i = 0; i < tds.length; i++) {
-                var td = tds[i];
-                range.selectNode(td).select(true);
-                me.__hasEnterExecCommand = true;
-                var removeFormatAttributes = me.options.removeFormatAttributes;
-                me.options.removeFormatAttributes = '';
-                me.execCommand('removeformat');
-                me.options.removeFormatAttributes = removeFormatAttributes;
-                me.__hasEnterExecCommand = false;
-                //trace:969
-                range = me.selection.getRange();
-                if(list.length){
-                    addFormat(range);
-                }
-                range.select();
-                text && domUtils.remove(text);
-            }
-        }
 
         me.undoManger && me.undoManger.save();
 
@@ -23088,37 +23064,35 @@ UE.plugins['formatmatch'] = function(){
 
             img = null;
         }else{
-            if(!img) {
-                var isTd = UE.UETable.getUETableBySelected(me)
-                if(isTd){
-                    matchTds(isTd);
-                } else {
-                    var collapsed = range.collapsed;
-                    if(collapsed){
-                        var text = me.document.createTextNode('match');
-                        range.insertNode(text).select();
-                    }
-                    me.__hasEnterExecCommand = true;
-                    //不能把block上的属性干掉
-                    //trace:1553
-                    var removeFormatAttributes = me.options.removeFormatAttributes;
-                    me.options.removeFormatAttributes = '';
-                    me.execCommand('removeformat');
-                    me.options.removeFormatAttributes = removeFormatAttributes;
-                    me.__hasEnterExecCommand = false;
-                    //trace:969
-                    range = me.selection.getRange();
-                    if(list.length){
-                        addFormat(range);
-                    }
-                    if(text){
-                        range.setStartBefore(text).collapse(true);
+            if(!img){
+                var collapsed = range.collapsed;
+                if(collapsed){
+                    var text = me.document.createTextNode('match');
+                    range.insertNode(text).select();
 
-                    }
-                    range.select();
-                    text && domUtils.remove(text);
+
                 }
+                me.__hasEnterExecCommand = true;
+                //不能把block上的属性干掉
+                //trace:1553
+                var removeFormatAttributes = me.options.removeFormatAttributes;
+                me.options.removeFormatAttributes = '';
+                me.execCommand('removeformat');
+                me.options.removeFormatAttributes = removeFormatAttributes;
+                me.__hasEnterExecCommand = false;
+                //trace:969
+                range = me.selection.getRange();
+                if(list.length){
+                    addFormat(range);
+                }
+                if(text){
+                    range.setStartBefore(text).collapse(true);
+
+                }
+                range.select();
+                text && domUtils.remove(text);
             }
+
         }
 
 
