@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Thu May 11 2017 15:24:18 GMT+0800 (CST)
+ * build: Fri May 12 2017 10:10:39 GMT+0800 (CST)
  */
 
 (function(){
@@ -18974,16 +18974,26 @@ UE.plugins['video'] = function (){
         },
         getLastCell:function (cells) {
             cells = cells || this.table.getElementsByTagName("td");
-            var firstInfo = this.getCellInfo(cells[0]);
-            var me = this, last = cells[0],
+            thCells = this.table.getElementsByTagName('th');
+            var allCells = [];
+            if(thCells.length !== 0){
+                for(var i = 0;i<thCells.length;i++){
+                    allCells.push(thCells[i]);
+                };
+            }
+            for(var j = 0; j<cells.length; j++){
+                allCells.push(cells[j]);
+            };
+            var firstInfo = this.getCellInfo(allCells[0]);
+            var me = this, last = allCells[0],
                 tr = last.parentNode,
                 cellsNum = 0, cols = 0, rows;
-            utils.each(cells, function (cell) {
+            utils.each(allCells, function (cell) {
                 if (cell.parentNode == tr)cols += cell.colSpan || 1;
                 cellsNum += cell.rowSpan * cell.colSpan || 1;
             });
             rows = cellsNum / cols;
-            utils.each(cells, function (cell) {
+            utils.each(allCells, function (cell) {
                 if (me.isLastCell(cell, rows, cols)) {
                     last = cell;
                     return false;
@@ -20621,10 +20631,6 @@ UE.plugins['table'] = function () {
                     range = me.selection.getRange();
                     range.selectNodeContents(obj);
                     if (domUtils.isEmptyBlock(obj)) {
-                        //opera不能自动合并到元素的里边，要手动处理一下
-                        // if(browser.opera && body.firstChild && body.firstChild.nodeType == 1){
-                        //     range.setStartAtFirst(body.firstChild);
-                        // }
                         range.collapse(true);
                     }
                     range.select(true);
@@ -20805,15 +20811,15 @@ UE.plugins['table'] = function () {
                                 me._ignoreContentChange = true;
                                 result = oldExecCommand.apply(me, arguments);
                                 me._ignoreContentChange = false;
-
                             }
-                            lastState = me.queryCommandState(cmd);
-                            lastValue = me.queryCommandValue(cmd);
-                            // if (domUtils.isEmptyBlock(td)) {
-                            //     domUtils.fillNode(me.document, td);
-                            // }
+                            if(cmd !=='removeformat'){
+                                lastState = me.queryCommandState(cmd);
+                                lastValue = me.queryCommandValue(cmd);
+                            }
                         }
                     }
+                    lastState = me.queryCommandState(cmd);
+                    lastValue = me.queryCommandValue(cmd);
                     range.setStart(tds[0], 0).shrinkBoundary(true).setCursor(false, true);
                     me.fireEvent('contentchange');
                     me.fireEvent("afterexeccommand", cmd);
@@ -21585,9 +21591,8 @@ UE.plugins['table'] = function () {
             tar = evt.target || evt.srcElement;
         currentTd = domUtils.findParentByTagName(tar, "td", true) || domUtils.findParentByTagName(tar, "th", true);
         //需要判断两个TD是否位于同一个表格内
-        if (startTd && currentTd &&
-            ((startTd.tagName == "TD" || startTd.tagName == "TH") && (currentTd.tagName == "TD" || currentTd.tagName == "TH")) &&
-            domUtils.findParentByTagName(startTd, 'table') == domUtils.findParentByTagName(currentTd, 'table')) {
+        //添加可以同时选中TD和TH
+        if (startTd && currentTd &&((startTd.tagName == "TD" || startTd.tagName == "TH") && (currentTd.tagName == "TD" || currentTd.tagName == "TH")) && domUtils.findParentByTagName(startTd, 'table') == domUtils.findParentByTagName(currentTd, 'table')) {
             var ut = getUETable(currentTd);
             if (startTd != currentTd) {
                 me.document.body.style.webkitUserSelect = 'none';
@@ -23050,6 +23055,27 @@ UE.plugins['formatmatch'] = function(){
             return range.applyInlineStyle(list[list.length-1].tagName,null,list);
 
         }
+        function matchTds(isTd){
+            var tds = UE.UETable.getUETableBySelected(me).selectedTds,
+                range = new dom.Range(me.document);
+            for(var i = 0; i < tds.length; i++) {
+                var td = tds[i];
+                range.selectNode(td).select(true);
+                me.__hasEnterExecCommand = true;
+                var removeFormatAttributes = me.options.removeFormatAttributes;
+                me.options.removeFormatAttributes = '';
+                me.execCommand('removeformat');
+                me.options.removeFormatAttributes = removeFormatAttributes;
+                me.__hasEnterExecCommand = false;
+                //trace:969
+                range = me.selection.getRange();
+                if(list.length){
+                    addFormat(range);
+                }
+                range.select();
+                text && domUtils.remove(text);
+            }
+        }
 
         me.undoManger && me.undoManger.save();
 
@@ -23062,35 +23088,37 @@ UE.plugins['formatmatch'] = function(){
 
             img = null;
         }else{
-            if(!img){
-                var collapsed = range.collapsed;
-                if(collapsed){
-                    var text = me.document.createTextNode('match');
-                    range.insertNode(text).select();
+            if(!img) {
+                var isTd = UE.UETable.getUETableBySelected(me)
+                if(isTd){
+                    matchTds(isTd);
+                } else {
+                    var collapsed = range.collapsed;
+                    if(collapsed){
+                        var text = me.document.createTextNode('match');
+                        range.insertNode(text).select();
+                    }
+                    me.__hasEnterExecCommand = true;
+                    //不能把block上的属性干掉
+                    //trace:1553
+                    var removeFormatAttributes = me.options.removeFormatAttributes;
+                    me.options.removeFormatAttributes = '';
+                    me.execCommand('removeformat');
+                    me.options.removeFormatAttributes = removeFormatAttributes;
+                    me.__hasEnterExecCommand = false;
+                    //trace:969
+                    range = me.selection.getRange();
+                    if(list.length){
+                        addFormat(range);
+                    }
+                    if(text){
+                        range.setStartBefore(text).collapse(true);
 
-
+                    }
+                    range.select();
+                    text && domUtils.remove(text);
                 }
-                me.__hasEnterExecCommand = true;
-                //不能把block上的属性干掉
-                //trace:1553
-                var removeFormatAttributes = me.options.removeFormatAttributes;
-                me.options.removeFormatAttributes = '';
-                me.execCommand('removeformat');
-                me.options.removeFormatAttributes = removeFormatAttributes;
-                me.__hasEnterExecCommand = false;
-                //trace:969
-                range = me.selection.getRange();
-                if(list.length){
-                    addFormat(range);
-                }
-                if(text){
-                    range.setStartBefore(text).collapse(true);
-
-                }
-                range.select();
-                text && domUtils.remove(text);
             }
-
         }
 
 
