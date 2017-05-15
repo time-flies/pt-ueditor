@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri May 12 2017 17:00:40 GMT+0800 (CST)
+ * build: Mon May 15 2017 11:45:00 GMT+0800 (CST)
  */
 
 (function(){
@@ -52,7 +52,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        ie		:  /(msie\s|trident.*rv:)([\w.]+)/i.test(agent),
+        ie      :  /(msie\s|trident.*rv:)([\w.]+)/i.test(agent),
 
         /**
          * @property {boolean} opera 检测当前浏览器是否为Opera
@@ -63,7 +63,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        opera	: ( !!opera && opera.version ),
+        opera   : ( !!opera && opera.version ),
 
         /**
          * @property {boolean} webkit 检测当前浏览器是否是webkit内核的浏览器
@@ -74,7 +74,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        webkit	: ( agent.indexOf( ' applewebkit/' ) > -1 ),
+        webkit  : ( agent.indexOf( ' applewebkit/' ) > -1 ),
 
         /**
          * @property {boolean} mac 检测当前浏览器是否是运行在mac平台下
@@ -85,7 +85,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        mac	: ( agent.indexOf( 'macintosh' ) > -1 ),
+        mac : ( agent.indexOf( 'macintosh' ) > -1 ),
 
         /**
          * @property {boolean} quirks 检测当前浏览器是否处于“怪异模式”下
@@ -234,7 +234,7 @@ var browser = UE.browser = function(){
      * ```
      */
     if(/(\d+\.\d)?(?:\.\d)?\s+safari\/?(\d+\.\d+)?/i.test(agent) && !/chrome/i.test(agent)){
-    	browser.safari = + (RegExp['\x241'] || RegExp['\x242']);
+        browser.safari = + (RegExp['\x241'] || RegExp['\x242']);
     }
 
 
@@ -8380,21 +8380,21 @@ UE.ajax = function() {
          * } );
          * ```
          */
-		request:function(url, opts) {
+        request:function(url, opts) {
             if (opts && opts.dataType == 'jsonp') {
                 doJsonp(url, opts);
             } else {
                 doAjax(url, opts);
             }
-		},
+        },
         getJSONP:function(url, data, fn) {
             var opts = {
                 'data': data,
                 'oncomplete': fn
             };
             doJsonp(url, opts);
-		}
-	};
+        }
+    };
 
 
 }();
@@ -17543,7 +17543,7 @@ UE.plugins['autofloat'] = function() {
         docStyle.backgroundImage = 'url("about:blank")';
         docStyle.backgroundAttachment = 'fixed';
     }
-    var	bakCssText,
+    var bakCssText,
         placeHolder = document.createElement('div'),
         toolbarBox,orgTop,
         getPosition,
@@ -20813,10 +20813,15 @@ UE.plugins['table'] = function () {
                                 me._ignoreContentChange = true;
                                 result = oldExecCommand.apply(me, arguments);
                                 me._ignoreContentChange = false;
-
+                            }
+                            if(cmd !=='removeformat'){
+                                lastState = me.queryCommandState(cmd);
+                                lastValue = me.queryCommandValue(cmd);
                             }
                         }
                     }
+                    lastState = me.queryCommandState(cmd);
+                    lastValue = me.queryCommandValue(cmd);
                     range.setStart(tds[0], 0).shrinkBoundary(true).setCursor(false, true);
                     me.fireEvent('contentchange');
                     me.fireEvent("afterexeccommand", cmd);
@@ -20851,8 +20856,8 @@ UE.plugins['table'] = function () {
             return result;
         };
 
-
     });
+
     /**
      * 删除obj的宽高style，改成属性宽高
      * @param obj
@@ -23052,6 +23057,28 @@ UE.plugins['formatmatch'] = function(){
             return range.applyInlineStyle(list[list.length-1].tagName,null,list);
 
         }
+        //匹配到单元格
+        function matchTds(isTd){
+            var tds = UE.UETable.getUETableBySelected(me).selectedTds,
+                range = new dom.Range(me.document);
+            for(var i = 0; i < tds.length; i++) {
+                var td = tds[i];
+                range.selectNode(td).select(true);
+                me.__hasEnterExecCommand = true;
+                var removeFormatAttributes = me.options.removeFormatAttributes;
+                me.options.removeFormatAttributes = '';
+                me.execCommand('removeformat');
+                me.options.removeFormatAttributes = removeFormatAttributes;
+                me.__hasEnterExecCommand = false;
+                
+                range = me.selection.getRange();
+                if(list.length){
+                    addFormat(range);
+                }
+                range.select();
+                text && domUtils.remove(text);
+            }
+        }
 
         me.undoManger && me.undoManger.save();
 
@@ -23064,35 +23091,37 @@ UE.plugins['formatmatch'] = function(){
 
             img = null;
         }else{
-            if(!img){
-                var collapsed = range.collapsed;
-                if(collapsed){
-                    var text = me.document.createTextNode('match');
-                    range.insertNode(text).select();
+            if(!img) {
+                var isTd = UE.UETable.getUETableBySelected(me)
+                if(isTd){
+                    matchTds(isTd);
+                } else {
+                    var collapsed = range.collapsed;
+                    if(collapsed){
+                        var text = me.document.createTextNode('match');
+                        range.insertNode(text).select();
+                    }
+                    me.__hasEnterExecCommand = true;
+                    //不能把block上的属性干掉
+                    //trace:1553
+                    var removeFormatAttributes = me.options.removeFormatAttributes;
+                    me.options.removeFormatAttributes = '';
+                    me.execCommand('removeformat');
+                    me.options.removeFormatAttributes = removeFormatAttributes;
+                    me.__hasEnterExecCommand = false;
+                    //trace:969
+                    range = me.selection.getRange();
+                    if(list.length){
+                        addFormat(range);
+                    }
+                    if(text){
+                        range.setStartBefore(text).collapse(true);
 
-
+                    }
+                    range.select();
+                    text && domUtils.remove(text);
                 }
-                me.__hasEnterExecCommand = true;
-                //不能把block上的属性干掉
-                //trace:1553
-                var removeFormatAttributes = me.options.removeFormatAttributes;
-                me.options.removeFormatAttributes = '';
-                me.execCommand('removeformat');
-                me.options.removeFormatAttributes = removeFormatAttributes;
-                me.__hasEnterExecCommand = false;
-                //trace:969
-                range = me.selection.getRange();
-                if(list.length){
-                    addFormat(range);
-                }
-                if(text){
-                    range.setStartBefore(text).collapse(true);
-
-                }
-                range.select();
-                text && domUtils.remove(text);
             }
-
         }
 
 
@@ -23112,9 +23141,6 @@ UE.plugins['formatmatch'] = function(){
                  me.removeListener('mouseup',addList);
                 return;
             }
-
-
-              
             var range = me.selection.getRange();
             img = range.getClosedNode();
             if(!img || img.tagName != 'IMG'){
