@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Mon May 15 2017 11:45:00 GMT+0800 (CST)
+ * build: Tue May 16 2017 09:22:21 GMT+0800 (CST)
  */
 
 (function(){
@@ -52,7 +52,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        ie      :  /(msie\s|trident.*rv:)([\w.]+)/i.test(agent),
+        ie		:  /(msie\s|trident.*rv:)([\w.]+)/i.test(agent),
 
         /**
          * @property {boolean} opera 检测当前浏览器是否为Opera
@@ -63,7 +63,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        opera   : ( !!opera && opera.version ),
+        opera	: ( !!opera && opera.version ),
 
         /**
          * @property {boolean} webkit 检测当前浏览器是否是webkit内核的浏览器
@@ -74,7 +74,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        webkit  : ( agent.indexOf( ' applewebkit/' ) > -1 ),
+        webkit	: ( agent.indexOf( ' applewebkit/' ) > -1 ),
 
         /**
          * @property {boolean} mac 检测当前浏览器是否是运行在mac平台下
@@ -85,7 +85,7 @@ var browser = UE.browser = function(){
          * }
          * ```
          */
-        mac : ( agent.indexOf( 'macintosh' ) > -1 ),
+        mac	: ( agent.indexOf( 'macintosh' ) > -1 ),
 
         /**
          * @property {boolean} quirks 检测当前浏览器是否处于“怪异模式”下
@@ -234,7 +234,7 @@ var browser = UE.browser = function(){
      * ```
      */
     if(/(\d+\.\d)?(?:\.\d)?\s+safari\/?(\d+\.\d+)?/i.test(agent) && !/chrome/i.test(agent)){
-        browser.safari = + (RegExp['\x241'] || RegExp['\x242']);
+    	browser.safari = + (RegExp['\x241'] || RegExp['\x242']);
     }
 
 
@@ -8380,21 +8380,21 @@ UE.ajax = function() {
          * } );
          * ```
          */
-        request:function(url, opts) {
+		request:function(url, opts) {
             if (opts && opts.dataType == 'jsonp') {
                 doJsonp(url, opts);
             } else {
                 doAjax(url, opts);
             }
-        },
+		},
         getJSONP:function(url, data, fn) {
             var opts = {
                 'data': data,
                 'oncomplete': fn
             };
             doJsonp(url, opts);
-        }
-    };
+		}
+	};
 
 
 }();
@@ -10160,7 +10160,6 @@ UE.plugins['defaultfilter'] = function () {
                                 '_href': ''
                             })
                         }
-                        break;
                         break;
                     case 'span':
                         val = node.getAttr('id');
@@ -17543,7 +17542,7 @@ UE.plugins['autofloat'] = function() {
         docStyle.backgroundImage = 'url("about:blank")';
         docStyle.backgroundAttachment = 'fixed';
     }
-    var bakCssText,
+    var	bakCssText,
         placeHolder = document.createElement('div'),
         toolbarBox,orgTop,
         getPosition,
@@ -19503,6 +19502,26 @@ UE.plugins['video'] = function (){
             if (table.getAttribute("interlaced") === "enabled")this.fireEvent("interlacetable", table);
         }
     };
+ UE.commands["insertrowtolast"] = {
+        queryCommandState: function () {
+            var tableItems = getTableItemsByRange(this),
+                cell = tableItems.cell;
+            return cell && (cell.tagName == "TD") && getUETable(tableItems.table).rowsNum < this.options.maxRowNum ? 0 : -1;
+        },
+        execCommand: function () {
+            var rng = this.selection.getRange(),
+                bk = rng.createBookmark(true);
+            var cell = getTableItemsByRange(this).cell,
+                ut = getUETable(cell),
+                table = ut.table,
+                newCell = ut.getLastCell(),
+                cellInfo = ut.getCellInfo(newCell);
+            ut.insertRow(cellInfo.rowIndex + cellInfo.rowSpan, newCell);  
+            rng.moveToBookmark(bk).select();
+            if (table.getAttribute("interlaced") === "enabled")this.fireEvent("interlacetable", table);
+        }
+    };
+    
     UE.commands["deleterow"] = {
         queryCommandState: function () {
             var tableItems = getTableItemsByRange(this);
@@ -19589,6 +19608,25 @@ UE.plugins['video'] = function (){
                     ut.insertCol(range.endColIndex + 1, cell);
                 }
             }
+            rng.moveToBookmark(bk).select();
+        }
+    };
+
+    UE.commands["insertcoltolast"] = {
+        queryCommandState: function () {
+            var tableItems = getTableItemsByRange(this),
+                cell = tableItems.cell;
+            return cell && getUETable(tableItems.table).colsNum < this.options.maxColNum ? 0 : -1;
+        },
+        execCommand: function () {
+            var rng = this.selection.getRange(),
+                bk = rng.createBookmark(true);
+            var cell = getTableItemsByRange(this).cell,
+                ut = getUETable(cell),
+                newCell = ut.getLastCell();
+                cellInfo = ut.getCellInfo(newCell);
+            var range = ut.cellsRange;
+            ut.insertCol(cellInfo.colIndex + cellInfo.colSpan, newCell);
             rng.moveToBookmark(bk).select();
         }
     };
@@ -20149,6 +20187,8 @@ UE.plugins['table'] = function () {
         "mergecells": 1,
         "insertrow": 1,
         "insertrownext": 1,
+        "insertcoltolast": 1,
+        "insertrowtolast":1,
         "deleterow": 1,
         "insertcol": 1,
         "insertcolnext": 1,
@@ -22352,14 +22392,6 @@ UE.plugins['contextmenu'] = function () {
                 },
                     '-',
                 {
-                    label: lang.splittorows,
-                    cmdName: 'splittorows'
-                },
-                {
-                    label: lang.splittocols,
-                    cmdName: 'splittocols'
-                },
-                {
                     label: lang.splittocells,
                     cmdName: 'splittocells'
                 },
@@ -22398,6 +22430,22 @@ UE.plugins['contextmenu'] = function () {
                     cmdName: 'setbordervisible'
                 }
                 ]
+            },
+            {
+                label: "追加行",
+                cmdName: 'insertrowtolast'
+            },
+            {
+                label: "追加列",
+                cmdName: 'insertcoltolast'
+            },
+            {
+                label: lang.splittorows,
+                cmdName: 'splittorows'
+            },
+            {
+                label: lang.splittocols,
+                cmdName: 'splittocols'
             },
             {
                 group: lang.tablesort,
@@ -23399,9 +23447,6 @@ UE.plugin.register('searchreplace',function(){
             }
         }
     }
-     me.addshortcutkey({
-         "searchreplace" : "ctrl+80"
-    });
 });
 
 // plugins/customstyle.js
