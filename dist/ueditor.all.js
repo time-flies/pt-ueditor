@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Tue May 16 2017 09:22:21 GMT+0800 (CST)
+ * build: Tue May 16 2017 16:58:32 GMT+0800 (CST)
  */
 
 (function(){
@@ -15588,6 +15588,8 @@ UE.plugins['list'] = function () {
                             first.innerHTML = '';
                             domUtils.fillNode(me.document, first);
                         }
+                        // 处理list到最底部时,按回车键页面不滚动到光标处
+                        this.body.scrollTop = this.body.scrollTop + first.offsetHeight + 5;
 
                         range.setStart(first, 0).collapse(true).shrinkBoundary().select();
                         domUtils.remove(span);
