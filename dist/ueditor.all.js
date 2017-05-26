@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Tue May 16 2017 16:58:32 GMT+0800 (CST)
+ * build: Fri May 26 2017 11:09:53 GMT+0800 (CST)
  */
 
 (function(){
@@ -6551,25 +6551,25 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             //不要产生多个textarea
             editor.textarea = textarea;
         }
-        !textarea.getAttribute('name') && textarea.setAttribute('name', editor.options.textarea );
+        !textarea.getAttribute('name') && textarea.setAttribute('name', editor.options.textarea);
         textarea.value = editor.hasContents() ?
             (editor.options.allHtmlEnabled ? editor.getAllHtml() : editor.getContent(null, null, true)) :
             ''
     }
-    function loadPlugins(me){
+    function loadPlugins(me) {
         //初始化插件
         for (var pi in UE.plugins) {
             UE.plugins[pi].call(me);
         }
 
     }
-    function checkCurLang(I18N){
-        for(var lang in I18N){
+    function checkCurLang(I18N) {
+        for (var lang in I18N) {
             return lang
         }
     }
 
-    function langReadied(me){
+    function langReadied(me) {
         me.langIsReady = true;
 
         me.fireEvent("langReady");
@@ -6740,13 +6740,13 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         /* 尝试异步加载后台配置 */
         me.loadServerConfig();
 
-        if(!utils.isEmptyObject(UE.I18N)){
+        if (!utils.isEmptyObject(UE.I18N)) {
             //修改默认的语言类型
             me.options.lang = checkCurLang(UE.I18N);
             UE.plugin.load(me);
             langReadied(me);
 
-        }else{
+        } else {
             utils.loadFile(document, {
                 src: me.options.langPath + me.options.lang + "/" + me.options.lang + ".js",
                 tag: "script",
@@ -6761,9 +6761,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         UE.instants['ueditorInstant' + me.uid] = me;
     };
     Editor.prototype = {
-         registerCommand : function(name,obj){
+        registerCommand: function (name, obj) {
             this.commands[name] = obj;
-         },
+        },
         /**
          * 编辑器对外提供的监听ready事件的接口， 通过调用该方法，达到的效果与监听ready事件是一致的
          * @method ready
@@ -6820,7 +6820,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
             utils.extend(this.options, obj, true);
         },
-        getOpt:function(key){
+        getOpt: function (key) {
             return this.options[key]
         },
         /**
@@ -6837,17 +6837,19 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             me.fireEvent('destroy');
             var container = me.container.parentNode;
             var textarea = me.textarea;
+            // weknow patch begin
             if (!textarea) {
-                textarea = document.createElement('textarea');
-                container.parentNode.insertBefore(textarea, container);
+                // textarea = document.createElement('textarea');
+                // container.parentNode.insertBefore(textarea, container);
             } else {
-                textarea.style.display = ''
+                textarea.style.display = '';
+                textarea.style.width = me.iframe.offsetWidth + 'px';
+                textarea.style.height = me.iframe.offsetHeight + 'px';
+                textarea.value = me.getContent();
+                textarea.id = me.key;
             }
+            // weknow patch end
 
-            textarea.style.width = me.iframe.offsetWidth + 'px';
-            textarea.style.height = me.iframe.offsetHeight + 'px';
-            textarea.value = me.getContent();
-            textarea.id = me.key;
             container.innerHTML = '';
             domUtils.remove(container);
             var key = me.key;
@@ -6878,32 +6880,32 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         render: function (container) {
             var me = this,
                 options = me.options,
-                getStyleValue=function(attr){
-                    return parseInt(domUtils.getComputedStyle(container,attr));
+                getStyleValue = function (attr) {
+                    return parseInt(domUtils.getComputedStyle(container, attr));
                 };
             if (utils.isString(container)) {
                 container = document.getElementById(container);
             }
             if (container) {
-                if(options.initialFrameWidth){
+                if (options.initialFrameWidth) {
                     options.minFrameWidth = options.initialFrameWidth
-                }else{
+                } else {
                     options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
                 }
-                if(options.initialFrameHeight){
+                if (options.initialFrameHeight) {
                     options.minFrameHeight = options.initialFrameHeight
-                }else{
+                } else {
                     options.initialFrameHeight = options.minFrameHeight = container.offsetHeight;
                 }
 
-                container.style.width = /%$/.test(options.initialFrameWidth) ?  '100%' : options.initialFrameWidth-
-                    getStyleValue("padding-left")- getStyleValue("padding-right") +'px';
-                container.style.height = /%$/.test(options.initialFrameHeight) ?  '100%' : options.initialFrameHeight -
-                    getStyleValue("padding-top")- getStyleValue("padding-bottom") +'px';
+                container.style.width = /%$/.test(options.initialFrameWidth) ? '100%' : options.initialFrameWidth -
+                    getStyleValue("padding-left") - getStyleValue("padding-right") + 'px';
+                container.style.height = /%$/.test(options.initialFrameHeight) ? '100%' : options.initialFrameHeight -
+                    getStyleValue("padding-top") - getStyleValue("padding-bottom") + 'px';
 
                 container.style.zIndex = options.zIndex;
 
-                var html = ( ie && browser.version < 9  ? '' : '<!DOCTYPE html>') +
+                var html = (ie && browser.version < 9 ? '' : '<!DOCTYPE html>') +
                     '<html xmlns=\'http://www.w3.org/1999/xhtml\' class=\'view\' >' +
                     '<head>' +
                     '<style type=\'text/css\'>' +
@@ -6914,15 +6916,15 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     'body{margin:8px;font-family:sans-serif;font-size:16px;}' +
                     //设置段落间距
                     'p{margin:5px 0;}</style>' +
-                    (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
+                    (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '') +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
                     '</head>' +
                     '<body class=\'view\' ></body>' +
-                    '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
+                    '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '') + ' id=\'_initialScript\'>' +
                     'setTimeout(function(){editor = window.parent.UE.instants[\'ueditorInstant' + me.uid + '\'];editor._setup(document);},0);' +
                     'var _tmpScript = document.getElementById(\'_initialScript\');_tmpScript.parentNode.removeChild(_tmpScript);' +
                     '</script>' +
-                    (options.iframeJsUrl ? ('<script type=\'text/javascript\' src=\'' + utils.unhtml(options.iframeJsUrl) + '\'></script>'):'') +
+                    (options.iframeJsUrl ? ('<script type=\'text/javascript\' src=\'' + utils.unhtml(options.iframeJsUrl) + '\'></script>') : '') +
                     '</html>';
 
                 container.appendChild(domUtils.createElement(document, 'iframe', {
@@ -6931,19 +6933,19 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     height: "100%",
                     frameborder: "0",
                     //先注释掉了，加的原因忘记了，但开启会直接导致全屏模式下内容多时不会出现滚动条
-//                    scrolling :'no',
-                    src: 'javascript:void(function(){document.open();' + (options.customDomain && document.domain != location.hostname ?  'document.domain="' + document.domain + '";' : '') +
-                        'document.write("' + html + '");document.close();}())'
+                    //                    scrolling :'no',
+                    src: 'javascript:void(function(){document.open();' + (options.customDomain && document.domain != location.hostname ? 'document.domain="' + document.domain + '";' : '') +
+                    'document.write("' + html + '");document.close();}())'
                 }));
                 container.style.overflow = 'hidden';
                 //解决如果是给定的百分比，会导致高度算不对的问题
-                setTimeout(function(){
-                    if( /%$/.test(options.initialFrameWidth)){
+                setTimeout(function () {
+                    if (/%$/.test(options.initialFrameWidth)) {
                         options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
                         //如果这里给定宽度，会导致ie在拖动窗口大小时，编辑区域不随着变化
-//                        container.style.width = options.initialFrameWidth + 'px';
+                        //                        container.style.width = options.initialFrameWidth + 'px';
                     }
-                    if(/%$/.test(options.initialFrameHeight)){
+                    if (/%$/.test(options.initialFrameHeight)) {
                         options.minFrameHeight = options.initialFrameHeight = container.offsetHeight;
                         container.style.height = options.initialFrameHeight + 'px';
                     }
@@ -6984,11 +6986,11 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             for (var form = this.iframe.parentNode; !domUtils.isBody(form); form = form.parentNode) {
                 if (form.tagName == 'FORM') {
                     me.form = form;
-                    if(me.options.autoSyncData){
-                        domUtils.on(me.window,'blur',function(){
-                            setValue(form,me);
+                    if (me.options.autoSyncData) {
+                        domUtils.on(me.window, 'blur', function () {
+                            setValue(form, me);
                         });
-                    }else{
+                    } else {
                         domUtils.on(form, 'submit', function () {
                             setValue(this, me);
                         });
@@ -7119,7 +7121,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * editor.setHeight(number);
          * ```
          */
-        setHeight: function (height,notSetHeight) {
+        setHeight: function (height, notSetHeight) {
             if (height !== parseInt(this.iframe.parentNode.style.height)) {
                 this.iframe.parentNode.style.height = height + 'px';
             }
@@ -7176,13 +7178,13 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                         ti = ti.split(':');
                         var key = ti[0], param = ti[1];
                         if (/^(ctrl)(\+shift)?\+(\d+)$/.test(key.toLowerCase()) || /^(\d+)$/.test(key)) {
-                            if (( (RegExp.$1 == 'ctrl' ? (e.ctrlKey || e.metaKey) : 0)
+                            if (((RegExp.$1 == 'ctrl' ? (e.ctrlKey || e.metaKey) : 0)
                                 && (RegExp.$2 != "" ? e[RegExp.$2.slice(1) + "Key"] : 1)
                                 && keyCode == RegExp.$3
-                                ) ||
+                            ) ||
                                 keyCode == RegExp.$1
-                                ) {
-                                if (me.queryCommandState(i,param) != -1)
+                            ) {
+                                if (me.queryCommandState(i, param) != -1)
                                     me.execCommand(i, param);
                                 domUtils.preventDefault(e);
                             }
@@ -7223,7 +7225,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * } );
          * ```
          */
-        getContent: function (cmd, fn,notSetCursor,ignoreBlank,formatter) {
+        getContent: function (cmd, fn, notSetCursor, ignoreBlank, formatter) {
             var me = this;
             if (cmd && utils.isFunction(cmd)) {
                 fn = cmd;
@@ -7233,10 +7235,10 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 return '';
             }
             me.fireEvent('beforegetcontent');
-            var root = UE.htmlparser(me.body.innerHTML,ignoreBlank);
+            var root = UE.htmlparser(me.body.innerHTML, ignoreBlank);
             me.filterOutputRule(root);
-            me.fireEvent('aftergetcontent', cmd,root);
-            return  root.toHtml(formatter);
+            me.fireEvent('aftergetcontent', cmd, root);
+            return root.toHtml(formatter);
         },
 
         /**
@@ -7256,7 +7258,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             if (browser.ie && browser.version > 8) {
                 var headHtmlForIE9 = '';
                 utils.each(me.document.styleSheets, function (si) {
-                    headHtmlForIE9 += ( si.href ? '<link rel="stylesheet" type="text/css" href="' + si.href + '" />' : '<style>' + si.cssText + '</style>');
+                    headHtmlForIE9 += (si.href ? '<link rel="stylesheet" type="text/css" href="' + si.href + '" />' : '<style>' + si.cssText + '</style>');
                 });
                 utils.each(me.document.getElementsByTagName('script'), function (si) {
                     headHtmlForIE9 += si.outerHTML;
@@ -7343,8 +7345,8 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             me.body.innerHTML = (isAppendTo ? me.body.innerHTML : '') + html;
 
 
-            function isCdataDiv(node){
-                return  node.tagName == 'DIV' && node.getAttribute('cdata_tag');
+            function isCdataDiv(node) {
+                return node.tagName == 'DIV' && node.getAttribute('cdata_tag');
             }
             //给文本或者inline节点套p标签
             if (me.options.enterTag == 'p') {
@@ -7353,7 +7355,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 if (!child || child.nodeType == 1 &&
                     (dtd.$cdata[child.tagName] || isCdataDiv(child) ||
                         domUtils.isCustomeNode(child)
-                        )
+                    )
                     && child === this.body.lastChild) {
                     this.body.innerHTML = '<p>' + (browser.ie ? '&nbsp;' : '<br/>') + '</p>' + this.body.innerHTML;
 
@@ -7389,8 +7391,8 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             if (browser.gecko && (geckoSel = this.selection.getNative())) {
                 geckoSel.removeAllRanges();
             }
-            if(me.options.autoSyncData){
-                me.form && setValue(me.form,me);
+            if (me.options.autoSyncData) {
+                me.form && setValue(me.form, me);
             }
         },
 
@@ -7418,20 +7420,20 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     rng = me.selection.getRange();
                 if (toEnd) {
                     var node = me.body.lastChild;
-                    if(node && node.nodeType == 1 && !dtd.$empty[node.tagName]){
-                        if(domUtils.isEmptyBlock(node)){
+                    if (node && node.nodeType == 1 && !dtd.$empty[node.tagName]) {
+                        if (domUtils.isEmptyBlock(node)) {
                             rng.setStartAtFirst(node)
-                        }else{
+                        } else {
                             rng.setStartAtLast(node)
                         }
                         rng.collapse(true);
                     }
                     rng.setCursor(true);
                 } else {
-                    if(!rng.collapsed && domUtils.isBody(rng.startContainer) && rng.startOffset == 0){
+                    if (!rng.collapsed && domUtils.isBody(rng.startContainer) && rng.startOffset == 0) {
 
                         var node = me.body.firstChild;
-                        if(node && node.nodeType == 1 && !dtd.$empty[node.tagName]){
+                        if (node && node.nodeType == 1 && !dtd.$empty[node.tagName]) {
                             rng.setStartAtFirst(node).collapse(true);
                         }
                     }
@@ -7444,18 +7446,18 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
 
         },
-        isFocus:function(){
+        isFocus: function () {
             return this.selection.isFocus();
         },
-        blur:function(){
+        blur: function () {
             var sel = this.selection.getNative();
-            if(sel.empty && browser.ie){
+            if (sel.empty && browser.ie) {
                 var nativeRng = document.body.createTextRange();
                 nativeRng.moveToElementText(document.body);
                 nativeRng.collapse(true);
                 nativeRng.select();
                 sel.empty()
-            }else{
+            } else {
                 sel.removeAllRanges()
             }
 
@@ -7473,9 +7475,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             me._proxyDomEvent = utils.bind(me._proxyDomEvent, me);
             domUtils.on(doc, ['click', 'contextmenu', 'mousedown', 'keydown', 'keyup', 'keypress', 'mouseup', 'mouseover', 'mouseout', 'selectstart'], me._proxyDomEvent);
             domUtils.on(win, ['focus', 'blur'], me._proxyDomEvent);
-            domUtils.on(me.body,'drop',function(e){
+            domUtils.on(me.body, 'drop', function (e) {
                 //阻止ff下默认的弹出新页面打开图片
-                if(browser.gecko && e.stopPropagation) { e.stopPropagation(); }
+                if (browser.gecko && e.stopPropagation) { e.stopPropagation(); }
                 me.fireEvent('contentchange')
             });
             domUtils.on(doc, ['mouseup', 'keydown'], function (evt) {
@@ -7483,7 +7485,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 if (evt.type == 'keydown' && (evt.ctrlKey || evt.metaKey || evt.shiftKey || evt.altKey)) {
                     return;
                 }
-                if (evt.button == 2)return;
+                if (evt.button == 2) return;
                 me._selectionChange(250, evt);
             });
         },
@@ -7495,10 +7497,10 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * @see UE.EventBase:fireEvent(String)
          */
         _proxyDomEvent: function (evt) {
-            if(this.fireEvent('before' + evt.type.replace(/^on/, '').toLowerCase()) === false){
+            if (this.fireEvent('before' + evt.type.replace(/^on/, '').toLowerCase()) === false) {
                 return false;
             }
-            if(this.fireEvent(evt.type.replace(/^on/, ''), evt) === false){
+            if (this.fireEvent(evt.type.replace(/^on/, ''), evt) === false) {
                 return false;
             }
             return this.fireEvent('after' + evt.type.replace(/^on/, '').toLowerCase())
@@ -7511,9 +7513,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         _selectionChange: function (delay, evt) {
             var me = this;
             //有光标才做selectionchange 为了解决未focus时点击source不能触发更改工具栏状态的问题（source命令notNeedUndo=1）
-//            if ( !me.selection.isFocus() ){
-//                return;
-//            }
+            //            if ( !me.selection.isFocus() ){
+            //                return;
+            //            }
 
 
             var hackForMouseUp = false;
@@ -7605,12 +7607,12 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
             if (!cmd.notNeedUndo && !me.__hasEnterExecCommand) {
                 me.__hasEnterExecCommand = true;
-                if (me.queryCommandState.apply(me,arguments) != -1) {
+                if (me.queryCommandState.apply(me, arguments) != -1) {
                     me.fireEvent('saveScene');
                     me.fireEvent.apply(me, ['beforeexeccommand', cmdName].concat(arguments));
                     result = this._callCmdFn('execCommand', arguments);
                     //保存场景时，做了内容对比，再看是否进行contentchange触发，这里多触发了一次，去掉
-//                    (!cmd.ignoreContentChange && !me._ignoreContentChange) && me.fireEvent('contentchange');
+                    //                    (!cmd.ignoreContentChange && !me._ignoreContentChange) && me.fireEvent('contentchange');
                     me.fireEvent.apply(me, ['afterexeccommand', cmdName].concat(arguments));
                     me.fireEvent('saveScene');
                 }
@@ -7893,7 +7895,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             path = (path || "").split(".");
             for (var i = 0, ci; ci = path[i++];) {
                 lang = lang[ci];
-                if (!lang)break;
+                if (!lang) break;
             }
             return lang;
         },
@@ -7920,9 +7922,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * ```
          */
         getContentLength: function (ingoneHtml, tagNames) {
-            var count = this.getContent(false,false,true).length;
+            var count = this.getContent(false, false, true).length;
             if (ingoneHtml) {
-                tagNames = (tagNames || []).concat([ 'hr', 'img', 'iframe']);
+                tagNames = (tagNames || []).concat(['hr', 'img', 'iframe']);
                 count = this.getContentTxt().replace(/[\t\r\n]+/g, '').length;
                 for (var i = 0, ci; ci = tagNames[i++];) {
                     count += this.document.getElementsByTagName(ci).length;
@@ -8012,17 +8014,17 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * editor.getActionUrl('imageManager'); //返回 "/ueditor/php/controller.php?action=listimage"
          * ```
          */
-        getActionUrl: function(action){
+        getActionUrl: function (action) {
             var actionName = this.getOpt(action) || action,
                 imageUrl = this.getOpt('imageUrl'),
                 serverUrl = this.getOpt('serverUrl');
 
-            if(!serverUrl && imageUrl) {
+            if (!serverUrl && imageUrl) {
                 serverUrl = imageUrl.replace(/^(.*[\/]).+([\.].+)$/, '$1controller$2');
             }
 
-            if(serverUrl) {
-                serverUrl = serverUrl + (serverUrl.indexOf('?') == -1 ? '?':'&') + 'action=' + (actionName || '');
+            if (serverUrl) {
+                serverUrl = serverUrl + (serverUrl.indexOf('?') == -1 ? '?' : '&') + 'action=' + (actionName || '');
                 return utils.formatUrl(serverUrl);
             } else {
                 return '';
@@ -10245,6 +10247,11 @@ UE.commands['inserthtml'] = {
             return;
         }
         range = me.selection.getRange();
+        // 插入子文件时,防止其插入到其他子文件中导致UI错误
+        if(range.startContainer.tagName === 'XNODE') {
+            range.startContainer = range.startContainer.parentElement;
+            range.endContainer = range.endContainer.parentElement;
+        }
         div = range.document.createElement( 'div' );
         div.style.display = 'inline';
 
