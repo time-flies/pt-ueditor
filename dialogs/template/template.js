@@ -23,8 +23,7 @@
         currentTmp = tmp;
         clearItem();
         domUtils.setStyles( preitem.childNodes[n - 1], {
-            "background-color":"lemonChiffon",
-            "border":"#ccc 1px solid"
+            "background-image": "-webkit-linear-gradient(-360deg, #73bcff, #e5f3ff)",
         } );
         preview.innerHTML = tmp.preHtml ? tmp.preHtml : "";
     };
@@ -32,8 +31,7 @@
         var items = preitem.children;
         for ( var i = 0, item; item = items[i++]; ) {
             domUtils.setStyles( item, {
-                "background-color":"",
-                "border":"white 1px solid"
+                "background-image":"",
             } );
         }
     };
@@ -51,3 +49,16 @@
     pre(2)
 
 })();
+
+function save(){
+   var box = document.getElementsByClassName('radiobox')[0];
+   var className = box.className;
+   var ipt = document.getElementById('issave');
+   if (className.indexOf('checked') !== -1 ) {
+       box.className = 'radiobox';
+       ipt.checked = false;
+   } else {
+       box.className = 'radiobox checked';
+       ipt.checked = true;
+   }
+}

@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri May 26 2017 11:09:53 GMT+0800 (CST)
+ * build: Fri Jun 02 2017 16:34:05 GMT+0800 (CST)
  */
 
 (function(){
@@ -6913,9 +6913,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '.view{padding:0;word-wrap:break-word;cursor:text;height:90%;}\n' +
                     //设置默认字体和字号
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
-                    'body{margin:8px;font-family:sans-serif;font-size:16px;}' +
+                    'body{margin:8px;font-family:arial;font-size:16px;}' +
                     //设置段落间距
-                    'p{margin:5px 0;}</style>' +
+                    'p{margin:7px 0;}</style>' +
                     (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '') +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
                     '</head>' +

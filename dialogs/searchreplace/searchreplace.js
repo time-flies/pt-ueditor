@@ -72,14 +72,26 @@ $G("nextFindBtn").onclick = function (txt, dir, mcase) {
         dir:1,
         casesensitive:getMatchCase("matchCase")
     };
-    if (!frCommond(obj)) {
+};
+$G("findAllBtn").onclick = function (txt, dir, mcase){
+    var findtxt = $G("findtxt1").value, obj;
+    if(!findtxt) {
+        return false;
+    }
+    obj = {
+        searchStr: findtxt,
+        dir: 1,
+        casesensitive:getMatchCase("matchCase"),
+        all: true
+    };
+    if(!frCommond(obj)) {
         var bk = editor.selection.getRange().createBookmark();
         $G('search-msg').innerHTML = lang.getEnd;
         editor.selection.getRange().moveToBookmark(bk).select();
-
-
     }
-};
+
+
+}
 $G("nextReplaceBtn").onclick = function (txt, dir, mcase) {
     var findtxt = $G("findtxt1").value, obj;
     if (!findtxt) {
@@ -106,6 +118,7 @@ $G("preFindBtn").onclick = function (txt, dir, mcase) {
         $G('search-msg').innerHTML = lang.getStart;
     }
 };
+
 $G("preReplaceBtn").onclick = function (txt, dir, mcase) {
     var findtxt = $G("findtxt1").value, obj;
     if (!findtxt) {
