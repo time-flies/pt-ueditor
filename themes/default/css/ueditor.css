@@ -1424,8 +1424,8 @@ div.edui-box {
 
 /*template-dialog*/
 .edui-default .edui-for-template .edui-dialog-content {
-    width: 630px;
-    height: 390px;
+    width: 780px;
+    height: 495px;
     overflow: hidden;
 }
 
