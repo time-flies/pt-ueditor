@@ -55,10 +55,14 @@
                 <div class="input-box">
                     <label>
                             <var id="lang_search2"></var>
-                            <input id="findtxt1" type="text" class="int"  />
-                        </label>
-                    <button id="preReplaceBtn"></button>
-                    <button id="nextReplaceBtn"></button>
+                            <div class=find-input-box>
+                                <input id="findtxt1" type="text" class="find-input"  />
+                            </div>
+                    </label>
+                    <div class="btn-box">
+                        <button id="preReplaceBtn"></button>
+                        <button id="nextReplaceBtn"></button>
+                    </div>
                 </div>
                 <div class="input-box">
                     <label>
@@ -70,18 +74,13 @@
                 <div style="display: none;">
                     <input id="matchCase1" type="checkbox" />
                 </div>
-
-
-                <input id="repalceBtn" class="btn btn-default" type="button" /><input id="repalceAllBtn" class="btn btn-primary" type="button" />
+                <input id="repalceBtn" class="btn btn-default" type="button" /><input id="repalceAllBtn" class="btn btn-primary"
+                        type="button" />
                 <input style="display:none;" id='findAllBtn' class='btn' type="button" />
-
-
                 <div class='msg'>
                     <span id="search-msg" style="color:red"></span>
                     <span id="replace-msg" style="color:red"></span>
                 </div>
-
-
             </div>
         </div>
     </div>
