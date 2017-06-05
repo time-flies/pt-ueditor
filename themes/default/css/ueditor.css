@@ -1252,7 +1252,7 @@ div.edui-box {
 }
 
 .edui-default .edui-dialog-foot {
-    background-color: white;
+    background-color: #fcfbfe;
 }
 
 .edui-default .edui-dialog-titlebar {
@@ -1327,6 +1327,9 @@ div.edui-box {
     -webkit-user-select: none;
     user-select: none;
     position: absolute;
+}
+.edui-default .edui-dialog-foot .edui-dialog-buttons .edui-label{
+    line-height: 30px;
 }
 .edui-default .edui-dialog-foot .edui-dialog-buttons .edui-okbutton{
     border-color: #0781f5 !important;
@@ -1519,9 +1522,9 @@ div.edui-box {
 
 /*edittable-dialog*/
 .edui-default .edui-for-edittable .edui-dialog-content {
-    width: 540px;
+    width: 690px;
     _width:590px;
-    height: 335px;
+    height: 385px;
 }
 
 /*edittip-dialog*/

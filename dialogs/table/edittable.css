@@ -1,13 +1,15 @@
 body{
     overflow: hidden;
-    width: 540px;
+    width: 690px;
+    background: #fcfbfe;
 }
 .wrapper {
-    margin: 10px auto 0;
-    font-size: 12px;
-    overflow: hidden;
-    width: 520px;
-    height: 315px;
+    height: 385px;
+    width: 690px;
+    background: #fcfbfe;
+    padding: 30px 30px 0 30px;
+    box-sizing: border-box;
+    font-family: -apple-system ,Arial, Helvetica, sans-serif;
 }
 
 .clear {
@@ -16,27 +18,26 @@ body{
 
 .wrapper .left {
     float: left;
-    margin-left: 10px;;
+    width: 370px;
+    height: 100%;
 }
 
 .wrapper .right {
     float: right;
-    border-left: 2px dotted #EDEDED;
-    padding-left: 15px;
+    height: 100%;
+    width: 260px; 
 }
 
 .section {
-    margin-bottom: 15px;
-    width: 240px;
-    /*overflow: hidden;*/
+    margin-bottom: 30px;
+    width: 100%;
 }
 
 .section h3 {
-    font-weight: bold;
-    padding: 5px 0;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #EDEDED;
-    font-size: 12px;
+    font-weight: normal;
+    font-size: 16px;
+    margin-bottom: 18px;
+    color: #999;
 }
 
 .section ul {
@@ -48,11 +49,48 @@ body{
 
 .section li {
     float: left;
-    width: 120px;;
+    width: 160px;
+    font-size: 15px;
+    color: #333;
+    height: 22px;
+    line-height: 22px;
+    margin-bottom: 10px;
 }
-
+.section li .checkbox,
+.section li .radio{
+    height: 19px;
+    width: 19px;
+    border: 1px #cdcdcd solid;
+    outline: none;
+    vertical-align: middle;
+    margin-right: 5px;
+    display: inline-block;
+    border-radius: 4px;
+    margin-top: -4px;
+}
+.section li .radio{
+    border-radius: 50%;
+}
+.section li .checkbox.active{
+    background: url(./img/1.png);
+    background-size: cover;
+    border: 1px solid #157efb;
+}
+.section li .radio.active{
+    background: url(./img/4.png);
+    background-size: cover;
+    border: 1px solid #157efb;
+}
 .section .tone {
-    width: 80px;;
+    margin-left: 10px;
+    width: 110px;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    box-sizing: border-box;
+    padding: 0 10px;
+    font-size: 15px;
 }
 
 .section .preview {
