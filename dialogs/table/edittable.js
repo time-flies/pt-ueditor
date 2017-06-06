@@ -45,7 +45,7 @@
             titleColBox.className = titleCol.checked ? 'J_titleCol checkbox active' : 'J_titleCol checkbox';
             captionBox.className = caption.checked ? 'J_caption checkbox active' : 'J_caption checkbox';
             autoSizeContentBox.className = autoSizeContent.checked ? 'radio J_autoSizeContent active' : 'radio J_autoSizeContent';
-           
+
 
 
             var enablesortState = editor.queryCommandState("enablesort"),
@@ -214,7 +214,7 @@
         },
         setAutoSize: function () {
             var me = this;
-            autoSizePage.checked = true;
+            autoSizePage.checked = false;
             autoSizePageBox.className = autoSizePage.checked ? 'radio J_autoSizePage active' : 'radio J_autoSizePage';
             me.autoSizePageHanler();
         }
@@ -278,10 +278,24 @@ function Jsorttable() {
     sorttableBox.className = sorttable.checked ? 'J_sorttable checkbox active' : 'J_sorttable checkbox';
 }
 function JautoSizeContent() {
-    autoSizeContentBox.className = autoSizeContent.checked ? 'radio J_autoSizeContent active' : 'radio J_autoSizeContent';
-    autoSizePageBox.className = 'radio J_autoSizePage';
+    autoSizeContent.checked = autoSizeContent.checked ? false : true;
+    if (autoSizeContent.checked) {
+        autoSizeContentBox.className = autoSizeContent.checked ? 'radio J_autoSizeContent active' : 'radio J_autoSizeContent';
+        autoSizePageBox.className = 'radio J_autoSizePage';
+
+        autoSizePage.checked = !autoSizeContent.checked;
+    } else {
+        autoSizeContentBox.className = 'radio J_autoSizeContent';
+    }
 }
 function JautoSizePage() {
-    autoSizePageBox.className = autoSizePage.checked ? 'radio J_autoSizePage active' : 'radio J_autoSizePage';
-    autoSizeContentBox.className = 'radio J_autoSizeContent';
+    autoSizePage.checked = autoSizePage.checked ? false : true;
+    if (autoSizePage.checked) {
+        autoSizePageBox.className = autoSizePage.checked ? 'radio J_autoSizePage active' : 'radio J_autoSizePage';
+        autoSizeContentBox.className = 'radio J_autoSizeContent';
+
+        autoSizeContent.checked = !autoSizePage.checked;
+    } else {
+        autoSizePageBox.className = 'radio J_autoSizePage';
+    }
 }

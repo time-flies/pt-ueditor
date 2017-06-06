@@ -9,18 +9,15 @@
 #issave{height: 20px;width: 20px;border-radius:50%;}
 
 .radiobox {
-  font-size: 15px;
+  height: 21px;
+  width: 21px;
+  border: 1px solid #cdcdcd;
+  border-radius: 50%;
 }
 
-.radiobox::before {
-  font-family: "iconfont";
-  color: #aaaaaa;
-  content: '\E609';
-}
 
-.radiobox.checked::before {
-  content: '\E60B';
-  color: #0781f5;
+.radiobox.checked {
+  background: url(./images/1.png);
 }
 
 ::-webkit-scrollbar {
