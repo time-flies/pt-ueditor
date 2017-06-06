@@ -1032,6 +1032,11 @@ div.edui-box {
     _filter: alpha(opacity = 30);
 }
 
+.edui-default .edui-state-disabled .tip {
+    opacity: 0.3;
+    _filter: alpha(opacity = 30);
+}
+
 .edui-default .edui-toolbar .edui-splitbutton .edui-state-opened .edui-splitbutton-body,
 .edui-default .edui-toolbar .edui-menubutton .edui-state-opened .edui-menubutton-body {
     background-color: white;
@@ -1510,7 +1515,7 @@ div.edui-box {
 
 /*searchreplace-dialog*/
 .edui-default .edui-for-searchreplace .edui-dialog-content {
-    width: 508px;
+    width: 450px;
     height: 246px;
 }
 

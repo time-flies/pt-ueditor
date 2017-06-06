@@ -1,6 +1,6 @@
 .warpper {
     position: relative;
-    width: 490px;
+    width: 450px;
     height: 246px;
     border: 0 none;
     box-sizing: border-box;
@@ -43,9 +43,34 @@ body{
 .input-box {
     line-height: 34px;
     margin-bottom: 20px;
-    position: relative;
+    position: relative; 
 }
-
+.find-input-box{
+    width: 280px;
+    padding: 0 10px;
+    height: 34px;
+    border: 1px solid #CCC;
+    line-height: 34px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-size: 16px;
+    display: inline-block;
+    position: absolute;
+    left: 36px;
+}
+.find-input{
+    width: 225px;
+    height: 32px;
+    line-height: 32px;
+    border: 0 none;
+    font-size: 16px;
+    outline: none;
+}
+.btn-box{
+    position: absolute;
+    top: 2px;
+    right: 70px;
+}
 #nextReplaceBtn {
     background-image: url(./img/next.png);
     height: 18px;
@@ -54,7 +79,7 @@ body{
     background-size: cover;
     outline: none;
     border: 1px solid transparent;
-    margin-left: 30px;
+    margin-left: 15px;
 }
 
 #nextReplaceBtn:active {
@@ -69,7 +94,6 @@ body{
     background-size: cover;
     outline: none;
     border: 1px solid transparent;
-    margin-left: 10px;
 }
 
 #preReplaceBtn:active {

@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri Jun 02 2017 16:34:05 GMT+0800 (CST)
+ * build: Tue Jun 06 2017 14:08:47 GMT+0800 (CST)
  */
 
 (function(){
@@ -20113,7 +20113,7 @@ UE.plugins['table'] = function () {
         cellMinWidth = 5,
         isInResizeBuffer = false,
         //单元格边框大小
-        cellBorderWidth = 12,
+        cellBorderWidth = 5,
         //鼠标偏移距离
         offsetOfTableCell = 10,
         //记录在有限时间内的点击状态， 共有3个取值， 0, 1, 2。 0代表未初始化， 1代表单击了1次，2代表2次
@@ -20220,7 +20220,7 @@ UE.plugins['table'] = function () {
             'table.noBorderTable td,table.noBorderTable th,table.noBorderTable caption{border:1px dashed #ddd !important}' +
             //插入的表格的默认样式
             'table{margin-bottom:10px;border-collapse:collapse;display:table;}' +
-            'td,th{padding: 8px 10px;border: 1px solid #DDD;}' +
+            'td,th{padding: 8px 10px;border: 1px solid #000;}' +
             'caption{border:1px dashed #DDD;border-bottom:0;padding:3px;text-align:center;}' +
             'th{border-top:1px solid #BBB;background-color:#F7F7F7;}' +
             'table tr.firstRow th{border-top-width:2px;}' +
@@ -26368,7 +26368,7 @@ UE.ui = baidu.editor.ui = {};
                 '<div class="edui-box edui-icon" style="' + this.cssRules + '"></div>' +
                 '</div>' +
                 // weknow patch begin
-                (this.tip ? '<span style="font-size: 12px; margin-left: 3px;">' + this.tip + '</span>' : '') +
+                (this.tip ? '<span class="tip" style="font-size: 12px; margin-left: 3px;">' + this.tip + '</span>' : '') +
                 // weknow patch end
                 '<div class="edui-box edui-splitborder"></div>' +
                 '<div class="edui-box edui-arrow" onclick="$$._onArrowClick();"></div>' +
