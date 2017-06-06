@@ -59,7 +59,7 @@ body{
     left: 36px;
 }
 .find-input{
-    width: 225px;
+    width: 220px;
     height: 32px;
     line-height: 32px;
     border: 0 none;
@@ -69,7 +69,7 @@ body{
 .btn-box{
     position: absolute;
     top: 2px;
-    right: 70px;
+    right: 55px;
 }
 #nextReplaceBtn {
     background-image: url(./img/next.png);

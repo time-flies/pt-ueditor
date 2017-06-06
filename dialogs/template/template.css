@@ -5,19 +5,24 @@
 .left .pre{height: 100%;width: 100%;overflow-y:auto;box-sizing: border-box;padding:20px 20px 0 20px;}
 .left .preitem{padding: 10px 0;}
 .left .preitem img {display: block;margin: 0 auto;width: 112px;}
-.bottom{height: 21px;padding-left: 30px;line-height: 20px;font-size: 16px;font-family: -apple-system, Arial, Helvetica, sans-serif;background:#fcfbfe;}
+.bottom{height: 21px;padding-left: 30px;line-height: 20px;font-size: 16px;font-family: -apple-system, Arial, Helvetica, sans-serif;background:#fcfbfe;position: relative;}
 #issave{height: 20px;width: 20px;border-radius:50%;}
 
 .radiobox {
-  height: 21px;
-  width: 21px;
+  height: 18px;
+  width: 18px;
   border: 1px solid #cdcdcd;
   border-radius: 50%;
+  position: absolute;
+  top: -1px;
+  left: 135px;
 }
 
 
 .radiobox.checked {
   background: url(./images/1.png);
+  background-size: cover;
+  border: 1px solid #007ff1;
 }
 
 ::-webkit-scrollbar {
