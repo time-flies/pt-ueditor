@@ -425,7 +425,7 @@ div.edui-box {
 .edui-default .edui-toolbar .edui-combox-body .edui-button-body {
     width: 60px;
     font-size: 12px;
-    height: 20px;
+    height: 22px;
     line-height: 20px;
     padding-left: 5px;
     white-space: nowrap;
@@ -435,7 +435,7 @@ div.edui-box {
 .edui-default .edui-toolbar .edui-combox-body .edui-arrow {
     background: url(../images/icons.png) -741px 0;
     _background: url(../images/icons.gif) -741px 0;
-    height: 20px;
+    height: 22px;
     width: 9px;
 }
 
@@ -487,6 +487,7 @@ div.edui-box {
 .edui-button, .edui-menubutton, .edui-splitbutton { 
     border: 1px solid #ccc !important;
     margin-right: 3px !important;
+    border-radius: 3px;
 }
 .edui-default .edui-toolbar .edui-button .edui-icon,
 .edui-default .edui-toolbar .edui-menubutton .edui-icon,
@@ -585,7 +586,8 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-backcolor .edui-icon {
-    background-position: -760px 0;
+    background: url(../images/bgcolor.png) !important;
+    background-size: 20px 20px !important;
 }
 
 .edui-default  .edui-for-inserttable .edui-icon {
@@ -873,7 +875,8 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-template .edui-icon {
-    background-position: -339px -40px;
+    background: url(../images/template.png) !important;
+    background-size: 20px 20px !important;
 }
 
 .edui-default  .edui-for-delete .edui-icon {
@@ -1060,6 +1063,38 @@ div.edui-box {
 .edui-default .edui-for-insertunorderedlist .edui-popup-body .edui-icon {
     /*background-position: 0 -40px;*/
     background-image: none  ;
+}
+.edui-button, .edui-menubutton, .edui-splitbutton { 
+    border: 1px solid #ccc !important;
+    margin-right: 3px !important;
+    border-radius: 3px;
+}
+/*左边的*/
+.edui-box.edui-button.edui-for-formatmatch,.edui-box.edui-button.edui-for-bold,.edui-box.edui-splitbutton.edui-for-forecolor,.edui-box.edui-menubutton.edui-for-insertunorderedlist,.edui-box.edui-button.edui-for-toword{
+    margin-right: 0 !important;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 3px;
+}
+/*中间的*/
+.edui-box.edui-button.edui-for-italic,.edui-box.edui-button.edui-for-underline{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    border-left: 0 none !important;
+    border-radius: 0;
+}
+/*右边的*/
+.edui-box.edui-button.edui-for-removeformat,.edui-box.edui-button.edui-for-strikethrough,.edui-box.edui-splitbutton.edui-for-backcolor,
+.edui-box.edui-menubutton.edui-for-insertorderedlist,
+.edui-box.edui-button.edui-for-tohtml{
+    margin-left: 0 !important;
+    border-left: 0 none !important;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 0px;
 }
 
 /* 弹出菜单 */
