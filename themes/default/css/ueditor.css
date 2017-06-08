@@ -127,9 +127,16 @@ div.edui-box {
 
 .edui-default .edui-toolbar .edui-button,
 .edui-default .edui-toolbar .edui-splitbutton,
-.edui-default .edui-toolbar .edui-menubutton,
-.edui-default .edui-toolbar .edui-combox {
-    margin: 1px;
+.edui-default .edui-toolbar .edui-menubutton{
+    margin: 6px 6px !important;
+    height: 30px;
+    box-sizing: border-box;
+}
+.edui-default .edui-toolbar .edui-combox{
+    height: 30px;
+    box-sizing: border-box;
+    margin: 6px 6px !important;
+    padding-top: 0px;
 }
 /*UI工具栏、编辑区域、底部*/
 .edui-default .edui-editor {
@@ -314,9 +321,6 @@ div.edui-box {
 
 .edui-default .edui-list .edui-state-hover {
     position: relative;
-    background-color: #fff5d4;
-    border: 1px solid #dcac6c;
-    padding: 0;
 }
 
 .edui-default .edui-for-fontfamily .edui-listitem-label {
@@ -425,18 +429,18 @@ div.edui-box {
 .edui-default .edui-toolbar .edui-combox-body .edui-button-body {
     width: 60px;
     font-size: 12px;
-    height: 22px;
+    height: 27px;
     line-height: 20px;
     padding-left: 5px;
+    padding-top: 3px;
     white-space: nowrap;
     margin: 0 3px 0 0;
 }
-
 .edui-default .edui-toolbar .edui-combox-body .edui-arrow {
-    background: url(../images/icons.png) -741px 0;
-    _background: url(../images/icons.gif) -741px 0;
-    height: 22px;
-    width: 9px;
+    background: url(../images/icons.png) -741px 4px;
+    _background: url(../images/icons.gif) -741px 4px;
+    height: 27px;
+    width: 10px;
 }
 
 .edui-default .edui-toolbar .edui-combox .edui-combox-body {
@@ -452,25 +456,20 @@ div.edui-box {
 }
 
 .edui-default .edui-toolbar .edui-combox-body .edui-arrow {
-    border-left: 1px solid #CCC;
 }
 
 .edui-default .edui-toolbar .edui-state-hover .edui-combox-body {
-    background-color: #fff5d4;
-    border: 1px solid #dcac6c;
 }
 
 .edui-default .edui-toolbar .edui-state-hover .edui-combox-body .edui-arrow {
-    border-left: 1px solid #dcac6c;
 }
 
 .edui-default .edui-toolbar .edui-state-checked .edui-combox-body {
-    background-color: #FFE69F;
-    border: 1px solid #DCAC6C;
+    background-color: #eaf5ff;
 }
 
 .edui-toolbar .edui-state-checked .edui-combox-body .edui-arrow {
-    border-left: 1px solid #DCAC6C;
+    background-color: #eaf5ff;
 }
 
 .edui-toolbar .edui-state-disabled .edui-combox-body {
@@ -480,8 +479,7 @@ div.edui-box {
 }
 
 .edui-toolbar .edui-state-opened .edui-combox-body {
-    background-color: white;
-    border: 1px solid gray;
+    background-color: #eaf5ff;
 }
 /*普通按钮样式及状态*/
 .edui-button, .edui-menubutton, .edui-splitbutton { 
@@ -499,20 +497,16 @@ div.edui-box {
 }
 
 .edui-default .edui-toolbar .edui-button .edui-button-wrap {
-    padding: 1px;
+    padding: 4px;
     position: relative;
 }
 
 .edui-default .edui-toolbar .edui-button .edui-state-hover .edui-button-wrap {
-    background-color: #fff5d4;
-    padding: 0;
-    border: 1px solid #dcac6c;
+
 }
 
 .edui-default .edui-toolbar .edui-button .edui-state-checked .edui-button-wrap {
-    background-color: #ffe69f;
-    padding: 0;
-    border: 1px solid #dcac6c;
+    background-color: #eaf5ff;
     border-radius: 2px;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
@@ -520,8 +514,6 @@ div.edui-box {
 
 .edui-default .edui-toolbar .edui-button .edui-state-active .edui-button-wrap {
     background-color: #ffffff;
-    padding: 0;
-    border: 1px solid gray;
 }
 .edui-default .edui-toolbar .edui-state-disabled .edui-label {
     color: #ccc;
@@ -978,15 +970,15 @@ div.edui-box {
 /*splitbutton*/
 .edui-default .edui-toolbar .edui-splitbutton-body .edui-arrow,
 .edui-default .edui-toolbar .edui-menubutton-body .edui-arrow {
-    background: url(../images/icons.png) -741px 0;
-    _background: url(../images/icons.gif) -741px 0;
+    background: url(../images/icons.png) -741px 0px;
+    _background: url(../images/icons.gif) -741px 0px;
     height: 20px;
     width: 9px;
 }
 
 .edui-default .edui-toolbar .edui-splitbutton .edui-splitbutton-body,
 .edui-default .edui-toolbar .edui-menubutton .edui-menubutton-body {
-    padding: 1px;
+    padding: 4px;
 }
 
 .edui-default .edui-toolbar .edui-splitborder {
@@ -996,38 +988,32 @@ div.edui-box {
 
 .edui-default .edui-toolbar .edui-state-hover .edui-splitborder {
     width: 1px;
-    border-left: 0px solid #dcac6c;
+
 }
 
 .edui-default .edui-toolbar .edui-state-active .edui-splitborder {
-    width: 0;
-    border-left: 1px solid gray;
+    width: 1px;
+ 
 }
 
 .edui-default .edui-toolbar .edui-state-opened .edui-splitborder {
-    width: 1px;
     border: 0;
 }
 
 .edui-default .edui-toolbar .edui-splitbutton .edui-state-hover .edui-splitbutton-body,
 .edui-default .edui-toolbar .edui-menubutton .edui-state-hover .edui-menubutton-body {
-    background-color: #fff5d4;
-    border: 1px solid #dcac6c;
-    padding: 0;
+
 }
 
 .edui-default .edui-toolbar .edui-splitbutton .edui-state-checked .edui-splitbutton-body,
 .edui-default .edui-toolbar .edui-menubutton .edui-state-checked .edui-menubutton-body {
-    background-color: #FFE69F;
-    border: 1px solid #DCAC6C;
-    padding: 0;
+    background-color: #eaf5ff;
+
 }
 
 .edui-default .edui-toolbar .edui-splitbutton .edui-state-active .edui-splitbutton-body,
 .edui-default .edui-toolbar .edui-menubutton .edui-state-active .edui-menubutton-body {
-    background-color: #ffffff;
-    border: 1px solid gray;
-    padding: 0;
+    background-color: #eaf5ff;
 }
 
 .edui-default .edui-state-disabled .edui-arrow {
@@ -1043,8 +1029,6 @@ div.edui-box {
 .edui-default .edui-toolbar .edui-splitbutton .edui-state-opened .edui-splitbutton-body,
 .edui-default .edui-toolbar .edui-menubutton .edui-state-opened .edui-menubutton-body {
     background-color: white;
-    border: 1px solid gray;
-    padding: 0;
 }
 
 .edui-default .edui-for-insertorderedlist .edui-bordereraser,
@@ -1367,12 +1351,14 @@ div.edui-box {
     -webkit-user-select: none;
     user-select: none;
     position: absolute;
+    font-family: "Microsoft YaHei", Lyh-Regular, helvetica, arial, sans-serif;
 }
 .edui-default .edui-dialog-foot .edui-dialog-buttons .edui-label{
     line-height: 30px;
 }
 .edui-default .edui-dialog-foot .edui-dialog-buttons .edui-okbutton{
     border-color: #0781f5 !important;
+    color: #0781f5;
     right: 0px;
 }
 .edui-default .edui-dialog-foot .edui-dialog-buttons .edui-okbutton:hover {

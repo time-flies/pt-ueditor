@@ -5,7 +5,7 @@
 .left .pre{height: 100%;width: 100%;overflow-y:auto;box-sizing: border-box;padding:20px 20px 0 20px;}
 .left .preitem{padding: 10px 0;}
 .left .preitem img {display: block;margin: 0 auto;width: 112px;}
-.bottom{height: 21px;padding-left: 30px;line-height: 20px;font-size: 16px;font-family: -apple-system, Arial, Helvetica, sans-serif;background:#fcfbfe;position: relative;}
+.bottom{height: 21px;padding-left: 30px;line-height: 20px;font-size: 16px;font-family: "Microsoft YaHei", Lyh-Regular, helvetica, arial, sans-serif;background:#fcfbfe;position: relative;}
 #issave{height: 20px;width: 20px;border-radius:50%;}
 
 .radiobox {
