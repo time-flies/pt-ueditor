@@ -318,6 +318,9 @@ div.edui-box {
     padding: 1px;
     white-space: nowrap;
 }
+.edui-default .edui-listitem:hover{
+    background: #eaf5ff;
+}
 
 .edui-default .edui-list .edui-state-hover {
     position: relative;
@@ -458,7 +461,8 @@ div.edui-box {
 .edui-default .edui-toolbar .edui-combox-body .edui-arrow {
 }
 
-.edui-default .edui-toolbar .edui-state-hover .edui-combox-body {
+.edui-default .edui-toolbar .edui-state-opened .edui-combox-body {
+    background-color: #eaf5ff;
 }
 
 .edui-default .edui-toolbar .edui-state-hover .edui-combox-body .edui-arrow {
@@ -513,7 +517,7 @@ div.edui-box {
 }
 
 .edui-default .edui-toolbar .edui-button .edui-state-active .edui-button-wrap {
-    background-color: #ffffff;
+    background-color: #eaf5ff;
 }
 .edui-default .edui-toolbar .edui-state-disabled .edui-label {
     color: #ccc;
@@ -637,7 +641,8 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-link .edui-icon {
-    background-position: -500px 0;
+    background: url(../images/link.png) !important;
+    background-size: 20px 20px !important;
 }
 
 .edui-default  .edui-for-code .edui-icon {
@@ -657,7 +662,8 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-spechars .edui-icon {
-    background-position: -240px 0;
+    background: url(../images/fuhao.png) !important;
+    background-size: 20px 20px !important;
 }
 
 .edui-default  .edui-for-help .edui-icon {
@@ -1308,8 +1314,15 @@ div.edui-box {
     top: 10px;
     border: 0px none !important;
 }
+.edui-default .edui-dialog-closebutton-win {
+    position: absolute !important;
+    right: 10px;
+    top: 10px;
+    border: 0px none !important;
+}
 
-.edui-default .edui-dialog-closebutton .edui-button-body {
+.edui-default .edui-dialog-closebutton .edui-button-body,
+.edui-default .edui-dialog-closebutton-win .edui-button-body {
     height: 17px;
     width: 17px;
     cursor: pointer;
@@ -1317,7 +1330,8 @@ div.edui-box {
     background-size: cover;
 }
 
-.edui-default .edui-dialog-closebutton .edui-state-hover .edui-button-body {
+.edui-default .edui-dialog-closebutton .edui-state-hover .edui-button-body,
+.edui-default .edui-dialog-closebutton-win .edui-state-hover .edui-button-body {
     background: url("../images/close.png") no-repeat;
     background-size: cover;
 }
@@ -1929,9 +1943,7 @@ div.edui-box {
 }
 
 .edui-default .edui-menu-body .edui-state-hover {
-    padding: 0 !important;
-    background-color: #fff5d4;
-    border: 1px solid #dcac6c;
+   background-color: #eaf5ff;
 }
 /*弹出菜单*/
 .edui-default .edui-shortcutmenu {

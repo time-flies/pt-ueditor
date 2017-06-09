@@ -87,7 +87,7 @@ UE.I18N['zh-cn'] = {
     'wordCountTip':"字数统计",
     'wordCountMsg':'当前已输入{#count}个字符, 您还可以输入{#leave}个字符。 ',
     'wordOverFlowMsg':'<span style="color:red;">字数超出最大允许值，服务器可能拒绝保存！</span>',
-    'ok':"确认",
+    'ok':"确定",
     'cancel':"取消",
     'closeDialog':"关闭对话框",
     'tableDrag':"表格拖动必须引入uiUtils.js文件！",

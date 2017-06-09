@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Tue Jun 06 2017 14:08:47 GMT+0800 (CST)
+ * build: Fri Jun 09 2017 13:43:50 GMT+0800 (CST)
  */
 
 (function(){
@@ -6913,7 +6913,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '.view{padding:0;word-wrap:break-word;cursor:text;height:90%;}\n' +
                     //设置默认字体和字号
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
-                    'body{margin:8px;font-family:arial;font-size:16px;}' +
+                    'body{margin:8px;font-family:arial,"Microsoft YaHei", Lyh-Regular, helvetica, sans-serif;font-size:16px;}' +
                     //设置段落间距
                     'p{margin:7px 0;}</style>' +
                     (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '') +
@@ -27370,8 +27370,10 @@ UE.ui = baidu.editor.ui = {};
                 className: 'edui-dialog-dragmask',
                 theme:theme
             })));
+            var userAgent = navigator.userAgent;
+            var isMac = userAgent.indexOf('Mac') !== -1 ? true : false;
             this.closeButton = new Button({
-                className: 'edui-dialog-closebutton',
+                className: isMac ? 'edui-dialog-closebutton' : 'edui-dialog-closebutton-win',
                 title: me.closeDialog,
                 theme:theme,
                 onclick: function (){
