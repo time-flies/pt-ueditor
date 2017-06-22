@@ -1,6 +1,6 @@
 {
     "name": "pt-ueditor",
-    "version": "1.0.59",
+    "version": "1.0.60",
     "description": "fex team's ueditor varius edition released by PaiThink Team",
     "main": "index.js",
     "scripts": {
