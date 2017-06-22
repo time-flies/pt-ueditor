@@ -113,6 +113,15 @@ div.edui-box {
     color: gray;
     cursor: default;
 }
+
+::-webkit-scrollbar {
+    width: 4px !important;
+    height: 4px !important;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background-color: rgba(60, 60, 60, 0.8) !important;
+}
 /* 工具栏 */
 .edui-default .edui-toolbar {
     cursor: default;
@@ -133,7 +142,6 @@ div.edui-box {
     box-sizing: border-box;
 }
 .edui-default .edui-toolbar .edui-combox{
-    height: 30px;
     box-sizing: border-box;
     margin: 6px 6px !important;
     padding-top: 0px;
@@ -442,14 +450,14 @@ div.edui-box {
 .edui-default .edui-toolbar .edui-combox-body .edui-arrow {
     background: url(../images/icons.png) -741px 4px;
     _background: url(../images/icons.gif) -741px 4px;
-    height: 27px;
+    height: 25px;
     width: 10px;
 }
 
 .edui-default .edui-toolbar .edui-combox .edui-combox-body {
     border: 1px solid #CCC;
     background-color: white;
-    border-radius: 2px;
+    border-radius: 3px;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
 }
