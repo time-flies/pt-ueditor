@@ -20225,7 +20225,7 @@ UE.plugins['table'] = function () {
             'th{border-top:1px solid #BBB;background-color:#F7F7F7;}' +
             'table tr.firstRow th{border-top-width:2px;}' +
             '.ue-table-interlace-color-single{ background-color: #fcfcfc; } .ue-table-interlace-color-double{ background-color: #f7faff; }' +
-            'td p{margin:0;padding:0;}', me.document);
+            'td p{margin:0;padding:0;} td ol,td ul{padding:0;margin:0;width:auto;}', me.document);
 
         var tableCopyList, isFullCol, isFullRow;
         //注册del/backspace事件
@@ -23369,7 +23369,7 @@ UE.plugin.register('searchreplace',function(){
             }
         }
 
-
+        rng.scrollToView(me , 500);
         rng.insertNode(span);
         rng.enlargeToBlockElm(true);
         startBlockNode = rng.startContainer;
