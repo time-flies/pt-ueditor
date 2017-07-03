@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Mon Jul 03 2017 14:45:06 GMT+0800 (CST)
+ * build: Mon Jul 03 2017 18:08:27 GMT+0800 (CST)
  */
 
 (function(){
@@ -12159,7 +12159,11 @@ UE.plugins['removeformat'] = function(){
                         }
 
                         next = domUtils.getNextDomNode( current, true, filter );
-
+                        // weknow patch start 避免去除节点样式
+                        // if(next.tagName === 'XNODE') {
+                        //     return;
+                        // }
+                        // weknow patch end
                         if ( !dtd.$empty[current.tagName.toLowerCase()] && !domUtils.isBookmarkNode( current ) ) {
                             if ( tagReg.test( current.tagName ) ) {
                                 if ( style ) {
@@ -12188,6 +12192,11 @@ UE.plugins['removeformat'] = function(){
                 //trace:1096 不能把td上的样式去掉，比如边框
                 var pN = bookmark.start.parentNode;
                 if(domUtils.isBlockElm(pN) && !dtd.$tableContent[pN.tagName] && !dtd.$list[pN.tagName]){
+                    // weknow patch start 清除样式时避免把body的class也去掉
+                    if(pN.className == 'view-body'){
+                        return ;
+                    }
+                    // weknow patch end
                     domUtils.removeAttributes(  pN,removeFormatAttributes );
                 }
                 pN = bookmark.end.parentNode;
