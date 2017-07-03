@@ -148,13 +148,13 @@ div.edui-box {
 }
 /*UI工具栏、编辑区域、底部*/
 .edui-default .edui-editor {
-    border: 1px solid #d4d4d4;
+    /*border: 1px solid #d4d4d4;*/
     background-color: white;
     position: relative;
     overflow: visible;
-    -webkit-border-radius: 4px;
+    /*-webkit-border-radius: 4px;
     -moz-border-radius: 4px;
-    border-radius: 4px;
+    border-radius: 4px;*/
 }
 .edui-editor div{
     width:auto;
@@ -196,6 +196,9 @@ div.edui-box {
 
 .edui-default .edui-editor-iframeholder {
     position: relative;
+    padding-bottom: 24px;
+    box-sizing: border-box;
+    background: #ebeaf1;
     /*for fix ie6 toolbarmsg under iframe bug. relative -> static */
     /*_position: static !important;*/
 }

@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri Jun 09 2017 16:32:59 GMT+0800 (CST)
+ * build: Mon Jul 03 2017 14:45:06 GMT+0800 (CST)
  */
 
 (function(){
@@ -6910,16 +6910,19 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '<head>' +
                     '<style type=\'text/css\'>' +
                     //设置四周的留边
-                    '.view{padding:0;word-wrap:break-word;cursor:text;height:90%;}\n' +
+                    '.view{padding:0;word-wrap:break-word;cursor:text;height:90%;background:#ebeaf1;margin:0;padding-bottom:24px;}\n' +
+                    //weknow  begin 
+                    '.view-body{width:868px;background:#fff;padding:98px 68px 24px 68px;margin:24px auto;margin-bottom:0;box-sizing:border-box;box-shadow:0 0 0 0.75pt #d1d1d1, 0 0 3pt 0.75pt #ccc;}'+
+                    //weknow  over
                     //设置默认字体和字号
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
                     'body{margin:8px;font-family:arial;font-size:16px;}' +
                     //设置段落间距
-                    'p{margin:7px 0;}</style>' +
+                    'p{line-height:1.75em;margin:0;letter-spacing:1px;}</style>' +
                     (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '') +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
                     '</head>' +
-                    '<body class=\'view\' ></body>' +
+                    '<body class=\'view-body\' ></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '') + ' id=\'_initialScript\'>' +
                     'setTimeout(function(){editor = window.parent.UE.instants[\'ueditorInstant' + me.uid + '\'];editor._setup(document);},0);' +
                     'var _tmpScript = document.getElementById(\'_initialScript\');_tmpScript.parentNode.removeChild(_tmpScript);' +
@@ -23369,7 +23372,7 @@ UE.plugin.register('searchreplace',function(){
             }
         }
 
-        rng.scrollToView(me , 500);
+        rng.scrollToView(me, 500);
         rng.insertNode(span);
         rng.enlargeToBlockElm(true);
         startBlockNode = rng.startContainer;
