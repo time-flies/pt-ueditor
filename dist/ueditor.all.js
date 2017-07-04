@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Mon Jul 03 2017 18:08:27 GMT+0800 (CST)
+ * build: Tue Jul 04 2017 18:37:22 GMT+0800 (CST)
  */
 
 (function(){
@@ -6910,9 +6910,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '<head>' +
                     '<style type=\'text/css\'>' +
                     //设置四周的留边
-                    '.view{padding:0;word-wrap:break-word;cursor:text;height:90%;background:#ebeaf1;margin:0;padding-bottom:24px;}\n' +
+                    '.view{padding:0;word-wrap:break-word;cursor:text;background:#ebeaf1;margin:0;padding-bottom:24px;}\n' +
                     //weknow  begin 
-                    '.view-body{width:868px;background:#fff;padding:98px 68px 24px 68px;margin:24px auto;margin-bottom:0;box-sizing:border-box;box-shadow:0 0 0 0.75pt #d1d1d1, 0 0 3pt 0.75pt #ccc;}'+
+                    '.view-body{width:868px;background:#fff;padding:98px 68px 24px 68px;margin:24px auto;margin-bottom:0;box-sizing:border-box;box-shadow:0 0 0 0.75pt #d1d1d1, 0 0 3pt 0.75pt #ccc;overflow-y: auto !important;}'+
                     //weknow  over
                     //设置默认字体和字号
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
