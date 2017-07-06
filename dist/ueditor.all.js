@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Tue Jul 04 2017 18:37:22 GMT+0800 (CST)
+ * build: Wed Jul 05 2017 18:28:33 GMT+0800 (CST)
  */
 
 (function(){
@@ -23393,9 +23393,12 @@ UE.plugin.register('searchreplace',function(){
             var rngStart = findNTextInBlockElm(result.node,result.index,searchStr);
             var rngEnd = findNTextInBlockElm(result.node,result.index + searchStr.length,searchStr);
             rng.setStart(rngStart.node,rngStart.index).setEnd(rngEnd.node,rngEnd.index);
-
             if(opt.replaceStr !== undefined){
-                replaceText(rng,opt.replaceStr)
+                if(rngEnd.node.parentElement.className !== 'x-node-title') {
+                    replaceText(rng,opt.replaceStr)
+                    rng.select();
+                    return true;
+                }
             }
             rng.select();
             return true;
@@ -29110,14 +29113,14 @@ UE.ui = baidu.editor.ui = {};
             editor.addListener("afterpaste", function () {
                 if(editor.queryCommandState('pasteplain'))
                     return;
-                if(baidu.editor.ui.PastePicker){
-                    pastePop = new baidu.editor.ui.Popup({
-                        content:new baidu.editor.ui.PastePicker({editor:editor}),
-                        editor:editor,
-                        className:'edui-wordpastepop'
-                    });
-                    pastePop.render();
-                }
+                // if(baidu.editor.ui.PastePicker){
+                //     pastePop = new baidu.editor.ui.Popup({
+                //         content:new baidu.editor.ui.PastePicker({editor:editor}),
+                //         editor:editor,
+                //         className:'edui-wordpastepop'
+                //     });
+                //     pastePop.render();
+                // }
                 isPaste = true;
             });
 

@@ -168,7 +168,7 @@ $G("repalceAllBtn").onclick = function () {
     };
     var num = frCommond(obj);
     if (num) {
-        $G('replace-msg').innerHTML = lang.countMsg.replace("{#count}", num);
+        $G('replace-msg').innerHTML = '已全部替换!';
     }
 };
 //执行
