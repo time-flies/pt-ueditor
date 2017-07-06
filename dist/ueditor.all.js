@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Wed Jul 05 2017 18:28:33 GMT+0800 (CST)
+ * build: Thu Jul 06 2017 17:45:24 GMT+0800 (CST)
  */
 
 (function(){
@@ -14749,7 +14749,11 @@ UE.plugins['paste'] = function () {
                 htmlContent = html.html;
 
                 address = me.selection.getRange().createAddress(true);
-                me.execCommand('insertHtml', me.getOpt('retainOnlyLabelPasted') === true ?  getPureHtml(htmlContent) : htmlContent, true);
+                if(div.firstChild.tagName === 'XNODE') {
+                    me.execCommand('insertHtml', htmlContent, true);
+                }else {
+                    me.execCommand('insertHtml', me.getOpt('retainOnlyLabelPasted') === true ?  getPureHtml(htmlContent) : htmlContent, true);
+                }
             }
             me.fireEvent("afterpaste", html);
         }
