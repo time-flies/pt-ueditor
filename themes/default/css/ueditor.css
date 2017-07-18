@@ -132,6 +132,8 @@ div.edui-box {
     zoom: 1;
     width:auto;
     height:auto;
+    padding-top: 7px;
+    padding-right: 160px;
 }
 
 .edui-default .edui-toolbar .edui-button,
