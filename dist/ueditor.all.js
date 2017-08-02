@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri Jul 07 2017 18:36:32 GMT+0800 (CST)
+ * build: Wed Aug 02 2017 16:47:30 GMT+0800 (CST)
  */
 
 (function(){
@@ -22724,6 +22724,8 @@ UE.plugins['contextmenu'] = function () {
                                     return '插入文件';
                                 case "pastToTruth":
                                     return '粘贴为副本';
+								case "shareBo":
+                                    return "共享";	
                                 default:
                                     return '';
                             }
