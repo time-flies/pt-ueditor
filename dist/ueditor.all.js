@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Wed Aug 02 2017 16:47:30 GMT+0800 (CST)
+ * build: Fri Aug 04 2017 17:35:18 GMT+0800 (CST)
  */
 
 (function(){
@@ -6910,7 +6910,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '<head>' +
                     '<style type=\'text/css\'>' +
                     //设置四周的留边
-                    '.view{padding:0;word-wrap:break-word;cursor:text;background:#ebeaf1;margin:0;padding-bottom:24px;}\n' +
+                    '.view{padding:0;word-wrap:break-word;cursor:text;background:#ebeaf1;margin:0;padding-bottom:45px;}\n' +
                     //weknow  begin 
                     '.view-body{width:868px;background:#fff;padding:98px 68px 24px 68px;margin:24px auto;margin-bottom:0;box-sizing:border-box;box-shadow:0 0 0 0.75pt #d1d1d1, 0 0 3pt 0.75pt #ccc;overflow-y: auto !important;}'+
                     //weknow  over

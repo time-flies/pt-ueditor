@@ -115,7 +115,7 @@ div.edui-box {
 }
 
 ::-webkit-scrollbar {
-    width: 8px !important;
+    width: 16px !important;
     height: 4px !important;
 }
 ::-webkit-scrollbar-thumb {
@@ -198,7 +198,6 @@ div.edui-box {
 
 .edui-default .edui-editor-iframeholder {
     position: relative;
-    padding-bottom: 24px;
     box-sizing: border-box;
     background: #ebeaf1;
     /*for fix ie6 toolbarmsg under iframe bug. relative -> static */
