@@ -114,12 +114,12 @@ div.edui-box {
     cursor: default;
 }
 
-::-webkit-scrollbar {
-    width: 16px !important;
+.edui-popup-content::-webkit-scrollbar {
+    width: 6px !important;
     height: 4px !important;
 }
-::-webkit-scrollbar-thumb {
-    border-radius: 8px;
+.edui-popup-content::-webkit-scrollbar-thumb {
+    border-radius: 8px !important;
     background-color: rgba(195, 195, 195, 0.5) !important;
 }
 /* 工具栏 */
@@ -1132,7 +1132,19 @@ div.edui-box {
     padding: 5px;
     background:#ffffff;
 }
-
+.edui-default .edui-popup-content a{
+    text-decoration: none;
+    outline: none;
+}
+.edui-default .edui-popup-content a{
+    text-decoration: none;
+    outline: none;
+    color: blue;
+}
+.edui-default .edui-popup-content a:hover{
+    text-decoration: underline;
+    outline: none;
+}
 .edui-default .edui-popup .edui-bordereraser {
     background-color: white;
     height: 3px;
@@ -1172,6 +1184,8 @@ div.edui-box {
     width:auto;
     height:auto;
 }
+
+
 .edui-default .edui-editor-messageholder {
     display: block;
     width: 150px;
