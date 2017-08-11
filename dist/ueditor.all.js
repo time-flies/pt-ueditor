@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri Aug 04 2017 17:35:18 GMT+0800 (CST)
+ * build: Fri Aug 11 2017 11:04:19 GMT+0800 (CST)
  */
 
 (function(){
@@ -6913,6 +6913,8 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '.view{padding:0;word-wrap:break-word;cursor:text;background:#ebeaf1;margin:0;padding-bottom:45px;}\n' +
                     //weknow  begin 
                     '.view-body{width:868px;background:#fff;padding:98px 68px 24px 68px;margin:24px auto;margin-bottom:0;box-sizing:border-box;box-shadow:0 0 0 0.75pt #d1d1d1, 0 0 3pt 0.75pt #ccc;overflow-y: auto !important;}'+
+                    //插入节点的问题
+                    'xnode div{display: inline-blocl;}' + 
                     //weknow  over
                     //设置默认字体和字号
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
