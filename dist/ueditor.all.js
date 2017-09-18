@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Fri Aug 11 2017 11:04:19 GMT+0800 (CST)
+ * build: Thu Aug 31 2017 09:12:42 GMT+0800 (CST)
  */
 
 (function(){
@@ -12056,6 +12056,7 @@ UE.commands['scrawl'] = {
 
 
 // plugins/removeformat.js
+// plugins/removeformat.js
 /**
  * 清除格式
  * @file
@@ -12161,11 +12162,7 @@ UE.plugins['removeformat'] = function(){
                         }
 
                         next = domUtils.getNextDomNode( current, true, filter );
-                        // weknow patch start 避免去除节点样式
-                        // if(next.tagName === 'XNODE') {
-                        //     return;
-                        // }
-                        // weknow patch end
+
                         if ( !dtd.$empty[current.tagName.toLowerCase()] && !domUtils.isBookmarkNode( current ) ) {
                             if ( tagReg.test( current.tagName ) ) {
                                 if ( style ) {
@@ -12174,15 +12171,22 @@ UE.plugins['removeformat'] = function(){
                                         domUtils.remove( current, true );
                                     }
                                 } else {
-                                    domUtils.remove( current, true );
+                                    if(!current.className.startsWith('live-doc-plugin')){
+                                        domUtils.remove( current, true );
+                                    }
                                 }
                             } else {
                                 //trace:939  不能把list上的样式去掉
                                 if(!dtd.$tableContent[current.tagName] && !dtd.$list[current.tagName]){
-                                    domUtils.removeAttributes( current, removeFormatAttributes );
-                                    if ( isRedundantSpan( current ) ){
-                                        domUtils.remove( current, true );
+                                    if(getNodeView(current)){
+
+                                    } else{
+                                        domUtils.removeAttributes( current, removeFormatAttributes );
+                                        if ( isRedundantSpan( current ) ){
+                                            domUtils.remove( current, true );
+                                        }
                                     }
+                                    
                                 }
 
                             }
@@ -12190,6 +12194,7 @@ UE.plugins['removeformat'] = function(){
                         current = next;
                     }
                 }
+
                 //trace:1035
                 //trace:1096 不能把td上的样式去掉，比如边框
                 var pN = bookmark.start.parentNode;
@@ -12199,7 +12204,7 @@ UE.plugins['removeformat'] = function(){
                         return ;
                     }
                     // weknow patch end
-                    domUtils.removeAttributes(  pN,removeFormatAttributes );
+                    domUtils.removeAttributes(pN,removeFormatAttributes );
                 }
                 pN = bookmark.end.parentNode;
                 if(bookmark.end && domUtils.isBlockElm(pN) && !dtd.$tableContent[pN.tagName]&& !dtd.$list[pN.tagName]){
@@ -12238,6 +12243,22 @@ UE.plugins['removeformat'] = function(){
 
             // weknow  start  
             // 判断是否是节点视图
+            function getNodeView(elementNode) {
+                if (elementNode.tagName === 'XNODE') {
+                    try {
+                        return elementNode;
+                    } catch (error) {
+                        return null;
+                    }
+                } else {
+                    if (elementNode.parentElement) {
+                        return getNodeView(elementNode.parentElement);
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
             function isNodeView(range) {
                 var aNode = domUtils.findParentByTagName(range.startContainer, 'xnode', true);
                 if (aNode) {
@@ -12265,7 +12286,6 @@ UE.plugins['removeformat'] = function(){
     };
 
 };
-
 
 // plugins/blockquote.js
 /**
@@ -13200,7 +13220,7 @@ UE.plugins['lineheight'] = function(){
 UE.plugins['insertcode'] = function() {
     var me = this;
     me.ready(function(){
-        utils.cssRule('pre','pre{margin:.5em 0;padding:.4em .6em;border-radius:8px;background:#f8f8f8;}',
+        utils.cssRule('pre','pre{margin:.5em 0;padding:.4em .6em;border-radius:8px;background:#f8f8f8;white-space:pre-wrap;}',
             me.document)
     });
     me.setOpt('insertcode',{
@@ -16550,6 +16570,28 @@ UE.plugins['enterkey'] = function() {
                 start = range.startContainer,
                 doSave;
 
+        // weknow start
+        function findId(dom){
+            if(dom.id){
+                return dom;
+            }else{
+                if(dom.parentElement){
+                    return findId(dom.parentElement);
+                }else{
+                    return null;
+                }
+            }
+        }
+        var dom = findId(start);
+        if(dom) {
+            if(dom.previousSibling && dom.previousSibling.textContent.length < 1){
+                dom.previousSibling.removeAttribute('id');
+            }else{
+                dom.removeAttribute('id');
+            }
+        }
+        // weknow end
+            
             //修正在h1-h6里边回车后不能嵌套p的问题
             if (!browser.ie) {
 
@@ -16626,8 +16668,22 @@ UE.plugins['enterkey'] = function() {
 
                     //opera下执行formatblock会在table的场景下有问题，回车在opera原生支持很好，所以暂时在opera去掉调用这个原生的command
                     //trace:2431
-                    hTag = start.tagName;
-                    start.tagName.toLowerCase() == 'p' && browser.gecko && domUtils.removeDirtyAttr(start);
+                    if (!start && !browser.opera) {
+
+                        me.document.execCommand('formatBlock', false, '<p>');
+
+                        if (browser.gecko) {
+                            range = me.selection.getRange();
+                            start = domUtils.findParentByTagName(range.startContainer, 'p', true);
+                            start && domUtils.removeDirtyAttr(start);
+                        }
+
+
+                    } else {
+                        hTag = start.tagName;
+                        start.tagName.toLowerCase() == 'p' && browser.gecko && domUtils.removeDirtyAttr(start);
+                    }
+
                 }
 
             } else {
@@ -23251,6 +23307,7 @@ UE.plugins['formatmatch'] = function(){
 
 
 // plugins/searchreplace.js
+// plugins/searchreplace.js
 ///import core
 ///commands 查找替换
 ///commandsName  SearchReplace
@@ -23265,13 +23322,6 @@ UE.plugin.register('searchreplace',function(){
     var me = this;
 
     var _blockElm = {'table':1,'tbody':1,'tr':1,'ol':1,'ul':1};
-
-    var lastRng = null;
-
-    function getText(node){
-        var text = node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent'];
-        return text.replace(domUtils.fillChar,'')
-    }
     me.ready(function (){
         me.addListener('keydown', function (cmd,evt){
             // 搜索快捷键设置
@@ -23283,28 +23333,19 @@ UE.plugin.register('searchreplace',function(){
     })
     function findTextInString(textContent,opt,currentIndex){
         var str = opt.searchStr;
-
-        var reg = new RegExp(str,'g' + (opt.casesensitive ? '' : 'i')),
-            match;
-
         if(opt.dir == -1){
-
-            textContent = textContent.substr(0,currentIndex);
             textContent = textContent.split('').reverse().join('');
             str = str.split('').reverse().join('');
-            match = reg.exec(textContent);
-            if(match){
-                return currentIndex - match.index - str.length;
-            }
+            currentIndex = textContent.length - currentIndex;
 
-        }else{
-            textContent = textContent.substr(currentIndex);
-            match = reg.exec(textContent);
-            if(match){
-                return match.index + currentIndex;
+        }
+        var reg = new RegExp(str,'g' + (opt.casesensitive ? '' : 'i')),match;
+
+        while(match = reg.exec(textContent)){
+            if(match.index >= currentIndex){
+                return opt.dir == -1 ? textContent.length - match.index - opt.searchStr.length : match.index;
             }
         }
-
         return  -1
     }
     function findTextBlockElm(node,currentIndex,opt){
@@ -23314,7 +23355,7 @@ UE.plugin.register('searchreplace',function(){
         }
         var first = 1;
         while(node){
-            textContent = getText(node);
+            textContent = node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent'];
             index = findTextInString(textContent,opt,currentIndex );
             first = 0;
             if(index!=-1){
@@ -23328,7 +23369,7 @@ UE.plugin.register('searchreplace',function(){
                 node = domUtils[methodName](node,true);
             }
             if(node){
-                currentIndex = opt.dir == -1 ? getText(node).length : 0;
+                currentIndex = opt.dir == -1 ? (node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent']).length : 0;
             }
 
         }
@@ -23340,7 +23381,7 @@ UE.plugin.register('searchreplace',function(){
             result;
         while(currentNode){
             if(currentNode.nodeType == 3){
-                currentNodeLength = getText(currentNode).replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
+                currentNodeLength = currentNode.nodeValue.replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
                 currentIndex += currentNodeLength;
                 if(currentIndex >= index){
                     return {
@@ -23349,7 +23390,7 @@ UE.plugin.register('searchreplace',function(){
                     }
                 }
             }else if(!dtd.$empty[currentNode.tagName]){
-                currentNodeLength = getText(currentNode).replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
+                currentNodeLength = currentNode[browser.ie ? 'innerText' : 'textContent'].replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length
                 currentIndex += currentNodeLength;
                 if(currentIndex >= index){
                     result = findNTextInBlockElm(currentNode,currentNodeLength - (currentIndex - index),str);
@@ -23365,7 +23406,7 @@ UE.plugin.register('searchreplace',function(){
 
     function searchReplace(me,opt){
 
-        var rng = lastRng || me.selection.getRange(),
+        var rng = me.selection.getRange(),
             startBlockNode,
             searchStr = opt.searchStr,
             span = me.document.createElement('span');
@@ -23379,9 +23420,14 @@ UE.plugin.register('searchreplace',function(){
             var rngText = me.selection.getText();
             if(new RegExp('^' + opt.searchStr + '$',(opt.casesensitive ? '' : 'i')).test(rngText)){
                 if(opt.replaceStr != undefined){
-                    replaceText(rng,opt.replaceStr);
-                    rng.select();
-                    return true;
+                    if(rngEnd.node.parentElement.parentElement.className.startsWith('live') || (rngEnd.node.parentElement.parentElement.tagName ==='XNODE')) {
+                        rng.select();
+                        return true;
+                    }else {
+                        replaceText(rng,opt.replaceStr)
+                        rng.select();
+                        return true;
+                    }
                 }else{
                     rng.collapse(opt.dir == -1)
                 }
@@ -23389,27 +23435,35 @@ UE.plugin.register('searchreplace',function(){
             }
         }
 
-        rng.scrollToView(me, 500);
+
         rng.insertNode(span);
         rng.enlargeToBlockElm(true);
         startBlockNode = rng.startContainer;
-        var currentIndex = getText(startBlockNode).indexOf('$$ueditor_searchreplace_key$$');
+        var currentIndex = startBlockNode[browser.ie ? 'innerText' : 'textContent'].indexOf('$$ueditor_searchreplace_key$$');
         rng.setStartBefore(span);
         domUtils.remove(span);
         var result = findTextBlockElm(startBlockNode,currentIndex,opt);
         if(result){
-            var rngStart = findNTextInBlockElm(result.node,result.index,searchStr);
-            var rngEnd = findNTextInBlockElm(result.node,result.index + searchStr.length,searchStr);
-            rng.setStart(rngStart.node,rngStart.index).setEnd(rngEnd.node,rngEnd.index);
-            if(opt.replaceStr !== undefined){
-                if(rngEnd.node.parentElement.className !== 'x-node-title') {
-                    replaceText(rng,opt.replaceStr)
-                    rng.select();
-                    return true;
+            if(result.node.tagName!=='XNODE'){
+                var rngStart = findNTextInBlockElm(result.node,result.index,searchStr);
+                var rngEnd = findNTextInBlockElm(result.node,result.index + searchStr.length,searchStr);
+                rng.setStart(rngStart.node,rngStart.index).setEnd(rngEnd.node,rngEnd.index);
+                rng.scrollToView(me, 500);
+                if(opt.replaceStr !== undefined){
+                    if(rngEnd.node.parentElement.parentElement.className.startsWith('live') || (rngEnd.node.parentElement.parentElement.tagName ==='XNODE')) {
+                        rng.select();
+                        return true;
+                    }else {
+                        replaceText(rng,opt.replaceStr)
+                        rng.select();
+                        return true;
+                    }
                 }
+                rng.select();
+                return true;
+            } else {
+                rng.setCursor()
             }
-            rng.select();
-            return true;
         }else{
             rng.setCursor()
         }
@@ -23432,7 +23486,7 @@ UE.plugin.register('searchreplace',function(){
                     },true);
                     var num = 0;
                     if(opt.all){
-                        lastRng = null;
+
                         var rng = me.selection.getRange(),
                             first = me.body.firstChild;
                         if(first && first.nodeType == 1){
@@ -23447,8 +23501,6 @@ UE.plugin.register('searchreplace',function(){
                         }
                         while(searchReplace(this,opt)){
                             num++;
-                            lastRng = me.selection.getRange();
-                            lastRng.collapse(opt.dir == -1)
                         }
                         if(num){
                             me.fireEvent('saveScene');
@@ -23458,9 +23510,7 @@ UE.plugin.register('searchreplace',function(){
                             me.fireEvent('saveScene');
                         }
                         if(searchReplace(this,opt)){
-                            num++;
-                            lastRng = me.selection.getRange();
-                            lastRng.collapse(opt.dir == -1)
+                            num++
                         }
                         if(num){
                             me.fireEvent('saveScene');
@@ -23471,11 +23521,6 @@ UE.plugin.register('searchreplace',function(){
                     return num;
                 },
                 notNeedUndo:1
-            }
-        },
-        bindEvents:{
-            clearlastSearchResult:function(){
-                lastRng = null;
             }
         }
     }

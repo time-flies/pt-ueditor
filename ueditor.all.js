@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Wed Jan 04 2017 18:09:00 GMT+0800 (中国标准时间)
+ * build: Thu Aug 31 2017 09:12:42 GMT+0800 (CST)
  */
 
 (function(){
@@ -22,6 +22,9 @@ window.UE = baidu.editor = {
     version:'1.5.0'
 };
 var dom = UE.dom = {};
+// weknow patch begin
+module.exports = window.UE;
+// weknow patch end
 
 // core/browser.js
 /**
@@ -1726,7 +1729,6 @@ var dtd = dom.dtd = (function() {
 
         //列表根元素列表
         $list: _({ul:1,ol:1,dl:1}),
-        $xnode: _({xnode: 1}),
 
         //不能认为是空的元素
         $isNotEmpty : _({table:1,ul:1,ol:1,dl:1,iframe:1,area:1,base:1,col:1,hr:1,img:1,embed:1,input:1,link:1,meta:1,param:1,h1:1,h2:1,h3:1,h4:1,h5:1,h6:1}),
@@ -6549,25 +6551,25 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             //不要产生多个textarea
             editor.textarea = textarea;
         }
-        !textarea.getAttribute('name') && textarea.setAttribute('name', editor.options.textarea );
+        !textarea.getAttribute('name') && textarea.setAttribute('name', editor.options.textarea);
         textarea.value = editor.hasContents() ?
             (editor.options.allHtmlEnabled ? editor.getAllHtml() : editor.getContent(null, null, true)) :
             ''
     }
-    function loadPlugins(me){
+    function loadPlugins(me) {
         //初始化插件
         for (var pi in UE.plugins) {
             UE.plugins[pi].call(me);
         }
 
     }
-    function checkCurLang(I18N){
-        for(var lang in I18N){
+    function checkCurLang(I18N) {
+        for (var lang in I18N) {
             return lang
         }
     }
 
-    function langReadied(me){
+    function langReadied(me) {
         me.langIsReady = true;
 
         me.fireEvent("langReady");
@@ -6738,13 +6740,13 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         /* 尝试异步加载后台配置 */
         me.loadServerConfig();
 
-        if(!utils.isEmptyObject(UE.I18N)){
+        if (!utils.isEmptyObject(UE.I18N)) {
             //修改默认的语言类型
             me.options.lang = checkCurLang(UE.I18N);
             UE.plugin.load(me);
             langReadied(me);
 
-        }else{
+        } else {
             utils.loadFile(document, {
                 src: me.options.langPath + me.options.lang + "/" + me.options.lang + ".js",
                 tag: "script",
@@ -6759,9 +6761,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         UE.instants['ueditorInstant' + me.uid] = me;
     };
     Editor.prototype = {
-         registerCommand : function(name,obj){
+        registerCommand: function (name, obj) {
             this.commands[name] = obj;
-         },
+        },
         /**
          * 编辑器对外提供的监听ready事件的接口， 通过调用该方法，达到的效果与监听ready事件是一致的
          * @method ready
@@ -6818,7 +6820,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
             utils.extend(this.options, obj, true);
         },
-        getOpt:function(key){
+        getOpt: function (key) {
             return this.options[key]
         },
         /**
@@ -6835,17 +6837,19 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             me.fireEvent('destroy');
             var container = me.container.parentNode;
             var textarea = me.textarea;
+            // weknow patch begin
             if (!textarea) {
-                textarea = document.createElement('textarea');
-                container.parentNode.insertBefore(textarea, container);
+                // textarea = document.createElement('textarea');
+                // container.parentNode.insertBefore(textarea, container);
             } else {
-                textarea.style.display = ''
+                textarea.style.display = '';
+                textarea.style.width = me.iframe.offsetWidth + 'px';
+                textarea.style.height = me.iframe.offsetHeight + 'px';
+                textarea.value = me.getContent();
+                textarea.id = me.key;
             }
+            // weknow patch end
 
-            textarea.style.width = me.iframe.offsetWidth + 'px';
-            textarea.style.height = me.iframe.offsetHeight + 'px';
-            textarea.value = me.getContent();
-            textarea.id = me.key;
             container.innerHTML = '';
             domUtils.remove(container);
             var key = me.key;
@@ -6876,52 +6880,56 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         render: function (container) {
             var me = this,
                 options = me.options,
-                getStyleValue=function(attr){
-                    return parseInt(domUtils.getComputedStyle(container,attr));
+                getStyleValue = function (attr) {
+                    return parseInt(domUtils.getComputedStyle(container, attr));
                 };
             if (utils.isString(container)) {
                 container = document.getElementById(container);
             }
             if (container) {
-                if(options.initialFrameWidth){
+                if (options.initialFrameWidth) {
                     options.minFrameWidth = options.initialFrameWidth
-                }else{
+                } else {
                     options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
                 }
-                if(options.initialFrameHeight){
+                if (options.initialFrameHeight) {
                     options.minFrameHeight = options.initialFrameHeight
-                }else{
+                } else {
                     options.initialFrameHeight = options.minFrameHeight = container.offsetHeight;
                 }
 
-                container.style.width = /%$/.test(options.initialFrameWidth) ?  '100%' : options.initialFrameWidth-
-                    getStyleValue("padding-left")- getStyleValue("padding-right") +'px';
-                container.style.height = /%$/.test(options.initialFrameHeight) ?  '100%' : options.initialFrameHeight -
-                    getStyleValue("padding-top")- getStyleValue("padding-bottom") +'px';
+                container.style.width = /%$/.test(options.initialFrameWidth) ? '100%' : options.initialFrameWidth -
+                    getStyleValue("padding-left") - getStyleValue("padding-right") + 'px';
+                container.style.height = /%$/.test(options.initialFrameHeight) ? '100%' : options.initialFrameHeight -
+                    getStyleValue("padding-top") - getStyleValue("padding-bottom") + 'px';
 
                 container.style.zIndex = options.zIndex;
 
-                var html = ( ie && browser.version < 9  ? '' : '<!DOCTYPE html>') +
+                var html = (ie && browser.version < 9 ? '' : '<!DOCTYPE html>') +
                     '<html xmlns=\'http://www.w3.org/1999/xhtml\' class=\'view\' >' +
                     '<head>' +
                     '<style type=\'text/css\'>' +
                     //设置四周的留边
-                    '.view{padding:0;word-wrap:break-word;cursor:text;height:90%;}\n' +
+                    '.view{padding:0;word-wrap:break-word;cursor:text;background:#ebeaf1;margin:0;padding-bottom:45px;}\n' +
+                    //weknow  begin 
+                    '.view-body{width:868px;background:#fff;padding:98px 68px 24px 68px;margin:24px auto;margin-bottom:0;box-sizing:border-box;box-shadow:0 0 0 0.75pt #d1d1d1, 0 0 3pt 0.75pt #ccc;overflow-y: auto !important;}'+
+                    //插入节点的问题
+                    'xnode div{display: inline-blocl;}' + 
+                    //weknow  over
                     //设置默认字体和字号
                     //font-family不能呢随便改，在safari下fillchar会有解析问题
-                    'body{margin:8px;font-family:sans-serif;font-size:16px;}' +
+                    'body{margin:8px;font-family:arial;font-size:16px;}' +
                     //设置段落间距
-                    // 'p{margin:5px 0;}</style>' +
-                    'p{margin:5px 20px;min-width: 700px; max-width: 1150px}</style>' +
-                    (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
+                    'p{line-height:1.75em;margin:0;letter-spacing:1px;}</style>' +
+                    (options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '') +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
                     '</head>' +
-                    '<body class=\'view\' ></body>' +
-                    '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
+                    '<body class=\'view-body\' ></body>' +
+                    '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '') + ' id=\'_initialScript\'>' +
                     'setTimeout(function(){editor = window.parent.UE.instants[\'ueditorInstant' + me.uid + '\'];editor._setup(document);},0);' +
                     'var _tmpScript = document.getElementById(\'_initialScript\');_tmpScript.parentNode.removeChild(_tmpScript);' +
                     '</script>' +
-                    (options.iframeJsUrl ? ('<script type=\'text/javascript\' src=\'' + utils.unhtml(options.iframeJsUrl) + '\'></script>'):'') +
+                    (options.iframeJsUrl ? ('<script type=\'text/javascript\' src=\'' + utils.unhtml(options.iframeJsUrl) + '\'></script>') : '') +
                     '</html>';
 
                 container.appendChild(domUtils.createElement(document, 'iframe', {
@@ -6930,19 +6938,19 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     height: "100%",
                     frameborder: "0",
                     //先注释掉了，加的原因忘记了，但开启会直接导致全屏模式下内容多时不会出现滚动条
-//                    scrolling :'no',
-                    src: 'javascript:void(function(){document.open();' + (options.customDomain && document.domain != location.hostname ?  'document.domain="' + document.domain + '";' : '') +
-                        'document.write("' + html + '");document.close();}())'
+                    //                    scrolling :'no',
+                    src: 'javascript:void(function(){document.open();' + (options.customDomain && document.domain != location.hostname ? 'document.domain="' + document.domain + '";' : '') +
+                    'document.write("' + html + '");document.close();}())'
                 }));
                 container.style.overflow = 'hidden';
                 //解决如果是给定的百分比，会导致高度算不对的问题
-                setTimeout(function(){
-                    if( /%$/.test(options.initialFrameWidth)){
+                setTimeout(function () {
+                    if (/%$/.test(options.initialFrameWidth)) {
                         options.minFrameWidth = options.initialFrameWidth = container.offsetWidth;
                         //如果这里给定宽度，会导致ie在拖动窗口大小时，编辑区域不随着变化
-//                        container.style.width = options.initialFrameWidth + 'px';
+                        //                        container.style.width = options.initialFrameWidth + 'px';
                     }
-                    if(/%$/.test(options.initialFrameHeight)){
+                    if (/%$/.test(options.initialFrameHeight)) {
                         options.minFrameHeight = options.initialFrameHeight = container.offsetHeight;
                         container.style.height = options.initialFrameHeight + 'px';
                     }
@@ -6983,11 +6991,11 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             for (var form = this.iframe.parentNode; !domUtils.isBody(form); form = form.parentNode) {
                 if (form.tagName == 'FORM') {
                     me.form = form;
-                    if(me.options.autoSyncData){
-                        domUtils.on(me.window,'blur',function(){
-                            setValue(form,me);
+                    if (me.options.autoSyncData) {
+                        domUtils.on(me.window, 'blur', function () {
+                            setValue(form, me);
                         });
-                    }else{
+                    } else {
                         domUtils.on(form, 'submit', function () {
                             setValue(this, me);
                         });
@@ -7118,7 +7126,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * editor.setHeight(number);
          * ```
          */
-        setHeight: function (height,notSetHeight) {
+        setHeight: function (height, notSetHeight) {
             if (height !== parseInt(this.iframe.parentNode.style.height)) {
                 this.iframe.parentNode.style.height = height + 'px';
             }
@@ -7169,29 +7177,19 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             var me = this, shortcutkeys = this.shortcutkeys;
             me.addListener('keydown', function (type, e) {
                 var keyCode = e.keyCode || e.which;
-                if (e.keyCode == 13) {//回车
-                    let rng = me.selection.getRange();
-                    let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-                    if (xnode) {
-                        e.stopPropagation();
-                        domUtils.preventDefault(e);
-                        return;
-                    }
-                }
-                
                 for (var i in shortcutkeys) {
                     var tmp = shortcutkeys[i].split(',');
                     for (var t = 0, ti; ti = tmp[t++];) {
                         ti = ti.split(':');
                         var key = ti[0], param = ti[1];
                         if (/^(ctrl)(\+shift)?\+(\d+)$/.test(key.toLowerCase()) || /^(\d+)$/.test(key)) {
-                            if (( (RegExp.$1 == 'ctrl' ? (e.ctrlKey || e.metaKey) : 0)
+                            if (((RegExp.$1 == 'ctrl' ? (e.ctrlKey || e.metaKey) : 0)
                                 && (RegExp.$2 != "" ? e[RegExp.$2.slice(1) + "Key"] : 1)
                                 && keyCode == RegExp.$3
-                                ) ||
+                            ) ||
                                 keyCode == RegExp.$1
-                                ) {
-                                if (me.queryCommandState(i,param) != -1)
+                            ) {
+                                if (me.queryCommandState(i, param) != -1)
                                     me.execCommand(i, param);
                                 domUtils.preventDefault(e);
                             }
@@ -7232,7 +7230,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * } );
          * ```
          */
-        getContent: function (cmd, fn,notSetCursor,ignoreBlank,formatter) {
+        getContent: function (cmd, fn, notSetCursor, ignoreBlank, formatter) {
             var me = this;
             if (cmd && utils.isFunction(cmd)) {
                 fn = cmd;
@@ -7242,10 +7240,10 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 return '';
             }
             me.fireEvent('beforegetcontent');
-            var root = UE.htmlparser(me.body.innerHTML,ignoreBlank);
+            var root = UE.htmlparser(me.body.innerHTML, ignoreBlank);
             me.filterOutputRule(root);
-            me.fireEvent('aftergetcontent', cmd,root);
-            return  root.toHtml(formatter);
+            me.fireEvent('aftergetcontent', cmd, root);
+            return root.toHtml(formatter);
         },
 
         /**
@@ -7265,7 +7263,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             if (browser.ie && browser.version > 8) {
                 var headHtmlForIE9 = '';
                 utils.each(me.document.styleSheets, function (si) {
-                    headHtmlForIE9 += ( si.href ? '<link rel="stylesheet" type="text/css" href="' + si.href + '" />' : '<style>' + si.cssText + '</style>');
+                    headHtmlForIE9 += (si.href ? '<link rel="stylesheet" type="text/css" href="' + si.href + '" />' : '<style>' + si.cssText + '</style>');
                 });
                 utils.each(me.document.getElementsByTagName('script'), function (si) {
                     headHtmlForIE9 += si.outerHTML;
@@ -7352,8 +7350,8 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             me.body.innerHTML = (isAppendTo ? me.body.innerHTML : '') + html;
 
 
-            function isCdataDiv(node){
-                return  node.tagName == 'DIV' && node.getAttribute('cdata_tag');
+            function isCdataDiv(node) {
+                return node.tagName == 'DIV' && node.getAttribute('cdata_tag');
             }
             //给文本或者inline节点套p标签
             if (me.options.enterTag == 'p') {
@@ -7362,7 +7360,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 if (!child || child.nodeType == 1 &&
                     (dtd.$cdata[child.tagName] || isCdataDiv(child) ||
                         domUtils.isCustomeNode(child)
-                        )
+                    )
                     && child === this.body.lastChild) {
                     this.body.innerHTML = '<p>' + (browser.ie ? '&nbsp;' : '<br/>') + '</p>' + this.body.innerHTML;
 
@@ -7398,8 +7396,8 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             if (browser.gecko && (geckoSel = this.selection.getNative())) {
                 geckoSel.removeAllRanges();
             }
-            if(me.options.autoSyncData){
-                me.form && setValue(me.form,me);
+            if (me.options.autoSyncData) {
+                me.form && setValue(me.form, me);
             }
         },
 
@@ -7427,20 +7425,20 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     rng = me.selection.getRange();
                 if (toEnd) {
                     var node = me.body.lastChild;
-                    if(node && node.nodeType == 1 && !dtd.$empty[node.tagName]){
-                        if(domUtils.isEmptyBlock(node)){
+                    if (node && node.nodeType == 1 && !dtd.$empty[node.tagName]) {
+                        if (domUtils.isEmptyBlock(node)) {
                             rng.setStartAtFirst(node)
-                        }else{
+                        } else {
                             rng.setStartAtLast(node)
                         }
                         rng.collapse(true);
                     }
                     rng.setCursor(true);
                 } else {
-                    if(!rng.collapsed && domUtils.isBody(rng.startContainer) && rng.startOffset == 0){
+                    if (!rng.collapsed && domUtils.isBody(rng.startContainer) && rng.startOffset == 0) {
 
                         var node = me.body.firstChild;
-                        if(node && node.nodeType == 1 && !dtd.$empty[node.tagName]){
+                        if (node && node.nodeType == 1 && !dtd.$empty[node.tagName]) {
                             rng.setStartAtFirst(node).collapse(true);
                         }
                     }
@@ -7453,18 +7451,18 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
 
         },
-        isFocus:function(){
+        isFocus: function () {
             return this.selection.isFocus();
         },
-        blur:function(){
+        blur: function () {
             var sel = this.selection.getNative();
-            if(sel.empty && browser.ie){
+            if (sel.empty && browser.ie) {
                 var nativeRng = document.body.createTextRange();
                 nativeRng.moveToElementText(document.body);
                 nativeRng.collapse(true);
                 nativeRng.select();
                 sel.empty()
-            }else{
+            } else {
                 sel.removeAllRanges()
             }
 
@@ -7482,9 +7480,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             me._proxyDomEvent = utils.bind(me._proxyDomEvent, me);
             domUtils.on(doc, ['click', 'contextmenu', 'mousedown', 'keydown', 'keyup', 'keypress', 'mouseup', 'mouseover', 'mouseout', 'selectstart'], me._proxyDomEvent);
             domUtils.on(win, ['focus', 'blur'], me._proxyDomEvent);
-            domUtils.on(me.body,'drop',function(e){
+            domUtils.on(me.body, 'drop', function (e) {
                 //阻止ff下默认的弹出新页面打开图片
-                if(browser.gecko && e.stopPropagation) { e.stopPropagation(); }
+                if (browser.gecko && e.stopPropagation) { e.stopPropagation(); }
                 me.fireEvent('contentchange')
             });
             domUtils.on(doc, ['mouseup', 'keydown'], function (evt) {
@@ -7492,7 +7490,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 if (evt.type == 'keydown' && (evt.ctrlKey || evt.metaKey || evt.shiftKey || evt.altKey)) {
                     return;
                 }
-                if (evt.button == 2)return;
+                if (evt.button == 2) return;
                 me._selectionChange(250, evt);
             });
         },
@@ -7504,10 +7502,10 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * @see UE.EventBase:fireEvent(String)
          */
         _proxyDomEvent: function (evt) {
-            if(this.fireEvent('before' + evt.type.replace(/^on/, '').toLowerCase()) === false){
+            if (this.fireEvent('before' + evt.type.replace(/^on/, '').toLowerCase()) === false) {
                 return false;
             }
-            if(this.fireEvent(evt.type.replace(/^on/, ''), evt) === false){
+            if (this.fireEvent(evt.type.replace(/^on/, ''), evt) === false) {
                 return false;
             }
             return this.fireEvent('after' + evt.type.replace(/^on/, '').toLowerCase())
@@ -7520,9 +7518,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         _selectionChange: function (delay, evt) {
             var me = this;
             //有光标才做selectionchange 为了解决未focus时点击source不能触发更改工具栏状态的问题（source命令notNeedUndo=1）
-//            if ( !me.selection.isFocus() ){
-//                return;
-//            }
+            //            if ( !me.selection.isFocus() ){
+            //                return;
+            //            }
 
 
             var hackForMouseUp = false;
@@ -7614,12 +7612,12 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
             if (!cmd.notNeedUndo && !me.__hasEnterExecCommand) {
                 me.__hasEnterExecCommand = true;
-                if (me.queryCommandState.apply(me,arguments) != -1) {
+                if (me.queryCommandState.apply(me, arguments) != -1) {
                     me.fireEvent('saveScene');
                     me.fireEvent.apply(me, ['beforeexeccommand', cmdName].concat(arguments));
                     result = this._callCmdFn('execCommand', arguments);
                     //保存场景时，做了内容对比，再看是否进行contentchange触发，这里多触发了一次，去掉
-//                    (!cmd.ignoreContentChange && !me._ignoreContentChange) && me.fireEvent('contentchange');
+                    //                    (!cmd.ignoreContentChange && !me._ignoreContentChange) && me.fireEvent('contentchange');
                     me.fireEvent.apply(me, ['afterexeccommand', cmdName].concat(arguments));
                     me.fireEvent('saveScene');
                 }
@@ -7902,7 +7900,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             path = (path || "").split(".");
             for (var i = 0, ci; ci = path[i++];) {
                 lang = lang[ci];
-                if (!lang)break;
+                if (!lang) break;
             }
             return lang;
         },
@@ -7929,9 +7927,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * ```
          */
         getContentLength: function (ingoneHtml, tagNames) {
-            var count = this.getContent(false,false,true).length;
+            var count = this.getContent(false, false, true).length;
             if (ingoneHtml) {
-                tagNames = (tagNames || []).concat([ 'hr', 'img', 'iframe']);
+                tagNames = (tagNames || []).concat(['hr', 'img', 'iframe']);
                 count = this.getContentTxt().replace(/[\t\r\n]+/g, '').length;
                 for (var i = 0, ci; ci = tagNames[i++];) {
                     count += this.document.getElementsByTagName(ci).length;
@@ -8021,17 +8019,17 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
          * editor.getActionUrl('imageManager'); //返回 "/ueditor/php/controller.php?action=listimage"
          * ```
          */
-        getActionUrl: function(action){
+        getActionUrl: function (action) {
             var actionName = this.getOpt(action) || action,
                 imageUrl = this.getOpt('imageUrl'),
                 serverUrl = this.getOpt('serverUrl');
 
-            if(!serverUrl && imageUrl) {
+            if (!serverUrl && imageUrl) {
                 serverUrl = imageUrl.replace(/^(.*[\/]).+([\.].+)$/, '$1controller$2');
             }
 
-            if(serverUrl) {
-                serverUrl = serverUrl + (serverUrl.indexOf('?') == -1 ? '?':'&') + 'action=' + (actionName || '');
+            if (serverUrl) {
+                serverUrl = serverUrl + (serverUrl.indexOf('?') == -1 ? '?' : '&') + 'action=' + (actionName || '');
                 return utils.formatUrl(serverUrl);
             } else {
                 return '';
@@ -10170,7 +10168,6 @@ UE.plugins['defaultfilter'] = function () {
                             })
                         }
                         break;
-                        break;
                     case 'span':
                         val = node.getAttr('id');
                         if(val && /^_baidu_bookmark_/i.test(val)){
@@ -10255,6 +10252,11 @@ UE.commands['inserthtml'] = {
             return;
         }
         range = me.selection.getRange();
+        // 插入子文件时,防止其插入到其他子文件中导致UI错误
+        if(range.startContainer.tagName === 'XNODE') {
+            range.startContainer = range.startContainer.parentElement;
+            range.endContainer = range.endContainer.parentElement;
+        }
         div = range.document.createElement( 'div' );
         div.style.display = 'inline';
 
@@ -11940,8 +11942,10 @@ UE.plugins['link'] = function(){
                 text =   utils.html(opt.href);
 
             }
+             // weknow  start  
+            // 修改点击链接跳转问题
             opt['onclick'] = 'javascript:return false;';
-
+            // weknow  end
             domUtils.setAttributes( a, opt );
             start =  domUtils.findParentByTagName( rngClone.startContainer, 'a', true );
             if(start && domUtils.isInNodeEndBoundary(rngClone,start)){
@@ -12052,6 +12056,7 @@ UE.commands['scrawl'] = {
 
 
 // plugins/removeformat.js
+// plugins/removeformat.js
 /**
  * 清除格式
  * @file
@@ -12108,7 +12113,6 @@ UE.plugins['removeformat'] = function(){
                 }
                 return !node.attributes.length;
             }
-
             function doRemove( range ) {
 
                 var bookmark1 = range.createBookmark();
@@ -12129,6 +12133,7 @@ UE.plugins['removeformat'] = function(){
                     }
 
                 }
+
 
                 bookmark = range.createBookmark();
 
@@ -12166,15 +12171,22 @@ UE.plugins['removeformat'] = function(){
                                         domUtils.remove( current, true );
                                     }
                                 } else {
-                                    domUtils.remove( current, true );
+                                    if(!current.className.startsWith('live-doc-plugin')){
+                                        domUtils.remove( current, true );
+                                    }
                                 }
                             } else {
                                 //trace:939  不能把list上的样式去掉
-                                if(!dtd.$tableContent[current.tagName] && !dtd.$list[current.tagName] && !dtd.$xnode[current.tagName]){
-                                    domUtils.removeAttributes( current, removeFormatAttributes );
-                                    if ( isRedundantSpan( current ) ){
-                                        domUtils.remove( current, true );
+                                if(!dtd.$tableContent[current.tagName] && !dtd.$list[current.tagName]){
+                                    if(getNodeView(current)){
+
+                                    } else{
+                                        domUtils.removeAttributes( current, removeFormatAttributes );
+                                        if ( isRedundantSpan( current ) ){
+                                            domUtils.remove( current, true );
+                                        }
                                     }
+                                    
                                 }
 
                             }
@@ -12182,11 +12194,17 @@ UE.plugins['removeformat'] = function(){
                         current = next;
                     }
                 }
+
                 //trace:1035
                 //trace:1096 不能把td上的样式去掉，比如边框
                 var pN = bookmark.start.parentNode;
                 if(domUtils.isBlockElm(pN) && !dtd.$tableContent[pN.tagName] && !dtd.$list[pN.tagName]){
-                    domUtils.removeAttributes(  pN,removeFormatAttributes );
+                    // weknow patch start 清除样式时避免把body的class也去掉
+                    if(pN.className == 'view-body'){
+                        return ;
+                    }
+                    // weknow patch end
+                    domUtils.removeAttributes(pN,removeFormatAttributes );
                 }
                 pN = bookmark.end.parentNode;
                 if(bookmark.end && domUtils.isBlockElm(pN) && !dtd.$tableContent[pN.tagName]&& !dtd.$list[pN.tagName]){
@@ -12223,23 +12241,44 @@ UE.plugins['removeformat'] = function(){
                 }
             }
 
-            function isNodeView( range ) {
-                var aNode = domUtils.findParentByTagName(range.startContainer,'xnode',true);
-                if(aNode){
+            // weknow  start  
+            // 判断是否是节点视图
+            function getNodeView(elementNode) {
+                if (elementNode.tagName === 'XNODE') {
+                    try {
+                        return elementNode;
+                    } catch (error) {
+                        return null;
+                    }
+                } else {
+                    if (elementNode.parentElement) {
+                        return getNodeView(elementNode.parentElement);
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
+            function isNodeView(range) {
+                var aNode = domUtils.findParentByTagName(range.startContainer, 'xnode', true);
+                if (aNode) {
                     return true;
                 }
 
-                aNode = domUtils.findParentByTagName(range.endContainer,'xnode',true);
-                if(aNode){
+                aNode = domUtils.findParentByTagName(range.endContainer, 'xnode', true);
+                if (aNode) {
                     return true;
                 }
             }
-            
+            // weknow  end  
+
             range = this.selection.getRange();
-            if ( isNodeView( range ) ) {
+            doRemove(range);
+            // weknow  start
+            if (isNodeView(range)) {
                 return;
             }
-            doRemove( range );
+            // weknow  end  
             range.select();
 
         }
@@ -12247,7 +12286,6 @@ UE.plugins['removeformat'] = function(){
     };
 
 };
-
 
 // plugins/blockquote.js
 /**
@@ -13182,7 +13220,7 @@ UE.plugins['lineheight'] = function(){
 UE.plugins['insertcode'] = function() {
     var me = this;
     me.ready(function(){
-        utils.cssRule('pre','pre{margin:.5em 0;padding:.4em .6em;border-radius:8px;background:#f8f8f8;}',
+        utils.cssRule('pre','pre{margin:.5em 0;padding:.4em .6em;border-radius:8px;background:#f8f8f8;white-space:pre-wrap;}',
             me.document)
     });
     me.setOpt('insertcode',{
@@ -13682,15 +13720,6 @@ UE.plugins['insertcode'] = function() {
     //方向键的处理
     me.addListener('keydown',function(cmd,evt){
         var me = this,keyCode = evt.keyCode || evt.which;
-        if (evt.keyCode == 13) {//回车
-            let rng = me.selection.getRange();
-            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-            if (xnode) {
-                evt.stopPropagation();
-                domUtils.preventDefault(evt);
-                return;
-            }
-        }
         if(keyCode == 40){
             var rng = me.selection.getRange(),pre,start = rng.startContainer;
             if(rng.collapsed && (pre = domUtils.findParentByTagName(rng.startContainer,'pre',true)) && !pre.nextSibling){
@@ -14097,14 +14126,17 @@ UE.plugin.register('wordimage',function(){
                     opt = me.options,
                     src = opt.UEDITOR_HOME_URL + 'themes/default/images/spacer.gif';
                 if (attrs['src'] && /^(?:(file:\/+))/.test(attrs['src'])) {
-                    img.setAttr({
-                        width:attrs.width,
-                        height:attrs.height,
-                        alt:attrs.alt,
-                        word_img: attrs.src,
-                        src:src,
-                        'style':'background:url(' + ( flag ? opt.themePath + opt.theme + '/images/word.gif' : opt.langPath + opt.lang + '/images/localimage.png') + ') no-repeat center center;border:1px solid #ddd'
-                    })
+                    // Ueditor给本地图片做了处理,过滤掉
+                    if(attrs['src'].indexOf('images') === -1){
+                        img.setAttr({
+                            width:attrs.width,
+                            height:attrs.height,
+                            alt:attrs.alt,
+                            word_img: attrs.src,
+                            src:src,
+                            'style':'background:url(' + ( flag ? opt.themePath + opt.theme + '/images/word.gif' : opt.langPath + opt.lang + '/images/localimage.png') + ') no-repeat center center;border:1px solid #ddd'
+                        })
+                    }
                 }
             })
         }
@@ -14413,15 +14445,6 @@ UE.plugins['undo'] = function () {
 
         var me = this;
         var keyCode = evt.keyCode || evt.which;
-        if (evt.keyCode == 13) {//回车
-            let rng = me.selection.getRange();
-            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-            if (xnode) {
-                evt.stopPropagation();
-                domUtils.preventDefault(evt);
-                return;
-            }
-        }
         if (!keys[keyCode] && !evt.ctrlKey && !evt.metaKey && !evt.shiftKey && !evt.altKey) {
             if (inputType)
                 return;
@@ -14748,7 +14771,11 @@ UE.plugins['paste'] = function () {
                 htmlContent = html.html;
 
                 address = me.selection.getRange().createAddress(true);
-                me.execCommand('insertHtml', me.getOpt('retainOnlyLabelPasted') === true ?  getPureHtml(htmlContent) : htmlContent, true);
+                if(div.firstChild.tagName === 'XNODE') {
+                    me.execCommand('insertHtml', htmlContent, true);
+                }else {
+                    me.execCommand('insertHtml', me.getOpt('retainOnlyLabelPasted') === true ?  getPureHtml(htmlContent) : htmlContent, true);
+                }
             }
             me.fireEvent("afterpaste", html);
         }
@@ -14850,18 +14877,20 @@ UE.plugins['paste'] = function () {
 
     });
 
+    // weknow  start 
     me.commands['paste'] = {
-        execCommand: function (cmd) {
+        execCommand: function(cmd) {
             // if (browser.ie) {
-                getClipboardData.call(me, function (div) {
-                    filter(div);
-                });
-                me.document.execCommand('paste');
+            getClipboardData.call(me, function(div) {
+                filter(div);
+            });
+            me.document.execCommand('paste');
             // } else {
             //     alert(me.getLang('pastemsg'));
             // }
         }
     }
+    // weknow  end
 };
 
 
@@ -15043,49 +15072,49 @@ UE.plugins['list'] = function () {
         for(var p in customStyle){
             if(p == 'dash' || p == 'dot'){
                 customCss.push('li.list-' + customStyle[p] + '{background-image:url(' + liiconpath +customStyle[p]+'.gif)}');
-                customCss.push('ul.custom_'+p+'{list-style:none;}ul.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
+                customCss.push('ul.custom_'+p+'{}ul.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
             }else{
                 for(var i= 0;i<99;i++){
                     customCss.push('li.list-' + customStyle[p] + i + '{background-image:url(' + liiconpath + 'list-'+customStyle[p] + i + '.gif)}')
                 }
-                customCss.push('ol.custom_'+p+'{list-style:none;}ol.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
+                customCss.push('ol.custom_'+p+'{}ol.custom_'+p+' li{background-position:0 3px;background-repeat:no-repeat}');
             }
             switch(p){
                 case 'cn':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:25px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:40px}');
-                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:55px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:0px}');
                     break;
                 case 'cn1':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:30px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:40px}');
-                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:55px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:0px}');
                     break;
                 case 'cn2':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:40px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:55px}');
-                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:68px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-3{padding-left:0px}');
                     break;
                 case 'num':
                 case 'num1':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:25px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
                     break;
                 case 'num2':
-                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:35px}');
-                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:40px}');
+                    customCss.push('li.list-'+p+'-paddingleft-1{padding-left:0px}');
+                    customCss.push('li.list-'+p+'-paddingleft-2{padding-left:0px}');
                     break;
                 case 'dash':
-                    customCss.push('li.list-'+p+'-paddingleft{padding-left:35px}');
+                    customCss.push('li.list-'+p+'-paddingleft{padding-left:0px}');
                     break;
                 case 'dot':
-                    customCss.push('li.list-'+p+'-paddingleft{padding-left:20px}');
+                    customCss.push('li.list-'+p+'-paddingleft{padding-left:0px}');
             }
         }
-        customCss.push('.list-paddingleft-1{padding-left:0}');
+        customCss.push('.list-paddingleft-1{}');
         customCss.push('.list-paddingleft-2{padding-left:'+me.options.listDefaultPaddingLeft+'px}');
         customCss.push('.list-paddingleft-3{padding-left:'+me.options.listDefaultPaddingLeft*2+'px}');
         //如果不给宽度会在自定应样式里出现滚动条
-        utils.cssRule('list', 'ol,ul{margin:0;pading:0;'+(browser.ie ? '' : 'width:95%')+'}li{clear:both;}'+customCss.join('\n'), me.document);
+        utils.cssRule('list', 'ol,ul{margin:0 0 0 30px;pading:0;'+(browser.ie ? '' : 'width:95%')+'}li{clear:both;}'+customCss.join('\n'), me.document);
     });
     //单独处理剪切的问题
     me.ready(function(){
@@ -15441,15 +15470,6 @@ UE.plugins['list'] = function () {
     }
 
     me.addListener('keydown', function (type, evt) {
-        if (evt.keyCode == 13) {//回车
-            let rng = me.selection.getRange();
-            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-            if (xnode) {
-                evt.stopPropagation();
-                domUtils.preventDefault(evt);
-                return;
-            }
-        }
         function preventAndSave() {
             evt.preventDefault ? evt.preventDefault() : (evt.returnValue = false);
             me.fireEvent('contentchange');
@@ -15613,6 +15633,8 @@ UE.plugins['list'] = function () {
                             first.innerHTML = '';
                             domUtils.fillNode(me.document, first);
                         }
+                        // 处理list到最底部时,按回车键页面不滚动到光标处
+                        this.body.scrollTop = this.body.scrollTop + first.offsetHeight + 5;
 
                         range.setStart(first, 0).collapse(true).shrinkBoundary().select();
                         domUtils.remove(span);
@@ -16548,6 +16570,28 @@ UE.plugins['enterkey'] = function() {
                 start = range.startContainer,
                 doSave;
 
+        // weknow start
+        function findId(dom){
+            if(dom.id){
+                return dom;
+            }else{
+                if(dom.parentElement){
+                    return findId(dom.parentElement);
+                }else{
+                    return null;
+                }
+            }
+        }
+        var dom = findId(start);
+        if(dom) {
+            if(dom.previousSibling && dom.previousSibling.textContent.length < 1){
+                dom.previousSibling.removeAttribute('id');
+            }else{
+                dom.removeAttribute('id');
+            }
+        }
+        // weknow end
+            
             //修正在h1-h6里边回车后不能嵌套p的问题
             if (!browser.ie) {
 
@@ -16594,14 +16638,6 @@ UE.plugins['enterkey'] = function() {
     me.addListener('keydown', function(type, evt) {
         var keyCode = evt.keyCode || evt.which;
         if (keyCode == 13) {//回车
-            let rng = me.selection.getRange();
-            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-            if (xnode) {
-                e.stopPropagation();
-                domUtils.preventDefault(evt);
-                return;
-            }
-     
             if(me.fireEvent('beforeenterkeydown')){
                 domUtils.preventDefault(evt);
                 return;
@@ -16720,15 +16756,7 @@ UE.plugins['keystrokes'] = function() {
     me.addListener('keydown', function(type, evt) {
         var keyCode = evt.keyCode || evt.which,
             rng = me.selection.getRange();
-        if (evt.keyCode == 13) {//回车
-            let rng = me.selection.getRange();
-            let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-            if (xnode) {
-                evt.stopPropagation();
-                domUtils.preventDefault(evt);
-                return;
-            }
-        }
+
         //处理全选的情况
         if(!rng.collapsed && !(evt.ctrlKey || evt.shiftKey || evt.altKey || evt.metaKey) && (keyCode >= 65 && keyCode <=90
             || keyCode >= 48 && keyCode <= 57 ||
@@ -18635,7 +18663,7 @@ UE.plugins['video'] = function (){
                 if (colIndex == 0) {
                     var tr = tableRow.nextSibling || tableRow.previousSibling,
                         th = tr.cells[colIndex];
-                    if (th.tagName == 'TH') {
+                    if (th && th.tagName == 'TH') {
                         th = cell.ownerDocument.createElement("th");
                         th.appendChild(cell.firstChild);
                         tableRow.insertBefore(th, cell);
@@ -18757,12 +18785,15 @@ UE.plugins['video'] = function (){
             function replaceTdToTh(rowIndex, cell, tableRow) {
                 if (rowIndex == 0) {
                     var th = cell.nextSibling || cell.previousSibling;
-                    if (th.tagName == 'TH') {
+                    // weknow patch begin
+                    // 无法插入一列
+                    if (th && th.tagName == 'TH') {
                         th = cell.ownerDocument.createElement("th");
                         th.appendChild(cell.firstChild);
                         tableRow.insertBefore(th, cell);
                         domUtils.remove(cell)
                     }
+                    // weknow patch end
                 }else{
                     if (cell.tagName == 'TH') {
                         var td = cell.ownerDocument.createElement("td");
@@ -18860,29 +18891,86 @@ UE.plugins['video'] = function (){
             })
         },
         splitToRows:function (cell) {
+            // var cellInfo = this.getCellInfo(cell),
+            //     rowIndex = cellInfo.rowIndex,
+            //     colIndex = cellInfo.colIndex,
+            //     results = [];
+            // // 修改Cell的rowSpan
+            // cell.rowSpan = 1;
+            // results.push(cell);
+            // // 补齐单元格
+            // for (var i = rowIndex, endRow = rowIndex + cellInfo.rowSpan; i < endRow; i++) {
+            //     if (i == rowIndex)continue;
+            //     var tableRow = this.table.rows[i],
+            //         tmpCell = tableRow.insertCell(colIndex - this.getPreviewMergedCellsNum(i, colIndex));
+            //     tmpCell.colSpan = cellInfo.colSpan;
+            //     this.setCellContent(tmpCell);
+            //     tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
+            //     tmpCell.setAttribute('align', cell.getAttribute('align'));
+            //     if (cell.style.cssText) {
+            //         tmpCell.style.cssText = cell.style.cssText;
+            //     }
+            //     results.push(tmpCell);
+            // }
+            // this.update();
+            // return results;
             var cellInfo = this.getCellInfo(cell),
-                rowIndex = cellInfo.rowIndex,
-                colIndex = cellInfo.colIndex,
-                results = [];
-            // 修改Cell的rowSpan
-            cell.rowSpan = 1;
-            results.push(cell);
-            // 补齐单元格
-            for (var i = rowIndex, endRow = rowIndex + cellInfo.rowSpan; i < endRow; i++) {
-                if (i == rowIndex)continue;
-                var tableRow = this.table.rows[i],
-                    tmpCell = tableRow.insertCell(colIndex - this.getPreviewMergedCellsNum(i, colIndex));
-                tmpCell.colSpan = cellInfo.colSpan;
-                this.setCellContent(tmpCell);
-                tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                tmpCell.setAttribute('align', cell.getAttribute('align'));
-                if (cell.style.cssText) {
-                    tmpCell.style.cssText = cell.style.cssText;
+                    tr = cell.parentNode,
+                    table = this.table,
+                    map = this.buildTableMap(this.table),
+                    rowIndex = tr.rowIndex,
+                    colIndex = cellInfo.colIndex,
+                    rowSpan = cellInfo.rowSpan,
+                    newCell, newColSpan, newCellColSpan;
+
+                if (rowSpan > 1) {
+                    newRowSpan = Math.ceil(rowSpan / 2);
+                    newCellRowSpan = Math.floor(rowSpan / 2);
+                    newRowIndex = rowIndex + newRowSpan;
+                    var newCellTr = document.createElement('tr'),
+                        newCellRow = this.cellInRow(map, newRowIndex),
+                        candidateCell;
+
+                    newCell = cell.cloneNode();
+
+                    // 竖直找出要插入的单元格在哪儿
+                    for (var c = 0; c < newCellRow.length; c++) {
+                        candidateCell = newCellRow[c];
+                        // 找到第一个单元格
+                        if (candidateCell.parentNode == newCellTr.$ && c > colIndex) {
+                            newCell.insertBefore(document.createElement(candidateCell));
+                            break;
+                        } else {
+                            candidateCell = null;
+                        }
+                    }
+
+                    // 将新的单元格插入到空的行中
+                    if (!candidateCell)
+                        newCellTr.appendChild(newCell);
+                } else {
+                    newCellRowSpan = newRowSpan = 1;
+
+                    newCellTr = tr.cloneNode();
+                    newCellTr.className = '';
+                    domUtils.insertAfter(tr, newCellTr);
+                    newCell = cell.cloneNode();
+                    newCell.innerHTML = '<br>';
+                    newCellTr.appendChild(newCell);
+                    var cellsInSameRow = this.cellInRow(map, rowIndex);
+                    for (var i = 0; i < cellsInSameRow.length; i++)
+                        cellsInSameRow[i].rowSpan++;
                 }
-                results.push(tmpCell);
-            }
-            this.update();
-            return results;
+
+
+                cell.rowSpan = newRowSpan;
+                newCell.rowSpan = newCellRowSpan;
+                if (newRowSpan == 1)
+                    cell.removeAttribute('rowSpan');
+                if (newCellRowSpan == 1)
+                    newCell.removeAttribute('rowSpan');
+                this.update();
+                return newCell;
         },
         getPreviewMergedCellsNum:function (rowIndex, colIndex) {
             var indexRow = this.indexTable[rowIndex],
@@ -18896,42 +18984,68 @@ UE.plugins['video'] = function (){
             return num;
         },
         splitToCols:function (cell) {
-            var backWidth = (cell.offsetWidth / cell.colSpan - 22).toFixed(0),
+            // var backWidth = (cell.offsetWidth / cell.colSpan - 22).toFixed(0),
 
-                cellInfo = this.getCellInfo(cell),
-                rowIndex = cellInfo.rowIndex,
+            //     cellInfo = this.getCellInfo(cell),
+            //     rowIndex = cellInfo.rowIndex,
+            //     colIndex = cellInfo.colIndex,
+            //     results = [];
+            // // 修改Cell的rowSpan
+            // cell.colSpan = 1;
+            // cell.setAttribute("width", backWidth);
+            // results.push(cell);
+            // // 补齐单元格
+            // for (var j = colIndex, endCol = colIndex + cellInfo.colSpan; j < endCol; j++) {
+            //     if (j == colIndex)continue;
+            //     var tableRow = this.table.rows[rowIndex],
+            //         tmpCell = tableRow.insertCell(this.indexTable[rowIndex][j].cellIndex + 1);
+            //     tmpCell.rowSpan = cellInfo.rowSpan;
+            //     this.setCellContent(tmpCell);
+            //     tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
+            //     tmpCell.setAttribute('align', cell.getAttribute('align'));
+            //     tmpCell.setAttribute('width', backWidth);
+            //     if (cell.style.cssText) {
+            //         tmpCell.style.cssText = cell.style.cssText;
+            //     }
+            //     //处理th的情况
+            //     if (cell.tagName == 'TH') {
+            //         var th = cell.ownerDocument.createElement('th');
+            //         th.appendChild(tmpCell.firstChild);
+            //         th.setAttribute('vAlign', cell.getAttribute('vAlign'));
+            //         th.rowSpan = tmpCell.rowSpan;
+            //         tableRow.insertBefore(th, tmpCell);
+            //         domUtils.remove(tmpCell);
+            //     }
+            //     results.push(tmpCell);
+            // }
+            // this.update();
+            // return results;
+            var cellInfo = this.getCellInfo(cell),
+                tr = cell.parentNode,
+                table = this.table,
+                map = this.buildTableMap(this.table),
+                rowIndex = tr.rowIndex,
                 colIndex = cellInfo.colIndex,
-                results = [];
-            // 修改Cell的rowSpan
-            cell.colSpan = 1;
-            cell.setAttribute("width", backWidth);
-            results.push(cell);
-            // 补齐单元格
-            for (var j = colIndex, endCol = colIndex + cellInfo.colSpan; j < endCol; j++) {
-                if (j == colIndex)continue;
-                var tableRow = this.table.rows[rowIndex],
-                    tmpCell = tableRow.insertCell(this.indexTable[rowIndex][j].cellIndex + 1);
-                tmpCell.rowSpan = cellInfo.rowSpan;
-                this.setCellContent(tmpCell);
-                tmpCell.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                tmpCell.setAttribute('align', cell.getAttribute('align'));
-                tmpCell.setAttribute('width', backWidth);
-                if (cell.style.cssText) {
-                    tmpCell.style.cssText = cell.style.cssText;
-                }
-                //处理th的情况
-                if (cell.tagName == 'TH') {
-                    var th = cell.ownerDocument.createElement('th');
-                    th.appendChild(tmpCell.firstChild);
-                    th.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                    th.rowSpan = tmpCell.rowSpan;
-                    tableRow.insertBefore(th, tmpCell);
-                    domUtils.remove(tmpCell);
-                }
-                results.push(tmpCell);
+                colSpan = cellInfo.colSpan,
+                newCell, newColSpan, newCellColSpan;
+            if (colSpan > 1) {
+                newColSpan = Math.ceil(colSpan / 2);
+                newCellColSpan = Math.floor(colSpan / 2);
+            } else {
+                newCellColSpan = newColSpan = 1;
+                var cellsInSameCol = this.cellInCol(map, colIndex);
+                for (var i = 0; i < cellsInSameCol.length; i++)
+                    cellsInSameCol[i].colSpan++;
             }
-            this.update();
-            return results;
+            newCell = cell.cloneNode();
+            domUtils.insertAfter(cell, newCell);
+            cell.colSpan = newColSpan;
+            newCell.colSpan = newCellColSpan;
+            if (newColSpan == 1)
+                cell.removeAttribute('colSpan');
+            if (newCellColSpan == 1)
+                newCell.removeAttribute('colSpan');
+            return newCell;           
         },
         isLastCell:function (cell, rowsNum, colsNum) {
             rowsNum = rowsNum || this.rowsNum;
@@ -18942,16 +19056,26 @@ UE.plugins['video'] = function (){
         },
         getLastCell:function (cells) {
             cells = cells || this.table.getElementsByTagName("td");
-            var firstInfo = this.getCellInfo(cells[0]);
-            var me = this, last = cells[0],
+            thCells = this.table.getElementsByTagName('th');
+            var allCells = [];
+            if(thCells.length !== 0){
+                for(var i = 0;i<thCells.length;i++){
+                    allCells.push(thCells[i]);
+                };
+            }
+            for(var j = 0; j<cells.length; j++){
+                allCells.push(cells[j]);
+            };
+            var firstInfo = this.getCellInfo(allCells[0]);
+            var me = this, last = allCells[0],
                 tr = last.parentNode,
                 cellsNum = 0, cols = 0, rows;
-            utils.each(cells, function (cell) {
+            utils.each(allCells, function (cell) {
                 if (cell.parentNode == tr)cols += cell.colSpan || 1;
                 cellsNum += cell.rowSpan * cell.colSpan || 1;
             });
             rows = cellsNum / cols;
-            utils.each(cells, function (cell) {
+            utils.each(allCells, function (cell) {
                 if (me.isLastCell(cell, rows, cols)) {
                     last = cell;
                     return false;
@@ -18998,9 +19122,69 @@ UE.plugins['video'] = function (){
             utils.each(cells, function (cell) {
                 cell.style.backgroundColor = "";
             })
+        },
+        buildTableMap: function (table) {
+            var aRows = table.rows;
+
+            // Row and Column counters.
+            var r = -1;
+
+            var aMap = [];
+
+            for (var i = 0; i < aRows.length; i++) {
+                r++;
+                !aMap[r] && (aMap[r] = []);
+
+                var c = -1;
+
+                for (var j = 0; j < aRows[i].cells.length; j++) {
+                    var oCell = aRows[i].cells[j];
+
+                    c++;
+                    while (aMap[r][c])
+                        c++;
+
+                    var iColSpan = isNaN(oCell.colSpan) ? 1 : oCell.colSpan;
+                    var iRowSpan = isNaN(oCell.rowSpan) ? 1 : oCell.rowSpan;
+
+                    for (var rs = 0; rs < iRowSpan; rs++) {
+                        if (!aMap[r + rs])
+                            aMap[r + rs] = [];
+
+                        for (var cs = 0; cs < iColSpan; cs++) {
+                            aMap[r + rs][c + cs] = aRows[i].cells[j];
+                        }
+                    }
+
+                    c += iColSpan - 1;
+                }
+            }
+            return aMap;
+        },
+        cellInCol: function (tableMap, colIndex) {
+            var oCol = [];
+            for (var r = 0; r < tableMap.length; r++) {
+                var row = tableMap[r];
+                oCol.push(row[colIndex]);
+                // Avoid adding duplicate cells.
+                if (row[colIndex].rowSpan > 1)
+                    r += row[colIndex].rowSpan - 1;
+            }
+            return oCol;
+        },
+        cellInRow:function( tableMap, rowIndex, cell ) {
+            var oRow = tableMap[ rowIndex ];
+            if ( typeof cell == 'undefined' )
+                return oRow;
+
+            for ( var c = 0; oRow && c < oRow.length; c++ ) {
+                if ( cell.is && oRow[ c ] == cell.$ )
+                    return c;
+                else if ( c == cell )
+                    return domUtils.createElement( oRow[ c ] );
+            }
+            return cell.is ? -1 : null;
         }
-
-
     };
     function showError(e) {
     }
@@ -19401,6 +19585,26 @@ UE.plugins['video'] = function (){
             if (table.getAttribute("interlaced") === "enabled")this.fireEvent("interlacetable", table);
         }
     };
+ UE.commands["insertrowtolast"] = {
+        queryCommandState: function () {
+            var tableItems = getTableItemsByRange(this),
+                cell = tableItems.cell;
+            return cell && (cell.tagName == "TD") && getUETable(tableItems.table).rowsNum < this.options.maxRowNum ? 0 : -1;
+        },
+        execCommand: function () {
+            var rng = this.selection.getRange(),
+                bk = rng.createBookmark(true);
+            var cell = getTableItemsByRange(this).cell,
+                ut = getUETable(cell),
+                table = ut.table,
+                newCell = ut.getLastCell(),
+                cellInfo = ut.getCellInfo(newCell);
+            ut.insertRow(cellInfo.rowIndex + cellInfo.rowSpan, newCell);  
+            rng.moveToBookmark(bk).select();
+            if (table.getAttribute("interlaced") === "enabled")this.fireEvent("interlacetable", table);
+        }
+    };
+    
     UE.commands["deleterow"] = {
         queryCommandState: function () {
             var tableItems = getTableItemsByRange(this);
@@ -19491,6 +19695,25 @@ UE.plugins['video'] = function (){
         }
     };
 
+    UE.commands["insertcoltolast"] = {
+        queryCommandState: function () {
+            var tableItems = getTableItemsByRange(this),
+                cell = tableItems.cell;
+            return cell && getUETable(tableItems.table).colsNum < this.options.maxColNum ? 0 : -1;
+        },
+        execCommand: function () {
+            var rng = this.selection.getRange(),
+                bk = rng.createBookmark(true);
+            var cell = getTableItemsByRange(this).cell,
+                ut = getUETable(cell),
+                newCell = ut.getLastCell();
+                cellInfo = ut.getCellInfo(newCell);
+            var range = ut.cellsRange;
+            ut.insertCol(cellInfo.colIndex + cellInfo.colSpan, newCell);
+            rng.moveToBookmark(bk).select();
+        }
+    };
+
     UE.commands["deletecol"] = {
         queryCommandState: function () {
             var tableItems = getTableItemsByRange(this);
@@ -19559,7 +19782,7 @@ UE.plugins['video'] = function (){
             if (!cell) return -1;
             var ut = getUETable(tableItems.table);
             if (ut.selectedTds.length > 0) return -1;
-            return cell && cell.rowSpan > 1 ? 0 : -1;
+            return cell ? 0 : -1;
         },
         execCommand: function () {
             var rng = this.selection.getRange(),
@@ -19577,7 +19800,7 @@ UE.plugins['video'] = function (){
             if (!cell) return -1;
             var ut = getUETable(tableItems.table);
             if (ut.selectedTds.length > 0) return -1;
-            return cell && cell.colSpan > 1 ? 0 : -1;
+            return cell ? 0 : -1;
         },
         execCommand: function () {
             var rng = this.selection.getRange(),
@@ -19971,7 +20194,9 @@ UE.plugins['table'] = function () {
         singleClickState = 0,
         userActionStatus = null,
         //双击允许的时间范围
-        dblclickTime = 360,
+        // weknow patch begin
+        dblclickTime = 50,
+        // weknow patch end
         UT = UE.UETable,
         getUETable = function (tdOrTable) {
             return UT.getUETable(tdOrTable);
@@ -19987,20 +20212,20 @@ UE.plugins['table'] = function () {
         };
 
     function showError(e) {
-//        throw e;
+        //        throw e;
     }
-    me.ready(function(){
+    me.ready(function () {
         var me = this;
         var orgGetText = me.selection.getText;
-        me.selection.getText = function(){
+        me.selection.getText = function () {
             var table = getUETableBySelected(me);
-            if(table){
+            if (table) {
                 var str = '';
-                utils.each(table.selectedTds,function(td){
-                    str += td[browser.ie?'innerText':'textContent'];
+                utils.each(table.selectedTds, function (td) {
+                    str += td[browser.ie ? 'innerText' : 'textContent'];
                 })
                 return str;
-            }else{
+            } else {
                 return orgGetText.call(me.selection)
             }
 
@@ -20018,76 +20243,69 @@ UE.plugins['table'] = function () {
         dragTd = null;    //发生拖动的目标td
 
     var mousedown = false,
-    //todo 判断混乱模式
+        //todo 判断混乱模式
         needIEHack = true;
 
     me.setOpt({
-        'maxColNum':20,
-        'maxRowNum':100,
-        'defaultCols':5,
-        'defaultRows':5,
-        'tdvalign':'top',
-        'cursorpath':me.options.UEDITOR_HOME_URL + "themes/default/images/cursor_",
-        'tableDragable':false,
-        'classList':["ue-table-interlace-color-single","ue-table-interlace-color-double"]
+        'maxColNum': 20,
+        'maxRowNum': 100,
+        'defaultCols': 4,
+        'defaultRows': 3,
+        'tdvalign': 'top',
+        'cursorpath': me.options.UEDITOR_HOME_URL + "themes/default/images/cursor_",
+        'tableDragable': false,
+        'classList': ["ue-table-interlace-color-single", "ue-table-interlace-color-double"]
     });
     me.getUETable = getUETable;
     var commands = {
-        'deletetable':1,
-        'inserttable':1,
-        'cellvalign':1,
-        'insertcaption':1,
-        'deletecaption':1,
-        'inserttitle':1,
-        'deletetitle':1,
-        "mergeright":1,
-        "mergedown":1,
-        "mergecells":1,
-        "insertrow":1,
-        "insertrownext":1,
-        "deleterow":1,
-        "insertcol":1,
-        "insertcolnext":1,
-        "deletecol":1,
-        "splittocells":1,
-        "splittorows":1,
-        "splittocols":1,
-        "adaptbytext":1,
-        "adaptbywindow":1,
-        "adaptbycustomer":1,
-        "insertparagraph":1,
-        "insertparagraphbeforetable":1,
-        "averagedistributecol":1,
-        "averagedistributerow":1
+        'deletetable': 1,
+        'inserttable': 1,
+        'cellvalign': 1,
+        'insertcaption': 1,
+        'deletecaption': 1,
+        'inserttitle': 1,
+        'deletetitle': 1,
+        "mergeright": 1,
+        "mergedown": 1,
+        "mergecells": 1,
+        "insertrow": 1,
+        "insertrownext": 1,
+        "insertcoltolast": 1,
+        "insertrowtolast":1,
+        "deleterow": 1,
+        "insertcol": 1,
+        "insertcolnext": 1,
+        "deletecol": 1,
+        "splittocells": 1,
+        "splittorows": 1,
+        "splittocols": 1,
+        "adaptbytext": 1,
+        "adaptbywindow": 1,
+        "adaptbycustomer": 1,
+        "insertparagraph": 1,
+        "insertparagraphbeforetable": 1,
+        "averagedistributecol": 1,
+        "averagedistributerow": 1
     };
     me.ready(function () {
         utils.cssRule('table',
             //选中的td上的样式
             '.selectTdClass{background-color:#edf5fa !important}' +
-                'table.noBorderTable td,table.noBorderTable th,table.noBorderTable caption{border:1px dashed #ddd !important}' +
-                //插入的表格的默认样式
-                'table{margin-bottom:10px;border-collapse:collapse;display:table;}' +
-                'td,th{padding: 5px 10px;border: 1px solid #DDD;}' +
-                'caption{border:1px dashed #DDD;border-bottom:0;padding:3px;text-align:center;}' +
-                'th{border-top:1px solid #BBB;background-color:#F7F7F7;}' +
-                'table tr.firstRow th{border-top-width:2px;}' +
-                '.ue-table-interlace-color-single{ background-color: #fcfcfc; } .ue-table-interlace-color-double{ background-color: #f7faff; }' +
-                'td p{margin:0;padding:0;}', me.document);
+            'table.noBorderTable td,table.noBorderTable th,table.noBorderTable caption{border:1px dashed #ddd !important}' +
+            //插入的表格的默认样式
+            'table{margin-bottom:10px;border-collapse:collapse;display:table;}' +
+            'td,th{padding: 8px 10px;border: 1px solid #000;}' +
+            'caption{border:1px dashed #DDD;border-bottom:0;padding:3px;text-align:center;}' +
+            'th{border-top:1px solid #BBB;background-color:#F7F7F7;}' +
+            'table tr.firstRow th{border-top-width:2px;}' +
+            '.ue-table-interlace-color-single{ background-color: #fcfcfc; } .ue-table-interlace-color-double{ background-color: #f7faff; }' +
+            'td p{margin:0;padding:0;} td ol,td ul{padding:0;margin:0;width:auto;}', me.document);
 
         var tableCopyList, isFullCol, isFullRow;
         //注册del/backspace事件
         me.addListener('keydown', function (cmd, evt) {
             var me = this;
             var keyCode = evt.keyCode || evt.which;
-            if (evt.keyCode == 13) {//回车
-                    let rng = me.selection.getRange();
-                    let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-                    if (xnode) {
-                        evt.stopPropagation();
-                        domUtils.preventDefault(evt);
-                        return;
-                    }
-                }
 
             if (keyCode == 8) {
 
@@ -20099,7 +20317,15 @@ UE.plugins['table'] = function () {
                     } else if (ut.isFullRow()) {
                         me.execCommand('deleterow')
                     } else {
-                        me.fireEvent('delcells');
+                        // weknow patch begin
+                        // 富文本里面全选表格按backspace键无法删除内容
+                        //me.fireEvent('delcells');
+                        me.fireEvent('saveScene');
+                        for (var i = 0, ci; ci = ut.selectedTds[i++];) {
+                            domUtils.fillNode(me.document, ci)
+                        }
+                        me.fireEvent('saveScene');
+                        // weknow patch end
                     }
                     domUtils.preventDefault(evt);
                 }
@@ -20156,9 +20382,9 @@ UE.plugins['table'] = function () {
                         var cell = table.rows[0].cells[0],
                             start = domUtils.findParentByTagName(me.selection.getStart(), ['td', 'th'], true),
                             preNode = table.previousSibling;
-                        if (cell === start && (!preNode || preNode.nodeType == 1 && preNode.tagName == 'TABLE' ) && domUtils.isStartInblock(rng)) {
-                            var first = domUtils.findParent(me.selection.getStart(), function(n){return domUtils.isBlockElm(n)}, true);
-                            if(first && ( /t(h|d)/i.test(first.tagName) || first ===  start.firstChild )){
+                        if (cell === start && (!preNode || preNode.nodeType == 1 && preNode.tagName == 'TABLE') && domUtils.isStartInblock(rng)) {
+                            var first = domUtils.findParent(me.selection.getStart(), function (n) { return domUtils.isBlockElm(n) }, true);
+                            if (first && (/t(h|d)/i.test(first.tagName) || first === start.firstChild)) {
                                 me.execCommand('insertparagraphbeforetable');
                                 domUtils.preventDefault(evt);
                             }
@@ -20176,22 +20402,62 @@ UE.plugins['table'] = function () {
                     isFullCol = ut.isFullCol();
                     isFullRow = ut.isFullRow();
                     tableCopyList = [
-                        [ut.cloneCell(tds[0],null,true)]
+                        [ut.cloneCell(tds[0], null, true)]
                     ];
                     for (var i = 1, ci; ci = tds[i]; i++) {
                         if (ci.parentNode !== tds[i - 1].parentNode) {
-                            tableCopyList.push([ut.cloneCell(ci,null,true)]);
+                            tableCopyList.push([ut.cloneCell(ci, null, true)]);
                         } else {
-                            tableCopyList[tableCopyList.length - 1].push(ut.cloneCell(ci,null,true));
+                            tableCopyList[tableCopyList.length - 1].push(ut.cloneCell(ci, null, true));
                         }
 
                     }
                 }
-            }
+            };
+
+            if ((evt.ctrlKey || evt.metaKey) && evt.keyCode == '88') {
+                tableCopyList = null;
+                var ut = getUETableBySelected(me);
+                if (ut) {
+                    var tds = ut.selectedTds;
+                    isFullCol = ut.isFullCol();
+                    isFullRow = ut.isFullRow();
+                    tableCopyList = [
+                        [ut.cloneCell(tds[0], null, true)]
+                    ];
+                    for (var i = 1, ci; ci = tds[i]; i++) {
+                        if (ci.parentNode !== tds[i - 1].parentNode) {
+                            tableCopyList.push([ut.cloneCell(ci, null, true)]);
+                        } else {
+                            tableCopyList[tableCopyList.length - 1].push(ut.cloneCell(ci, null, true));
+                        }
+
+                    }
+                    if (ut && ut.selectedTds.length) {
+
+                        if (ut.isFullCol()) {
+                            me.execCommand('deletecol')
+                        } else if (ut.isFullRow()) {
+                            me.execCommand('deleterow')
+                        } else {
+                            // weknow patch begin
+                            // 富文本里面全选表格按backspace键无法删除内容
+                            //me.fireEvent('delcells');
+                            me.fireEvent('saveScene');
+                            for (var i = 0, ci; ci = ut.selectedTds[i++];) {
+                                domUtils.fillNode(me.document, ci)
+                            }
+                            me.fireEvent('saveScene');
+                            // weknow patch end
+                        }
+                        domUtils.preventDefault(evt);
+                    }
+                }
+            };
         });
-        me.addListener("tablehasdeleted",function(){
+        me.addListener("tablehasdeleted", function () {
             toggleDraggableState(this, false, "", null);
-            if (dragButton)domUtils.remove(dragButton);
+            if (dragButton) domUtils.remove(dragButton);
         });
 
         me.addListener('beforepaste', function (cmd, html) {
@@ -20292,7 +20558,7 @@ UE.plugins['table'] = function () {
                     for (var i = 0, ci; ci = tableCopyList[i++];) {
                         var tr = table.insertRow(table.rows.length);
                         for (var j = 0, cj; cj = ci[j++];) {
-                            cloneTd = UT.cloneCell(cj,null,true);
+                            cloneTd = UT.cloneCell(cj, null, true);
                             domUtils.removeAttributes(cloneTd, ['class']);
                             tr.appendChild(cloneTd)
                         }
@@ -20305,8 +20571,8 @@ UE.plugins['table'] = function () {
                         width = me.body.offsetWidth -
                             (needIEHack ? parseInt(domUtils.getComputedStyle(me.body, 'margin-left'), 10) * 2 : 0) - defaultValue.tableBorder * 2 - (me.options.offsetWidth || 0);
                     me.execCommand('insertHTML', '<table  ' +
-                        ( isFullCol && isFullRow ? 'width="' + width + '"' : '') +
-                        '>' + table.innerHTML.replace(/>\s*</g, '><').replace(/\bth\b/gi, "td") + '</table>')
+                        (isFullCol && isFullRow ? 'width="' + width + '"' : '') +
+                        '>' + table.innerHTML + '</table>')
                 }
                 me.fireEvent('contentchange');
                 me.fireEvent('saveScene');
@@ -20332,7 +20598,7 @@ UE.plugins['table'] = function () {
                                 domUtils.fillNode(me.document, td);
                             }
                             removeStyleSize(td, true);
-//                            domUtils.removeAttributes(td, ['style'])
+                            //                            domUtils.removeAttributes(td, ['style'])
                         });
                     });
                 }
@@ -20352,16 +20618,7 @@ UE.plugins['table'] = function () {
             tableCopyList = null;
         });
         var timer;
-        me.addListener('keydown', function (type, evt) {
-            if (evt.keyCode == 13) {//回车
-                let rng = me.selection.getRange();
-                let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-                if (xnode) {
-                    evt.stopPropagation();
-                    domUtils.preventDefault(evt);
-                    return;
-                }
-            }
+        me.addListener('keydown', function () {
             clearTimeout(timer);
             timer = setTimeout(function () {
                 var rng = me.selection.getRange(),
@@ -20386,7 +20643,7 @@ UE.plugins['table'] = function () {
             var me = this;
             //尽可能排除一些不需要更新的状况
             hideDragLine(me);
-            if (getUETableBySelected(me))return;
+            if (getUETableBySelected(me)) return;
             var rng = me.selection.getRange();
             var start = rng.startContainer;
             start = domUtils.findParentByTagName(start, ['td', 'th'], true);
@@ -20394,56 +20651,59 @@ UE.plugins['table'] = function () {
                 if (me.fireEvent("excludetable", table) === true) return;
                 table.ueTable = new UT(table);
                 //trace:3742
-//                utils.each(domUtils.getElementsByTagName(me.document, 'td'), function (td) {
-//
-//                    if (domUtils.isEmptyBlock(td) && td !== start) {
-//                        domUtils.fillNode(me.document, td);
-//                        if (browser.ie && browser.version == 6) {
-//                            td.innerHTML = '&nbsp;'
-//                        }
-//                    }
-//                });
-//                utils.each(domUtils.getElementsByTagName(me.document, 'th'), function (th) {
-//                    if (domUtils.isEmptyBlock(th) && th !== start) {
-//                        domUtils.fillNode(me.document, th);
-//                        if (browser.ie && browser.version == 6) {
-//                            th.innerHTML = '&nbsp;'
-//                        }
-//                    }
-//                });
+                //                utils.each(domUtils.getElementsByTagName(me.document, 'td'), function (td) {
+                //
+                //                    if (domUtils.isEmptyBlock(td) && td !== start) {
+                //                        domUtils.fillNode(me.document, td);
+                //                        if (browser.ie && browser.version == 6) {
+                //                            td.innerHTML = '&nbsp;'
+                //                        }
+                //                    }
+                //                });
+                //                utils.each(domUtils.getElementsByTagName(me.document, 'th'), function (th) {
+                //                    if (domUtils.isEmptyBlock(th) && th !== start) {
+                //                        domUtils.fillNode(me.document, th);
+                //                        if (browser.ie && browser.version == 6) {
+                //                            th.innerHTML = '&nbsp;'
+                //                        }
+                //                    }
+                //                });
                 table.onmouseover = function () {
                     me.fireEvent('tablemouseover', table);
                 };
                 table.onmousemove = function () {
                     me.fireEvent('tablemousemove', table);
                     me.options.tableDragable && toggleDragButton(true, this, me);
-                    utils.defer(function(){
-                        me.fireEvent('contentchange',50)
-                    },true)
+                    utils.defer(function () {
+                        me.fireEvent('contentchange', 50)
+                    }, true)
                 };
                 table.onmouseout = function () {
                     me.fireEvent('tablemouseout', table);
                     toggleDraggableState(me, false, "", null);
                     hideDragLine(me);
+                    // weknow path begin modify by shirley.jiang, 回退代码修复：0005621: [win] 文档中表格的的大小不好调节
+                    toggleDragButton(false, this, me);
+                    // weknow path end
                 };
                 table.onclick = function (evt) {
                     evt = me.window.event || evt;
                     var target = getParentTdOrTh(evt.target || evt.srcElement);
-                    if (!target)return;
+                    if (!target) return;
                     var ut = getUETable(target),
                         table = ut.table,
                         cellInfo = ut.getCellInfo(target),
                         cellsRange,
                         rng = me.selection.getRange();
-//                    if ("topLeft" == inPosition(table, mouseCoords(evt))) {
-//                        cellsRange = ut.getCellsRange(ut.table.rows[0].cells[0], ut.getLastCell());
-//                        ut.setSelected(cellsRange);
-//                        return;
-//                    }
-//                    if ("bottomRight" == inPosition(table, mouseCoords(evt))) {
-//
-//                        return;
-//                    }
+                    //                    if ("topLeft" == inPosition(table, mouseCoords(evt))) {
+                    //                        cellsRange = ut.getCellsRange(ut.table.rows[0].cells[0], ut.getLastCell());
+                    //                        ut.setSelected(cellsRange);
+                    //                        return;
+                    //                    }
+                    //                    if ("bottomRight" == inPosition(table, mouseCoords(evt))) {
+                    //
+                    //                        return;
+                    //                    }
                     if (inTableSide(table, target, evt, true)) {
                         var endTdCol = ut.getCell(ut.indexTable[ut.rowsNum - 1][cellInfo.colIndex].rowIndex, ut.indexTable[ut.rowsNum - 1][cellInfo.colIndex].cellIndex);
                         if (evt.shiftKey && ut.selectedTds.length) {
@@ -20482,6 +20742,24 @@ UE.plugins['table'] = function () {
                         }
                     }
                 };
+                // 单元格双击全选单元格内容
+                table.ondblclick = function (evt) {
+                    console.info("1---2");
+                    obj = evt.target;
+                    if (evt.target.tagName === 'TD') {
+                        obj = evt.target;
+                    } else if (evt.target.parentElement.tagName === 'TD') {
+                        obj = evt.target.parentElement;
+                    } else if (evt.target.parentElement.parentElement.tagName === 'TD') {
+                        obj = evt.target.parentElement.parentElement;
+                    }
+                    range = me.selection.getRange();
+                    range.selectNodeContents(obj);
+                    if (domUtils.isEmptyBlock(obj)) {
+                        range.collapse(true);
+                    }
+                    range.select(true);
+                };
             });
 
             switchBorderColor(me, true);
@@ -20498,37 +20776,37 @@ UE.plugins['table'] = function () {
         /**
          * 表格隔行变色
          */
-        me.addListener("interlacetable",function(type,table,classList){
-            if(!table) return;
+        me.addListener("interlacetable", function (type, table, classList) {
+            if (!table) return;
             var me = this,
                 rows = table.rows,
                 len = rows.length,
-                getClass = function(list,index,repeat){
-                    return list[index] ? list[index] : repeat ? list[index % list.length]: "";
+                getClass = function (list, index, repeat) {
+                    return list[index] ? list[index] : repeat ? list[index % list.length] : "";
                 };
-            for(var i = 0;i<len;i++){
-                rows[i].className = getClass( classList|| me.options.classList,i,true);
+            for (var i = 0; i < len; i++) {
+                rows[i].className = getClass(classList || me.options.classList, i, true);
             }
         });
-        me.addListener("uninterlacetable",function(type,table){
-            if(!table) return;
+        me.addListener("uninterlacetable", function (type, table) {
+            if (!table) return;
             var me = this,
                 rows = table.rows,
                 classList = me.options.classList,
                 len = rows.length;
-            for(var i = 0;i<len;i++){
-                domUtils.removeClasses( rows[i], classList );
+            for (var i = 0; i < len; i++) {
+                domUtils.removeClasses(rows[i], classList);
             }
         });
 
         me.addListener("mousedown", mouseDownEvent);
         me.addListener("mouseup", mouseUpEvent);
         //拖动的时候触发mouseup
-        domUtils.on( me.body, 'dragstart', function( evt ){
-            mouseUpEvent.call( me, 'dragstart', evt );
+        domUtils.on(me.body, 'dragstart', function (evt) {
+            mouseUpEvent.call(me, 'dragstart', evt);
         });
-        me.addOutputRule(function(root){
-            utils.each(root.getNodesByTagName('div'),function(n){
+        me.addOutputRule(function (root) {
+            utils.each(root.getNodesByTagName('div'), function (n) {
                 if (n.getAttr('id') == 'ue_tableDragLine') {
                     n.parentNode.removeChild(n);
                 }
@@ -20639,45 +20917,70 @@ UE.plugins['table'] = function () {
                 result;
             if (!cmdFun) return;
             if (ut && !commands[cmd] && !cmdFun.notNeedUndo && !me.__hasEnterExecCommand) {
-                me.__hasEnterExecCommand = true;
-                me.fireEvent("beforeexeccommand", cmd);
-                tds = ut.selectedTds;
-                var lastState = -2, lastValue = -2, value, state;
-                for (var i = 0, td; td = tds[i]; i++) {
-                    if (isEmptyBlock(td)) {
-                        range.setStart(td, 0).setCursor(false, true)
-                    } else {
-                        range.selectNode(td).select(true);
-                    }
-                    state = me.queryCommandState(cmd);
-                    value = me.queryCommandValue(cmd);
-                    if (state != -1) {
-                        if (lastState !== state || lastValue !== value) {
-                            me._ignoreContentChange = true;
-                            result = oldExecCommand.apply(me, arguments);
-                            me._ignoreContentChange = false;
-
+                if (cmd !== 'copy') {
+                    me.__hasEnterExecCommand = true;
+                    me.fireEvent("beforeexeccommand", cmd);
+                    tds = ut.selectedTds;
+                    var lastState = -2, lastValue = -2, value, state;
+                    for (var i = 0, td; td = tds[i]; i++) {
+                        if (isEmptyBlock(td)) {
+                            td.innerHTML = '<span>&nbsp;</span>';
+                            range.selectNode(td).select(true);
+                        } else {
+                            range.selectNode(td).select(true);
                         }
-                        lastState = me.queryCommandState(cmd);
-                        lastValue = me.queryCommandValue(cmd);
-                        if (domUtils.isEmptyBlock(td)) {
-                            domUtils.fillNode(me.document, td)
+                        state = me.queryCommandState(cmd);
+                        value = me.queryCommandValue(cmd);
+                        if (state != -1) {
+                            if (lastState !== state || lastValue !== value) {
+                                me._ignoreContentChange = true;
+                                result = oldExecCommand.apply(me, arguments);
+                                me._ignoreContentChange = false;
+                            }
+                            if(cmd !=='removeformat'){
+                                lastState = me.queryCommandState(cmd);
+                                lastValue = me.queryCommandValue(cmd);
+                            }
+                        }
+                    }
+                    lastState = me.queryCommandState(cmd);
+                    lastValue = me.queryCommandValue(cmd);
+                    range.setStart(tds[0], 0).shrinkBoundary(true).setCursor(false, true);
+                    me.fireEvent('contentchange');
+                    me.fireEvent("afterexeccommand", cmd);
+                    me.__hasEnterExecCommand = false;
+                    me._selectionChange();
+                } else {
+                    tableCopyList = null;
+                    var ut = getUETableBySelected(me);
+                    if (ut) {
+                        var tds = ut.selectedTds;
+                        isFullCol = ut.isFullCol();
+                        isFullRow = ut.isFullRow();
+                        tableCopyList = [
+                            [ut.cloneCell(tds[0], null, true)]
+                        ];
+                        for (var i = 1, ci; ci = tds[i]; i++) {
+                            if (ci.parentNode !== tds[i - 1].parentNode) {
+                                tableCopyList.push([ut.cloneCell(ci, null, true)]);
+                            } else {
+                                tableCopyList[tableCopyList.length - 1].push(ut.cloneCell(ci, null, true));
+                            }
+
                         }
                     }
                 }
-                range.setStart(tds[0], 0).shrinkBoundary(true).setCursor(false, true);
-                me.fireEvent('contentchange');
-                me.fireEvent("afterexeccommand", cmd);
-                me.__hasEnterExecCommand = false;
-                me._selectionChange();
             } else {
+                if(cmd === 'copy'){
+                    tableCopyList = null;
+                }
                 result = oldExecCommand.apply(me, arguments);
             }
             return result;
         };
 
-
     });
+
     /**
      * 删除obj的宽高style，改成属性宽高
      * @param obj
@@ -20718,17 +21021,17 @@ UE.plugins['table'] = function () {
 
     function mouseCoords(evt) {
         if (evt.pageX || evt.pageY) {
-            return { x:evt.pageX, y:evt.pageY };
+            return { x: evt.pageX, y: evt.pageY };
         }
         return {
-            x:evt.clientX + me.document.body.scrollLeft - me.document.body.clientLeft,
-            y:evt.clientY + me.document.body.scrollTop - me.document.body.clientTop
+            x: evt.clientX + me.document.body.scrollLeft - me.document.body.clientLeft,
+            y: evt.clientY + me.document.body.scrollTop - me.document.body.clientTop
         };
     }
 
     function mouseMoveEvent(evt) {
 
-        if( isEditorDisabled() ) {
+        if (isEditorDisabled()) {
             return;
         }
 
@@ -20739,11 +21042,11 @@ UE.plugins['table'] = function () {
                 pos;
 
             //区分用户的行为是拖动还是双击
-            if( isInResizeBuffer  ) {
+            if (isInResizeBuffer) {
 
                 me.body.style.webkitUserSelect = 'none';
 
-                if( Math.abs( userActionStatus.x - evt.clientX ) > offsetOfTableCell || Math.abs( userActionStatus.y - evt.clientY ) > offsetOfTableCell ) {
+                if (Math.abs(userActionStatus.x - evt.clientX) > offsetOfTableCell || Math.abs(userActionStatus.y - evt.clientY) > offsetOfTableCell) {
                     clearTableDragTimer();
                     isInResizeBuffer = false;
                     singleClickState = 0;
@@ -20805,7 +21108,7 @@ UE.plugins['table'] = function () {
 
     function toggleDragButton(show, table, editor) {
         if (!show) {
-            if (dragOver)return;
+            if (dragOver) return;
             dragButtonTimer = setTimeout(function () {
                 !dragOver && dragButton && dragButton.parentNode && dragButton.parentNode.removeChild(dragButton);
             }, 2000);
@@ -20817,7 +21120,7 @@ UE.plugins['table'] = function () {
     function createDragButton(table, editor) {
         var pos = domUtils.getXY(table),
             doc = table.ownerDocument;
-        if (dragButton && dragButton.parentNode)return dragButton;
+        if (dragButton && dragButton.parentNode) return dragButton;
         dragButton = doc.createElement("div");
         dragButton.contentEditable = false;
         dragButton.innerHTML = "";
@@ -20846,6 +21149,12 @@ UE.plugins['table'] = function () {
             timer = setTimeout(function () {
                 editor.fireEvent("tableClicked", table, button);
             }, 300);
+            var ut = getUETable(table),
+                start = table.rows[0].cells[0],
+                end = ut.getLastCell(),
+                range = ut.getCellsRange(start, end);
+            editor.selection.getRange().setStart(start, 0).setCursor(false, true);
+            ut.setSelected(range);
         }
 
         function doDblClick(evt) {
@@ -20862,16 +21171,16 @@ UE.plugins['table'] = function () {
     }
 
 
-//    function inPosition(table, pos) {
-//        var tablePos = domUtils.getXY(table),
-//            width = table.offsetWidth,
-//            height = table.offsetHeight;
-//        if (pos.x - tablePos.x < 5 && pos.y - tablePos.y < 5) {
-//            return "topLeft";
-//        } else if (tablePos.x + width - pos.x < 5 && tablePos.y + height - pos.y < 5) {
-//            return "bottomRight";
-//        }
-//    }
+    //    function inPosition(table, pos) {
+    //        var tablePos = domUtils.getXY(table),
+    //            width = table.offsetWidth,
+    //            height = table.offsetHeight;
+    //        if (pos.x - tablePos.x < 5 && pos.y - tablePos.y < 5) {
+    //            return "topLeft";
+    //        } else if (tablePos.x + width - pos.x < 5 && tablePos.y + height - pos.y < 5) {
+    //            return "bottomRight";
+    //        }
+    //    }
 
     function inTableSide(table, cell, evt, top) {
         var pos = mouseCoords(evt),
@@ -20891,14 +21200,14 @@ UE.plugins['table'] = function () {
      * @param dragTd
      * @param evt
      */
-    function getPermissionX(dragTd, evt) {
+    function getPermissionX(dragTd, evt)  {
         var ut = getUETable(dragTd);
         if (ut) {
             var preTd = ut.getSameEndPosCells(dragTd, "x")[0],
                 nextTd = ut.getSameStartPosXCells(dragTd)[0],
                 mouseX = mouseCoords(evt).x,
-                left = (preTd ? domUtils.getXY(preTd).x : domUtils.getXY(ut.table).x) + 20 ,
-                right = nextTd ? domUtils.getXY(nextTd).x + nextTd.offsetWidth - 20 : (me.body.offsetWidth + 5 || parseInt(domUtils.getComputedStyle(me.body, "width"), 10));
+                left = (preTd ? domUtils.getXY(preTd).x : domUtils.getXY(ut.table).x) + 20,
+                right = nextTd ? domUtils.getXY(nextTd).x + nextTd.offsetWidth - 20 : ( me.body.offsetWidth + parseInt(domUtils.getComputedStyle(me.body,"margin-left"), 10) - 68 || parseInt(domUtils.getComputedStyle(me.body, "width"), 10) + parseInt(domUtils.getComputedStyle(me.body,"margin-left"), 10) - 68 );
 
             left += cellMinWidth;
             right -= cellMinWidth;
@@ -20906,7 +21215,7 @@ UE.plugins['table'] = function () {
             return mouseX < left ? left : mouseX > right ? right : mouseX;
         }
     }
-
+    
     /**
      * 获取拖动时允许的Y轴坐标
      */
@@ -20947,16 +21256,16 @@ UE.plugins['table'] = function () {
     function getResizeLineByUETable() {
 
         var lineId = '_UETableResizeLine',
-            line = this.document.getElementById( lineId );
+            line = this.document.getElementById(lineId);
 
-        if( !line ) {
+        if (!line) {
             line = this.document.createElement("div");
             line.id = lineId;
             line.contnetEditable = false;
             line.setAttribute("unselectable", "on");
 
             var styles = {
-                width: 2*cellBorderWidth + 1 + 'px',
+                width: 2 * cellBorderWidth + 1 + 'px',
                 position: 'absolute',
                 'z-index': 100000,
                 cursor: 'col-resize',
@@ -20965,13 +21274,13 @@ UE.plugins['table'] = function () {
             };
 
             //切换状态
-            line.onmouseout = function(){
+            line.onmouseout = function () {
                 this.style.display = 'none';
             };
 
-            utils.extend( line.style, styles );
+            utils.extend(line.style, styles);
 
-            this.document.body.appendChild( line );
+            this.document.body.appendChild(line);
 
         }
 
@@ -20982,29 +21291,29 @@ UE.plugins['table'] = function () {
     /**
      * 更新resize-line
      */
-    function updateResizeLine( cell, uetable ) {
+    function updateResizeLine(cell, uetable) {
 
-        var line = getResizeLineByUETable.call( this ),
+        var line = getResizeLineByUETable.call(this),
             table = uetable.table,
             styles = {
-                top: domUtils.getXY( table ).y + 'px',
-                left: domUtils.getXY( cell).x + cell.offsetWidth - cellBorderWidth + 'px',
+                top: domUtils.getXY(table).y + 'px',
+                left: domUtils.getXY(cell).x + cell.offsetWidth - cellBorderWidth + 'px',
                 display: 'block',
                 height: table.offsetHeight + 'px'
             };
 
-        utils.extend( line.style, styles );
+        utils.extend(line.style, styles);
 
     }
 
     /**
      * 显示resize-line
      */
-    function showResizeLine( cell ) {
+    function showResizeLine(cell) {
 
-        var uetable = getUETable( cell );
+        var uetable = getUETable(cell);
 
-        updateResizeLine.call( this, cell, uetable );
+        updateResizeLine.call(this, cell, uetable);
 
     }
 
@@ -21016,7 +21325,7 @@ UE.plugins['table'] = function () {
     function getRelation(ele, mousePos) {
         var elePos = domUtils.getXY(ele);
 
-        if( !elePos ) {
+        if (!elePos) {
             return '';
         }
 
@@ -21037,8 +21346,8 @@ UE.plugins['table'] = function () {
 
     function mouseDownEvent(type, evt) {
 
-        if( isEditorDisabled() ) {
-            return ;
+        if (isEditorDisabled()) {
+            return;
         }
 
         userActionStatus = {
@@ -21070,14 +21379,14 @@ UE.plugins['table'] = function () {
                 }
             }
         } else {
-            tableClickHander( evt );
+            tableClickHander(evt);
         }
 
     }
 
     //清除表格的计时器
     function clearTableTimer() {
-        tabTimer && clearTimeout( tabTimer );
+        tabTimer && clearTimeout(tabTimer);
         tabTimer = null;
     }
 
@@ -21090,7 +21399,7 @@ UE.plugins['table'] = function () {
             var h;
             if (h = getRelation(target, mouseCoords(evt))) {
 
-                hideDragLine( me );
+                hideDragLine(me);
 
                 if (h == 'h1') {
                     h = 'h';
@@ -21107,70 +21416,70 @@ UE.plugins['table'] = function () {
                 if (h == 'h') {
                     var ut = getUETable(target),
                         table = ut.table,
-                        cells = getCellsByMoveBorder( target, table, true );
+                        cells = getCellsByMoveBorder(target, table, true);
 
-                    cells = extractArray( cells, 'left' );
+                    cells = extractArray(cells, 'left');
 
                     ut.width = ut.offsetWidth;
 
                     var oldWidth = [],
                         newWidth = [];
 
-                    utils.each( cells, function( cell ){
+                    utils.each(cells, function (cell) {
 
-                        oldWidth.push( cell.offsetWidth );
+                        oldWidth.push(cell.offsetWidth);
 
-                    } );
+                    });
 
-                    utils.each( cells, function( cell ){
+                    utils.each(cells, function (cell) {
 
                         cell.removeAttribute("width");
 
-                    } );
+                    });
 
-                    window.setTimeout( function(){
+                    window.setTimeout(function () {
 
                         //是否允许改变
                         var changeable = true;
 
-                        utils.each( cells, function( cell, index ){
+                        utils.each(cells, function (cell, index) {
 
                             var width = cell.offsetWidth;
 
-                            if( width > oldWidth[index] ) {
+                            if (width > oldWidth[index]) {
                                 changeable = false;
                                 return false;
                             }
 
-                            newWidth.push( width );
+                            newWidth.push(width);
 
-                        } );
+                        });
 
                         var change = changeable ? newWidth : oldWidth;
 
-                        utils.each( cells, function( cell, index ){
+                        utils.each(cells, function (cell, index) {
 
                             cell.width = change[index] - getTabcellSpace();
 
-                        } );
+                        });
 
 
-                    }, 0 );
+                    }, 0);
 
-//                    minWidth -= cellMinWidth;
-//
-//                    table.removeAttribute("width");
-//                    utils.each(cells, function (cell) {
-//                        cell.style.width = "";
-//                        cell.width -= minWidth;
-//                    });
+                    //                    minWidth -= cellMinWidth;
+                    //
+                    //                    table.removeAttribute("width");
+                    //                    utils.each(cells, function (cell) {
+                    //                        cell.style.width = "";
+                    //                        cell.width -= minWidth;
+                    //                    });
 
                 }
             }
         }
     }
 
-    function tableClickHander( evt ) {
+    function tableClickHander(evt) {
 
         removeSelectedClass(domUtils.getElementsByTagName(me.body, "td th"));
         //trace:3113
@@ -21179,7 +21488,7 @@ UE.plugins['table'] = function () {
             t.ueTable = null;
         });
         startTd = getTargetTd(me, evt);
-        if( !startTd ) return;
+        if (!startTd) return;
         var table = domUtils.findParentByTagName(startTd, "table", true);
         ut = getUETable(table);
         ut && ut.clearSelected();
@@ -21191,17 +21500,17 @@ UE.plugins['table'] = function () {
             me.addListener('mouseover', mouseOverEvent);
         } else {
             //边框上的动作处理
-            borderActionHandler( evt );
+            borderActionHandler(evt);
         }
 
 
     }
 
     //处理表格边框上的动作, 这里做延时处理，避免两种动作互相影响
-    function borderActionHandler( evt ) {
+    function borderActionHandler(evt) {
 
-        if ( browser.ie ) {
-            evt = reconstruct(evt );
+        if (browser.ie) {
+            evt = reconstruct(evt);
         }
 
         clearTableDragTimer();
@@ -21209,23 +21518,23 @@ UE.plugins['table'] = function () {
         //是否正在等待resize的缓冲中
         isInResizeBuffer = true;
 
-        tableDragTimer = setTimeout(function(){
-            tableBorderDrag( evt );
+        tableDragTimer = setTimeout(function () {
+            tableBorderDrag(evt);
         }, dblclickTime);
 
     }
 
-    function extractArray( originArr, key ) {
+    function extractArray(originArr, key) {
 
         var result = [],
             tmp = null;
 
-        for( var i = 0, len = originArr.length; i<len; i++ ) {
+        for (var i = 0, len = originArr.length; i < len; i++) {
 
-            tmp = originArr[ i ][ key ];
+            tmp = originArr[i][key];
 
-            if( tmp ) {
-                result.push( tmp );
+            if (tmp) {
+                result.push(tmp);
             }
 
         }
@@ -21239,16 +21548,16 @@ UE.plugins['table'] = function () {
         tableDragTimer = null;
     }
 
-    function reconstruct( obj ) {
+    function reconstruct(obj) {
 
         var attrs = ['pageX', 'pageY', 'clientX', 'clientY', 'srcElement', 'target'],
             newObj = {};
 
-        if( obj ) {
+        if (obj) {
 
-            for( var i = 0, key, val; key = attrs[i]; i++ ) {
-                val=obj[ key ];
-                val && (newObj[ key ] = val);
+            for (var i = 0, key, val; key = attrs[i]; i++) {
+                val = obj[key];
+                val && (newObj[key] = val);
             }
 
         }
@@ -21258,12 +21567,12 @@ UE.plugins['table'] = function () {
     }
 
     //边框拖动
-    function tableBorderDrag( evt ) {
+    function tableBorderDrag(evt) {
 
         isInResizeBuffer = false;
 
         startTd = evt.target || evt.srcElement;
-        if( !startTd ) return;
+        if (!startTd) return;
         var state = getRelation(startTd, mouseCoords(evt));
         if (/\d/.test(state)) {
             state = state.replace(/\d/, '');
@@ -21281,15 +21590,15 @@ UE.plugins['table'] = function () {
 
     function mouseUpEvent(type, evt) {
 
-        if( isEditorDisabled() ) {
-            return ;
+        if (isEditorDisabled()) {
+            return;
         }
 
         clearTableDragTimer();
 
         isInResizeBuffer = false;
 
-        if( onBorder ) {
+        if (onBorder) {
             singleClickState = ++singleClickState % 3;
 
             userActionStatus = {
@@ -21297,11 +21606,11 @@ UE.plugins['table'] = function () {
                 y: evt.clientY
             };
 
-            tableResizeTimer = setTimeout(function(){
+            tableResizeTimer = setTimeout(function () {
                 singleClickState > 0 && singleClickState--;
-            }, dblclickTime );
+            }, dblclickTime);
 
-            if( singleClickState === 2 ) {
+            if (singleClickState === 2) {
 
                 singleClickState = 0;
                 tableDbclickHandler(evt);
@@ -21311,7 +21620,7 @@ UE.plugins['table'] = function () {
 
         }
 
-        if (evt.button == 2)return;
+        if (evt.button == 2) return;
         var me = this;
         //清除表格上原生跨选问题
         var range = me.selection.getRange(),
@@ -21332,7 +21641,7 @@ UE.plugins['table'] = function () {
         mousedown = false;
         me.document.body.style.webkitUserSelect = '';
         //拖拽状态下的mouseUP
-        if ( onDrag && dragTd ) {
+        if (onDrag && dragTd) {
 
             me.selection.getNative()[browser.ie9below ? 'empty' : 'removeAllRanges']();
 
@@ -21399,7 +21708,7 @@ UE.plugins['table'] = function () {
 
     function mouseOverEvent(type, evt) {
 
-        if( isEditorDisabled() ) {
+        if (isEditorDisabled()) {
             return;
         }
 
@@ -21407,9 +21716,8 @@ UE.plugins['table'] = function () {
             tar = evt.target || evt.srcElement;
         currentTd = domUtils.findParentByTagName(tar, "td", true) || domUtils.findParentByTagName(tar, "th", true);
         //需要判断两个TD是否位于同一个表格内
-        if (startTd && currentTd &&
-            ((startTd.tagName == "TD" && currentTd.tagName == "TD") || (startTd.tagName == "TH" && currentTd.tagName == "TH")) &&
-            domUtils.findParentByTagName(startTd, 'table') == domUtils.findParentByTagName(currentTd, 'table')) {
+        //添加可以同时选中TD和TH
+        if (startTd && currentTd &&((startTd.tagName == "TD" || startTd.tagName == "TH") && (currentTd.tagName == "TD" || currentTd.tagName == "TH")) && domUtils.findParentByTagName(startTd, 'table') == domUtils.findParentByTagName(currentTd, 'table')) {
             var ut = getUETable(currentTd);
             if (startTd != currentTd) {
                 me.document.body.style.webkitUserSelect = 'none';
@@ -21434,7 +21742,7 @@ UE.plugins['table'] = function () {
     }
 
     function getWidth(cell) {
-        if (!cell)return 0;
+        if (!cell) return 0;
         return parseInt(domUtils.getComputedStyle(cell, "width"), 10);
     }
 
@@ -21445,30 +21753,30 @@ UE.plugins['table'] = function () {
 
             //根据当前移动的边框获取相关的单元格
             var table = ut.table,
-                cells = getCellsByMoveBorder( cell, table );
+                cells = getCellsByMoveBorder(cell, table);
 
             table.style.width = "";
             table.removeAttribute("width");
 
             //修正改变量
-            changeValue = correctChangeValue( changeValue, cell, cells );
+            changeValue = correctChangeValue(changeValue, cell, cells);
 
             if (cell.nextSibling) {
 
-                var i=0;
+                var i = 0;
 
-                utils.each( cells, function( cellGroup ){
+                utils.each(cells, function (cellGroup) {
 
-                    cellGroup.left.width = (+cellGroup.left.width)+changeValue;
-                    cellGroup.right && ( cellGroup.right.width = (+cellGroup.right.width)-changeValue );
+                    cellGroup.left.width = (+cellGroup.left.width) + changeValue;
+                    cellGroup.right && (cellGroup.right.width = (+cellGroup.right.width) - changeValue);
 
-                } );
+                });
 
             } else {
 
-                utils.each( cells, function( cellGroup ){
+                utils.each(cells, function (cellGroup) {
                     cellGroup.left.width -= -changeValue;
-                } );
+                });
 
             }
         }
@@ -21484,7 +21792,7 @@ UE.plugins['table'] = function () {
         var ut = getUETable(td);
         if (ut) {
             var cells = ut.getSameEndPosCells(td, "y"),
-            //备份需要连带变化的td的原始高度，否则后期无法获取正确的值
+                //备份需要连带变化的td的原始高度，否则后期无法获取正确的值
                 backHeight = cells[0] ? cells[0].offsetHeight : 0;
             for (var i = 0, cell; cell = cells[i++];) {
                 setCellHeight(cell, changeValue, backHeight);
@@ -21497,25 +21805,25 @@ UE.plugins['table'] = function () {
      * 获取调整单元格大小的相关单元格
      * @isContainMergeCell 返回的结果中是否包含发生合并后的单元格
      */
-    function getCellsByMoveBorder( cell, table, isContainMergeCell ) {
+    function getCellsByMoveBorder(cell, table, isContainMergeCell) {
 
-        if( !table ) {
-            table = domUtils.findParentByTagName( cell, 'table' );
+        if (!table) {
+            table = domUtils.findParentByTagName(cell, 'table');
         }
 
-        if( !table ) {
+        if (!table) {
             return null;
         }
 
         //获取到该单元格所在行的序列号
-        var index = domUtils.getNodeIndex( cell ),
+        var index = domUtils.getNodeIndex(cell),
             temp = cell,
             rows = table.rows,
             colIndex = 0;
 
-        while( temp ) {
+        while (temp) {
             //获取到当前单元格在未发生单元格合并时的序列
-            if( temp.nodeType === 1 ) {
+            if (temp.nodeType === 1) {
                 colIndex += (temp.colSpan || 1);
             }
             temp = temp.previousSibling;
@@ -21526,16 +21834,16 @@ UE.plugins['table'] = function () {
         //记录想关的单元格
         var borderCells = [];
 
-        utils.each(rows, function( tabRow ){
+        utils.each(rows, function (tabRow) {
 
             var cells = tabRow.cells,
                 currIndex = 0;
 
-            utils.each( cells, function( tabCell ){
+            utils.each(cells, function (tabCell) {
 
                 currIndex += (tabCell.colSpan || 1);
 
-                if( currIndex === colIndex ) {
+                if (currIndex === colIndex) {
 
                     borderCells.push({
                         left: tabCell,
@@ -21544,9 +21852,9 @@ UE.plugins['table'] = function () {
 
                     return false;
 
-                } else if( currIndex > colIndex ) {
+                } else if (currIndex > colIndex) {
 
-                    if( isContainMergeCell ) {
+                    if (isContainMergeCell) {
                         borderCells.push({
                             left: tabCell
                         });
@@ -21556,7 +21864,7 @@ UE.plugins['table'] = function () {
                 }
 
 
-            } );
+            });
 
         });
 
@@ -21568,13 +21876,13 @@ UE.plugins['table'] = function () {
     /**
      * 通过给定的单元格集合获取最小的单元格width
      */
-    function getMinWidthByTableCells( cells ) {
+    function getMinWidthByTableCells(cells) {
 
         var minWidth = Number.MAX_VALUE;
 
-        for( var i = 0, curCell; curCell = cells[ i ] ; i++ ) {
+        for (var i = 0, curCell; curCell = cells[i]; i++) {
 
-            minWidth = Math.min( minWidth, curCell.width || getTableCellWidth( curCell ) );
+            minWidth = Math.min(minWidth, curCell.width || getTableCellWidth(curCell));
 
         }
 
@@ -21582,34 +21890,34 @@ UE.plugins['table'] = function () {
 
     }
 
-    function correctChangeValue( changeValue, relatedCell, cells ) {
+    function correctChangeValue(changeValue, relatedCell, cells) {
 
         //为单元格的paading预留空间
         changeValue -= getTabcellSpace();
 
-        if( changeValue < 0 ) {
+        if (changeValue < 0) {
             return 0;
         }
 
-        changeValue -= getTableCellWidth( relatedCell );
+        changeValue -= getTableCellWidth(relatedCell);
 
         //确定方向
-        var direction = changeValue < 0 ? 'left':'right';
+        var direction = changeValue < 0 ? 'left' : 'right';
 
         changeValue = Math.abs(changeValue);
 
         //只关心非最后一个单元格就可以
-        utils.each( cells, function( cellGroup ){
+        utils.each(cells, function (cellGroup) {
 
             var curCell = cellGroup[direction];
 
             //为单元格保留最小空间
-            if( curCell ) {
-                changeValue = Math.min( changeValue, getTableCellWidth( curCell )-cellMinWidth );
+            if (curCell) {
+                changeValue = Math.min(changeValue, getTableCellWidth(curCell) - cellMinWidth);
             }
 
 
-        } );
+        });
 
 
         //修正越界
@@ -21619,7 +21927,7 @@ UE.plugins['table'] = function () {
 
     }
 
-    function getTableCellWidth( cell ) {
+    function getTableCellWidth(cell) {
 
         var width = 0,
             //偏移纠正量
@@ -21627,9 +21935,9 @@ UE.plugins['table'] = function () {
             width = cell.offsetWidth - getTabcellSpace();
 
         //最后一个节点纠正一下
-        if( !cell.nextSibling ) {
+        if (!cell.nextSibling) {
 
-            width -= getTableCellOffset( cell );
+            width -= getTableCellOffset(cell);
 
         }
 
@@ -21637,7 +21945,7 @@ UE.plugins['table'] = function () {
 
         try {
             cell.width = width;
-        } catch(e) {
+        } catch (e) {
         }
 
         return width;
@@ -21647,15 +21955,15 @@ UE.plugins['table'] = function () {
     /**
      * 获取单元格所在表格的最末单元格的偏移量
      */
-    function getTableCellOffset( cell ) {
+    function getTableCellOffset(cell) {
 
-        tab = domUtils.findParentByTagName( cell, "table", false);
+        tab = domUtils.findParentByTagName(cell, "table", false);
 
-        if( tab.offsetVal === undefined ) {
+        if (tab.offsetVal === undefined) {
 
             var prev = cell.previousSibling;
 
-            if( prev ) {
+            if (prev) {
 
                 //最后一个单元格和前一个单元格的width diff结果 如果恰好为一个border width， 则条件成立
                 tab.offsetVal = cell.offsetWidth - prev.offsetWidth === UT.borderWidth ? UT.borderWidth : 0;
@@ -21672,7 +21980,7 @@ UE.plugins['table'] = function () {
 
     function getTabcellSpace() {
 
-        if( UT.tabcellSpace === undefined ) {
+        if (UT.tabcellSpace === undefined) {
 
             var cell = null,
                 tab = me.document.createElement("table"),
@@ -21684,16 +21992,16 @@ UE.plugins['table'] = function () {
             tabcell.style.cssText = 'border: 0;';
             tabcell.width = 1;
 
-            trow.appendChild( tabcell );
-            trow.appendChild( mirror = tabcell.cloneNode( false ) );
+            trow.appendChild(tabcell);
+            trow.appendChild(mirror = tabcell.cloneNode(false));
 
-            tbody.appendChild( trow );
+            tbody.appendChild(trow);
 
-            tab.appendChild( tbody );
+            tab.appendChild(tbody);
 
             tab.style.cssText = "visibility: hidden;";
 
-            me.body.appendChild( tab );
+            me.body.appendChild(tab);
 
             UT.paddingSpace = tabcell.offsetWidth - 1;
 
@@ -21702,37 +22010,37 @@ UE.plugins['table'] = function () {
             tabcell.style.cssText = '';
             mirror.style.cssText = '';
 
-            UT.borderWidth = ( tab.offsetWidth - tmpTabWidth ) / 3;
+            UT.borderWidth = (tab.offsetWidth - tmpTabWidth) / 3;
 
             UT.tabcellSpace = UT.paddingSpace + UT.borderWidth;
 
-            me.body.removeChild( tab );
+            me.body.removeChild(tab);
 
         }
 
-        getTabcellSpace = function(){ return UT.tabcellSpace; };
+        getTabcellSpace = function () { return UT.tabcellSpace; };
 
         return UT.tabcellSpace;
 
     }
 
     function getDragLine(editor, doc) {
-        if (mousedown)return;
+        if (mousedown) return;
         dragLine = editor.document.createElement("div");
         domUtils.setAttributes(dragLine, {
-            id:"ue_tableDragLine",
-            unselectable:'on',
-            contenteditable:false,
-            'onresizestart':'return false',
-            'ondragstart':'return false',
-            'onselectstart':'return false',
-            style:"background-color:blue;position:absolute;padding:0;margin:0;background-image:none;border:0px none;opacity:0;filter:alpha(opacity=0)"
+            id: "ue_tableDragLine",
+            unselectable: 'on',
+            contenteditable: false,
+            'onresizestart': 'return false',
+            'ondragstart': 'return false',
+            'onselectstart': 'return false',
+            style: "background-color:blue;position:absolute;padding:0;margin:0;background-image:none;border:0px none;opacity:0;filter:alpha(opacity=0)"
         });
         editor.body.appendChild(dragLine);
     }
 
     function hideDragLine(editor) {
-        if (mousedown)return;
+        if (mousedown) return;
         var line;
         while (line = editor.document.getElementById('ue_tableDragLine')) {
             domUtils.remove(line)
@@ -21758,7 +22066,7 @@ UE.plugins['table'] = function () {
                 dragLine.style.cssText = css + 'px;position: absolute;display:block;background-color:blue;width:1px;border:0; color:blue;opacity:.3;filter:alpha(opacity=30)';
                 break;
             case "v":
-                css = 'width:' + width + 'px;left:' + tablePos.x + 'px;top:' + (cellPos.y + cell.offsetHeight );
+                css = 'width:' + width + 'px;left:' + tablePos.x + 'px;top:' + (cellPos.y + cell.offsetHeight);
                 //必须加上border:0和color:blue，否则低版ie不支持背景色显示
                 dragLine.style.cssText = css + 'px;overflow:hidden;position: absolute;display:block;background-color:blue;height:1px;border:0;color:blue;opacity:.2;filter:alpha(opacity=20)';
                 break;
@@ -21801,33 +22109,33 @@ UE.plugins['table'] = function () {
         var target = domUtils.findParentByTagName(evt.target || evt.srcElement, ["td", "th"], true),
             dir = null;
 
-        if( !target ) {
+        if (!target) {
             return null;
         }
 
-        dir = getRelation( target, mouseCoords( evt ) );
+        dir = getRelation(target, mouseCoords(evt));
 
         //如果有前一个节点， 需要做一个修正， 否则可能会得到一个错误的td
 
-        if( !target ) {
+        if (!target) {
             return null;
         }
 
-        if( dir === 'h1' && target.previousSibling ) {
+        if (dir === 'h1' && target.previousSibling) {
 
-            var position = domUtils.getXY( target),
+            var position = domUtils.getXY(target),
                 cellWidth = target.offsetWidth;
 
-            if( Math.abs( position.x + cellWidth - evt.clientX ) > cellWidth / 3 ) {
+            if (Math.abs(position.x + cellWidth - evt.clientX) > cellWidth / 3) {
                 target = target.previousSibling;
             }
 
-        } else if( dir === 'v1' && target.parentNode.previousSibling ) {
+        } else if (dir === 'v1' && target.parentNode.previousSibling) {
 
-            var position = domUtils.getXY( target),
+            var position = domUtils.getXY(target),
                 cellHeight = target.offsetHeight;
 
-            if( Math.abs( position.y + cellHeight - evt.clientY ) > cellHeight / 3 ) {
+            if (Math.abs(position.y + cellHeight - evt.clientY) > cellHeight / 3) {
                 target = target.parentNode.previousSibling.firstChild;
             }
 
@@ -21856,6 +22164,9 @@ UE.UETable.prototype.sortTable = function (sortByCellIndex, compareFn) {
         trArray = [],
         flag = rows[0].cells[0].tagName === "TH",
         lastRowIndex = 0;
+    if(!table.className){
+        return;
+    }
     if(this.selectedTds.length){
         var range = this.cellsRange,
             len = range.endRowIndex + 1;
@@ -22023,423 +22334,442 @@ UE.plugins['tablesort'] = function () {
 
 UE.plugins['contextmenu'] = function () {
     var me = this;
-    
+
     me.setOpt('enableContextMenu', me.getOpt('enableContextMenu') || true);
-    
-    if(me.getOpt('enableContextMenu') === false){
+
+    if (me.getOpt('enableContextMenu') === false) {
         return;
     }
-    var lang = me.getLang( "contextMenu" ),
-            menu,
-            items = me.options.contextMenu || [
-                {label:lang['selectall'], cmdName:'selectall'},
+    var lang = me.getLang("contextMenu"),
+        menu,
+        items = me.options.contextMenu || [
+            // weknow patch begin
+            // 去掉重复的
+            // {
+            //     label: lang['copy'],
+            //     cmdName: 'copy'
+            // },
+            // weknow patch end
+            {
+                label: lang['paste'],
+                cmdName: 'paste'
+            },
+            { label: lang['selectall'], cmdName: 'selectall' },
+            // weknow patch begin
+            // 0005305: [客户反馈]富文本右键菜单-清空文档功能去掉
+            // {
+            //     label: lang.cleardoc,
+            //     cmdName: 'cleardoc',
+            //     exec: function () {
+            //         if (confirm(lang.confirmclear)) {
+            //             this.execCommand('cleardoc');
+            //         }
+            //     }
+            // },
+            // weknow patch end
+            '-',
+            {
+                label: lang.unlink,
+                cmdName: 'unlink'
+            },
+            '-',
+            {
+                group: lang.paragraph,
+                icon: 'justifyjustify',
+                subMenu: [{
+                    label: lang.justifyleft,
+                    cmdName: 'justify',
+                    value: 'left'
+                },
                 {
-                    label:lang.cleardoc,
-                    cmdName:'cleardoc',
-                    exec:function () {
-                        if ( confirm( lang.confirmclear ) ) {
-                            this.execCommand( 'cleardoc' );
+                    label: lang.justifyright,
+                    cmdName: 'justify',
+                    value: 'right'
+                },
+                {
+                    label: lang.justifycenter,
+                    cmdName: 'justify',
+                    value: 'center'
+                },
+                {
+                    label: lang.justifyjustify,
+                    cmdName: 'justify',
+                    value: 'justify'
+                }
+                ]
+            },
+            '-',
+            {
+                group: lang.table,
+                icon: 'table',
+                subMenu: [{
+                    label: lang.inserttable,
+                    cmdName: 'inserttable'
+                },
+                {
+                    label: lang.deletetable,
+                    cmdName: 'deletetable'
+                },
+                    '-',
+                {
+                    label: lang.deleterow,
+                    cmdName: 'deleterow'
+                },
+                {
+                    label: lang.deletecol,
+                    cmdName: 'deletecol'
+                },
+                {
+                    label: lang.insertcol,
+                    cmdName: 'insertcol'
+                },
+                {
+                    label: lang.insertcolnext,
+                    cmdName: 'insertcolnext'
+                },
+                {
+                    label: lang.insertrow,
+                    cmdName: 'insertrow'
+                },
+                {
+                    label: lang.insertrownext,
+                    cmdName: 'insertrownext'
+                },
+                    '-',
+                {
+                    label: lang.insertcaption,
+                    cmdName: 'insertcaption'
+                },
+                {
+                    label: lang.deletecaption,
+                    cmdName: 'deletecaption'
+                },
+                {
+                    label: lang.inserttitle,
+                    cmdName: 'inserttitle'
+                },
+                {
+                    label: lang.deletetitle,
+                    cmdName: 'deletetitle'
+                },
+                {
+                    label: lang.inserttitlecol,
+                    cmdName: 'inserttitlecol'
+                },
+                {
+                    label: lang.deletetitlecol,
+                    cmdName: 'deletetitlecol'
+                },
+                    '-',
+                {
+                    label: lang.mergecells,
+                    cmdName: 'mergecells'
+                },
+                {
+                    label: lang.mergeright,
+                    cmdName: 'mergeright'
+                },
+                {
+                    label: lang.mergedown,
+                    cmdName: 'mergedown'
+                },
+                    '-',
+                {
+                    label: lang.splittocells,
+                    cmdName: 'splittocells'
+                },
+                    '-',
+                {
+                    label: lang.averageDiseRow,
+                    cmdName: 'averagedistributerow'
+                },
+                {
+                    label: lang.averageDisCol,
+                    cmdName: 'averagedistributecol'
+                },
+                    '-',
+                {
+                    label: lang.edittd,
+                    cmdName: 'edittd',
+                    exec: function () {
+                        if (UE.ui['edittd']) {
+                            new UE.ui['edittd'](this);
                         }
+                        this.getDialog('edittd').open();
                     }
                 },
-                '-',
                 {
-                    label:lang.unlink,
-                    cmdName:'unlink'
-                },
-                '-',
-                {
-                    group:lang.paragraph,
-                    icon:'justifyjustify',
-                    subMenu:[
-                        {
-                            label:lang.justifyleft,
-                            cmdName:'justify',
-                            value:'left'
-                        },
-                        {
-                            label:lang.justifyright,
-                            cmdName:'justify',
-                            value:'right'
-                        },
-                        {
-                            label:lang.justifycenter,
-                            cmdName:'justify',
-                            value:'center'
-                        },
-                        // {
-                        //     label:lang.justifyjustify,
-                        //     cmdName:'justify',
-                        //     value:'justify'
-                        // }
-                    ]
-                },
-                '-',
-                {
-                    group:lang.table,
-                    icon:'table',
-                    subMenu:[
-                        {
-                            label:lang.inserttable,
-                            cmdName:'inserttable'
-                        },
-                        {
-                            label:lang.deletetable,
-                            cmdName:'deletetable'
-                        },
-                        '-',
-                        {
-                            label:lang.deleterow,
-                            cmdName:'deleterow'
-                        },
-                        {
-                            label:lang.deletecol,
-                            cmdName:'deletecol'
-                        },
-                        {
-                            label:lang.insertcol,
-                            cmdName:'insertcol'
-                        },
-                        {
-                            label:lang.insertcolnext,
-                            cmdName:'insertcolnext'
-                        },
-                        {
-                            label:lang.insertrow,
-                            cmdName:'insertrow'
-                        },
-                        {
-                            label:lang.insertrownext,
-                            cmdName:'insertrownext'
-                        },
-                        '-',
-                        {
-                            label:lang.insertcaption,
-                            cmdName:'insertcaption'
-                        },
-                        {
-                            label:lang.deletecaption,
-                            cmdName:'deletecaption'
-                        },
-                        {
-                            label:lang.inserttitle,
-                            cmdName:'inserttitle'
-                        },
-                        {
-                            label:lang.deletetitle,
-                            cmdName:'deletetitle'
-                        },
-                        {
-                            label:lang.inserttitlecol,
-                            cmdName:'inserttitlecol'
-                        },
-                        {
-                            label:lang.deletetitlecol,
-                            cmdName:'deletetitlecol'
-                        },
-                        '-',
-                        {
-                            label:lang.mergecells,
-                            cmdName:'mergecells'
-                        },
-                        {
-                            label:lang.mergeright,
-                            cmdName:'mergeright'
-                        },
-                        {
-                            label:lang.mergedown,
-                            cmdName:'mergedown'
-                        },
-                        '-',
-                        {
-                            label:lang.splittorows,
-                            cmdName:'splittorows'
-                        },
-                        {
-                            label:lang.splittocols,
-                            cmdName:'splittocols'
-                        },
-                        {
-                            label:lang.splittocells,
-                            cmdName:'splittocells'
-                        },
-                        '-',
-                        {
-                            label:lang.averageDiseRow,
-                            cmdName:'averagedistributerow'
-                        },
-                        {
-                            label:lang.averageDisCol,
-                            cmdName:'averagedistributecol'
-                        },
-                        '-',
-                        {
-                            label:lang.edittd,
-                            cmdName:'edittd',
-                            exec:function () {
-                                if ( UE.ui['edittd'] ) {
-                                    new UE.ui['edittd']( this );
-                                }
-                                this.getDialog('edittd').open();
-                            }
-                        },
-                        {
-                            label:lang.edittable,
-                            cmdName:'edittable',
-                            exec:function () {
-                                if ( UE.ui['edittable'] ) {
-                                    new UE.ui['edittable']( this );
-                                }
-                                this.getDialog('edittable').open();
-                            }
-                        },
-                        {
-                            label:lang.setbordervisible,
-                            cmdName:'setbordervisible'
+                    label: lang.edittable,
+                    cmdName: 'edittable',
+                    exec: function () {
+                        if (UE.ui['edittable']) {
+                            new UE.ui['edittable'](this);
                         }
-                    ]
+                        this.getDialog('edittable').open();
+                    }
                 },
                 {
-                    group:lang.tablesort,
-                    icon:'tablesort',
-                    subMenu:[
-                        {
-                            label:lang.enablesort,
-                            cmdName:'enablesort'
-                        },
-                        {
-                            label:lang.disablesort,
-                            cmdName:'disablesort'
-                        },
-                        '-',
-                        {
-                            label:lang.reversecurrent,
-                            cmdName:'sorttable',
-                            value:'reversecurrent'
-                        },
-                        {
-                            label:lang.orderbyasc,
-                            cmdName:'sorttable',
-                            value:'orderbyasc'
-                        },
-                        {
-                            label:lang.reversebyasc,
-                            cmdName:'sorttable',
-                            value:'reversebyasc'
-                        },
-                        {
-                            label:lang.orderbynum,
-                            cmdName:'sorttable',
-                            value:'orderbynum'
-                        },
-                        {
-                            label:lang.reversebynum,
-                            cmdName:'sorttable',
-                            value:'reversebynum'
-                        }
-                    ]
-                },
-                {
-                    group:lang.borderbk,
-                    icon:'borderBack',
-                    subMenu:[
-                        {
-                            label:lang.setcolor,
-                            cmdName:"interlacetable",
-                            exec:function(){
-                                this.execCommand("interlacetable");
-                            }
-                        },
-                        {
-                            label:lang.unsetcolor,
-                            cmdName:"uninterlacetable",
-                            exec:function(){
-                                this.execCommand("uninterlacetable");
-                            }
-                        },
-                        {
-                            label:lang.setbackground,
-                            cmdName:"settablebackground",
-                            exec:function(){
-                                this.execCommand("settablebackground",{repeat:true,colorList:["#bbb","#ccc"]});
-                            }
-                        },
-                        {
-                            label:lang.unsetbackground,
-                            cmdName:"cleartablebackground",
-                            exec:function(){
-                                this.execCommand("cleartablebackground");
-                            }
-                        },
-                        {
-                            label:lang.redandblue,
-                            cmdName:"settablebackground",
-                            exec:function(){
-                                this.execCommand("settablebackground",{repeat:true,colorList:["red","blue"]});
-                            }
-                        },
-                        {
-                            label:lang.threecolorgradient,
-                            cmdName:"settablebackground",
-                            exec:function(){
-                                this.execCommand("settablebackground",{repeat:true,colorList:["#aaa","#bbb","#ccc"]});
-                            }
-                        }
-                    ]
-                },
-                {
-                    group:lang.aligntd,
-                    icon:'aligntd',
-                    subMenu:[
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'left',vAlign:'top'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'center',vAlign:'top'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'right',vAlign:'top'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'left',vAlign:'middle'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'center',vAlign:'middle'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'right',vAlign:'middle'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'left',vAlign:'bottom'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'center',vAlign:'bottom'}
-                        },
-                        {
-                            cmdName:'cellalignment',
-                            value:{align:'right',vAlign:'bottom'}
-                        }
-                    ]
-                },
-                {
-                    group:lang.aligntable,
-                    icon:'aligntable',
-                    subMenu:[
-                        {
-                            cmdName:'tablealignment',
-                            className: 'left',
-                            label:lang.tableleft,
-                            value:"left"
-                        },
-                        {
-                            cmdName:'tablealignment',
-                            className: 'center',
-                            label:lang.tablecenter,
-                            value:"center"
-                        },
-                        {
-                            cmdName:'tablealignment',
-                            className: 'right',
-                            label:lang.tableright,
-                            value:"right"
-                        }
-                    ]
-                },
-                '-',
-                {
-                    label:lang.insertparagraphbefore,
-                    cmdName:'insertparagraph',
-                    value:true
-                },
-                {
-                    label:lang.insertparagraphafter,
-                    cmdName:'insertparagraph'
-                },
-                {
-                    label:lang['copy'],
-                    cmdName:'copy'
-                },
-                {
-                    label:lang['paste'],
-                    cmdName:'paste'
+                    label: lang.setbordervisible,
+                    cmdName: 'setbordervisible'
                 }
-            ];
-    if ( !items.length ) {
+                ]
+            },
+            {
+                label: "追加行",
+                cmdName: 'insertrowtolast'
+            },
+            {
+                label: "追加列",
+                cmdName: 'insertcoltolast'
+            },
+            {
+                label: lang.splittorows,
+                cmdName: 'splittorows'
+            },
+            {
+                label: lang.splittocols,
+                cmdName: 'splittocols'
+            },
+            {
+                group: lang.tablesort,
+                icon: 'tablesort',
+                subMenu: [{
+                    label: lang.enablesort,
+                    cmdName: 'enablesort'
+                },
+                {
+                    label: lang.disablesort,
+                    cmdName: 'disablesort'
+                },
+                    '-',
+                {
+                    label: lang.reversecurrent,
+                    cmdName: 'sorttable',
+                    value: 'reversecurrent'
+                },
+                {
+                    label: lang.orderbyasc,
+                    cmdName: 'sorttable',
+                    value: 'orderbyasc'
+                },
+                {
+                    label: lang.reversebyasc,
+                    cmdName: 'sorttable',
+                    value: 'reversebyasc'
+                },
+                {
+                    label: lang.orderbynum,
+                    cmdName: 'sorttable',
+                    value: 'orderbynum'
+                },
+                {
+                    label: lang.reversebynum,
+                    cmdName: 'sorttable',
+                    value: 'reversebynum'
+                }
+                ]
+            },
+            {
+                group: lang.borderbk,
+                icon: 'borderBack',
+                subMenu: [{
+                    label: lang.setcolor,
+                    cmdName: "interlacetable",
+                    exec: function () {
+                        this.execCommand("interlacetable");
+                    }
+                },
+                {
+                    label: lang.unsetcolor,
+                    cmdName: "uninterlacetable",
+                    exec: function () {
+                        this.execCommand("uninterlacetable");
+                    }
+                },
+                {
+                    label: lang.setbackground,
+                    cmdName: "settablebackground",
+                    exec: function () {
+                        this.execCommand("settablebackground", { repeat: true, colorList: ["#bbb", "#ccc"] });
+                    }
+                },
+                {
+                    label: lang.unsetbackground,
+                    cmdName: "cleartablebackground",
+                    exec: function () {
+                        this.execCommand("cleartablebackground");
+                    }
+                },
+                {
+                    label: lang.redandblue,
+                    cmdName: "settablebackground",
+                    exec: function () {
+                        this.execCommand("settablebackground", { repeat: true, colorList: ["red", "blue"] });
+                    }
+                },
+                {
+                    label: lang.threecolorgradient,
+                    cmdName: "settablebackground",
+                    exec: function () {
+                        this.execCommand("settablebackground", { repeat: true, colorList: ["#aaa", "#bbb", "#ccc"] });
+                    }
+                }
+                ]
+            },
+            {
+                group: lang.aligntd,
+                icon: 'aligntd',
+                subMenu: [{
+                    cmdName: 'cellalignment',
+                    value: { align: 'left', vAlign: 'top' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'center', vAlign: 'top' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'right', vAlign: 'top' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'left', vAlign: 'middle' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'center', vAlign: 'middle' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'right', vAlign: 'middle' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'left', vAlign: 'bottom' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'center', vAlign: 'bottom' }
+                },
+                {
+                    cmdName: 'cellalignment',
+                    value: { align: 'right', vAlign: 'bottom' }
+                }
+                ]
+            },
+            {
+                group: lang.aligntable,
+                icon: 'aligntable',
+                subMenu: [{
+                    cmdName: 'tablealignment',
+                    className: 'left',
+                    label: lang.tableleft,
+                    value: "left"
+                },
+                {
+                    cmdName: 'tablealignment',
+                    className: 'center',
+                    label: lang.tablecenter,
+                    value: "center"
+                },
+                {
+                    cmdName: 'tablealignment',
+                    className: 'right',
+                    label: lang.tableright,
+                    value: "right"
+                }
+                ]
+            },
+            '-',
+            {
+                label: lang.insertparagraphbefore,
+                cmdName: 'insertparagraph',
+                value: true
+            },
+            {
+                label: lang.insertparagraphafter,
+                cmdName: 'insertparagraph'
+            }
+        ];
+
+    // weknow patch begin
+    if (me.options.expandContextMenu) {
+        if (!items) {
+            items = [];
+        }
+        for (var i = 0; i < me.options.expandContextMenu.length; i++) {
+            var item = me.options.expandContextMenu[i];
+            var index = 0;
+            if (item.index === null || item.index === undefined) {
+                // 不传数据默认放在第一个
+                index = 0;
+            } else if (item.index >= 0) {
+                // 大于0，按照正确的index来
+                index = item.index;
+            } else if (item.index < 0) {
+                // 小于0，按照倒数来
+                index = items.length + item.index + 1;
+            }
+            items.splice(index, 0, item.item);
+        }
+    }
+    // weknow patch end
+    if (!items.length) {
         return;
     }
     var uiUtils = UE.ui.uiUtils;
 
-    me.addListener( 'contextmenu', function ( type, evt ) {
+    me.addListener('contextmenu', function (type, evt) {
 
-        var offset = uiUtils.getViewportOffsetByEvent( evt );
-        me.fireEvent( 'beforeselectionchange' );
-        if ( menu ) {
+        var offset = uiUtils.getViewportOffsetByEvent(evt);
+        me.fireEvent('beforeselectionchange');
+        if (menu) {
             menu.destroy();
         }
-        let popMenuContainer = document.getElementById('pop-menu-box');
-        if (popMenuContainer) {
-            evt.stopPropagation();
-            domUtils.preventDefault(evt);
-            return;
-        }
-        if (me.selection) {
-            let start = me.selection.getStart();
-            if (start) {
-                let xnode = domUtils.findParentByTagName(start,'xnode',true);
-                if (xnode) {
-                    evt.stopPropagation();
-                    domUtils.preventDefault(evt);
-                    return;
-                }
-            }
-        }
-        for ( var i = 0, ti, contextItems = []; ti = items[i]; i++ ) {
+
+        for (var i = 0, ti, contextItems = []; ti = items[i]; i++) {
             var last;
-            (function ( item ) {
-                if ( item == '-' ) {
-                    if ( (last = contextItems[contextItems.length - 1 ] ) && last !== '-' ) {
-                        contextItems.push( '-' );
+            (function (item) {
+                if (item == '-') {
+                    if ((last = contextItems[contextItems.length - 1]) && last !== '-') {
+                        contextItems.push('-');
                     }
-                } else if ( item.hasOwnProperty( "group" ) ) {
-                    for ( var j = 0, cj, subMenu = []; cj = item.subMenu[j]; j++ ) {
-                        (function ( subItem ) {
-                            if ( subItem == '-' ) {
-                                if ( (last = subMenu[subMenu.length - 1 ] ) && last !== '-' ) {
-                                    subMenu.push( '-' );
-                                }else{
-                                    subMenu.splice(subMenu.length-1);
+                } else if (item.hasOwnProperty("group")) {
+                    for (var j = 0, cj, subMenu = []; cj = item.subMenu[j]; j++) {
+                        (function (subItem) {
+                            if (subItem == '-') {
+                                if ((last = subMenu[subMenu.length - 1]) && last !== '-') {
+                                    subMenu.push('-');
+                                } else {
+                                    subMenu.splice(subMenu.length - 1);
                                 }
                             } else {
-                                if ( (me.commands[subItem.cmdName] || UE.commands[subItem.cmdName] || subItem.query) &&
-                                        (subItem.query ? subItem.query() : me.queryCommandState( subItem.cmdName )) > -1 ) {
-                                    subMenu.push( {
-                                        'label':subItem.label || me.getLang( "contextMenu." + subItem.cmdName + (subItem.value || '') )||"",
-                                        'className':'edui-for-' +subItem.cmdName + ( subItem.className ? ( ' edui-for-' + subItem.cmdName + '-' + subItem.className ) : '' ),
-                                        onclick:subItem.exec ? function () {
-                                                subItem.exec.call( me );
+                                if ((me.commands[subItem.cmdName] || UE.commands[subItem.cmdName] || subItem.query) &&
+                                    // weknow path begin
+                                    (subItem.query ? subItem.query(evt, subItem) : me.queryCommandState(subItem.cmdName)) > -1) {
+                                    // weknow path end
+                                    subMenu.push({
+                                        'label': subItem.label || me.getLang("contextMenu." + subItem.cmdName + (subItem.value || '')) || "",
+                                        'className': 'edui-for-' + subItem.cmdName + (subItem.className ? (' edui-for-' + subItem.cmdName + '-' + subItem.className) : ''),
+                                        onclick: subItem.exec ? function () {
+                                            // weknow path begin
+                                            subItem.exec.call(me, evt);
+                                            // weknow path end
                                         } : function () {
-                                            me.execCommand( subItem.cmdName, subItem.value );
+                                            me.execCommand(subItem.cmdName, subItem.value);
                                         }
-                                    } );
+                                    });
                                 }
                             }
-                        })( cj );
+                        })(cj);
                     }
-                    if ( subMenu.length ) {
-                        function getLabel(){
-                            switch (item.icon){
+                    if (subMenu.length) {
+                        function getLabel() {
+                            switch (item.icon) {
                                 case "table":
-                                    return me.getLang( "contextMenu.table" );
+                                    return me.getLang("contextMenu.table");
                                 case "justifyjustify":
-                                    return me.getLang( "contextMenu.paragraph" );
+                                    return me.getLang("contextMenu.paragraph");
                                 case "aligntd":
                                     return me.getLang("contextMenu.aligntd");
                                 case "aligntable":
@@ -22448,72 +22778,82 @@ UE.plugins['contextmenu'] = function () {
                                     return lang.tablesort;
                                 case "borderBack":
                                     return lang.borderbk;
-                                default :
+                                case "add_file":
+                                    return '插入文件';
+                                case "pastToTruth":
+                                    return '粘贴为副本';
+								case "shareBo":
+                                    return "共享";	
+                                default:
                                     return '';
                             }
                         }
-                        contextItems.push( {
+                        contextItems.push({
                             //todo 修正成自动获取方式
-                            'label':getLabel(),
-                            className:'edui-for-' + item.icon,
-                            'subMenu':{
-                                items:subMenu,
-                                editor:me
+                            'label': getLabel(),
+                            className: 'edui-for-' + item.icon,
+                            'subMenu': {
+                                items: subMenu,
+                                editor: me
                             }
-                        } );
+                        });
                     }
 
                 } else {
                     //有可能commmand没有加载右键不能出来，或者没有command也想能展示出来添加query方法
-                    if ( (me.commands[item.cmdName] || UE.commands[item.cmdName] || item.query) &&
-                            (item.query ? item.query.call(me) : me.queryCommandState( item.cmdName )) > -1 ) {
+                    if ((me.commands[item.cmdName] || UE.commands[item.cmdName] || item.query) &&
+                        // weknow patch begin
+                        (item.query ? item.query.call(me, evt, item) : me.queryCommandState(item.cmdName)) > -1) {
+                        // weknow patch end
 
-                        contextItems.push( {
-                            'label':item.label || me.getLang( "contextMenu." + item.cmdName ),
-                            className:'edui-for-' + (item.icon ? item.icon : item.cmdName + (item.value || '')),
-                            onclick:item.exec ? function () {
-                                item.exec.call( me );
+                        contextItems.push({
+                            'label': item.label || me.getLang("contextMenu." + item.cmdName),
+                            className: 'edui-for-' + (item.icon ? item.icon : item.cmdName + (item.value || '')),
+                            onclick: item.exec ? function () {
+                                item.exec.call(me, evt);
                             } : function () {
-                                me.execCommand( item.cmdName, item.value );
+                                // weknow patch begin
+                                me.execCommand(item.cmdName, item.value);
+                                // weknow patch end
                             }
-                        } );
+                        });
                     }
 
                 }
 
-            })( ti );
+            })(ti);
         }
-        if ( contextItems[contextItems.length - 1] == '-' ) {
+        if (contextItems[contextItems.length - 1] == '-') {
             contextItems.pop();
         }
 
-        menu = new UE.ui.Menu( {
-            items:contextItems,
-            className:"edui-contextmenu",
-            editor:me
-        } );
+        menu = new UE.ui.Menu({
+            items: contextItems,
+            className: "edui-contextmenu",
+            editor: me
+        });
         menu.render();
-        menu.showAt( offset );
+        menu.showAt(offset);
 
-        me.fireEvent("aftershowcontextmenu",menu);
+        me.fireEvent("aftershowcontextmenu", menu);
 
-        domUtils.preventDefault( evt );
-        if ( browser.ie ) {
+        domUtils.preventDefault(evt);
+        if (browser.ie) {
             var ieRange;
             try {
                 ieRange = me.selection.getNative().createRange();
-            } catch ( e ) {
+            } catch (e) {
                 return;
             }
-            if ( ieRange.item ) {
-                var range = new dom.Range( me.document );
-                range.selectNode( ieRange.item( 0 ) ).select( true, true );
+            if (ieRange.item) {
+                var range = new dom.Range(me.document);
+                range.selectNode(ieRange.item(0)).select(true, true);
             }
         }
     });
 
     // 添加复制的flash按钮
-    me.addListener('aftershowcontextmenu', function(type, menu) {
+    me.addListener('aftershowcontextmenu', function (type, menu) {
         if (me.zeroclipboard) {
             var items = menu.items;
             for (var key in items) {
@@ -22525,7 +22865,6 @@ UE.plugins['contextmenu'] = function () {
     });
 
 };
-
 
 // plugins/shortcutmenu.js
 ///import core
@@ -22851,6 +23190,28 @@ UE.plugins['formatmatch'] = function(){
             return range.applyInlineStyle(list[list.length-1].tagName,null,list);
 
         }
+        //匹配到单元格
+        function matchTds(isTd){
+            var tds = UE.UETable.getUETableBySelected(me).selectedTds,
+                range = new dom.Range(me.document);
+            for(var i = 0; i < tds.length; i++) {
+                var td = tds[i];
+                range.selectNode(td).select(true);
+                me.__hasEnterExecCommand = true;
+                var removeFormatAttributes = me.options.removeFormatAttributes;
+                me.options.removeFormatAttributes = '';
+                me.execCommand('removeformat');
+                me.options.removeFormatAttributes = removeFormatAttributes;
+                me.__hasEnterExecCommand = false;
+                
+                range = me.selection.getRange();
+                if(list.length){
+                    addFormat(range);
+                }
+                range.select();
+                text && domUtils.remove(text);
+            }
+        }
 
         me.undoManger && me.undoManger.save();
 
@@ -22863,35 +23224,37 @@ UE.plugins['formatmatch'] = function(){
 
             img = null;
         }else{
-            if(!img){
-                var collapsed = range.collapsed;
-                if(collapsed){
-                    var text = me.document.createTextNode('match');
-                    range.insertNode(text).select();
+            if(!img) {
+                var isTd = UE.UETable.getUETableBySelected(me)
+                if(isTd){
+                    matchTds(isTd);
+                } else {
+                    var collapsed = range.collapsed;
+                    if(collapsed){
+                        var text = me.document.createTextNode('match');
+                        range.insertNode(text).select();
+                    }
+                    me.__hasEnterExecCommand = true;
+                    //不能把block上的属性干掉
+                    //trace:1553
+                    var removeFormatAttributes = me.options.removeFormatAttributes;
+                    me.options.removeFormatAttributes = '';
+                    me.execCommand('removeformat');
+                    me.options.removeFormatAttributes = removeFormatAttributes;
+                    me.__hasEnterExecCommand = false;
+                    //trace:969
+                    range = me.selection.getRange();
+                    if(list.length){
+                        addFormat(range);
+                    }
+                    if(text){
+                        range.setStartBefore(text).collapse(true);
 
-
+                    }
+                    range.select();
+                    text && domUtils.remove(text);
                 }
-                me.__hasEnterExecCommand = true;
-                //不能把block上的属性干掉
-                //trace:1553
-                var removeFormatAttributes = me.options.removeFormatAttributes;
-                me.options.removeFormatAttributes = '';
-                me.execCommand('removeformat');
-                me.options.removeFormatAttributes = removeFormatAttributes;
-                me.__hasEnterExecCommand = false;
-                //trace:969
-                range = me.selection.getRange();
-                if(list.length){
-                    addFormat(range);
-                }
-                if(text){
-                    range.setStartBefore(text).collapse(true);
-
-                }
-                range.select();
-                text && domUtils.remove(text);
             }
-
         }
 
 
@@ -22911,9 +23274,6 @@ UE.plugins['formatmatch'] = function(){
                  me.removeListener('mouseup',addList);
                 return;
             }
-
-
-              
             var range = me.selection.getRange();
             img = range.getClosedNode();
             if(!img || img.tagName != 'IMG'){
@@ -22947,6 +23307,7 @@ UE.plugins['formatmatch'] = function(){
 
 
 // plugins/searchreplace.js
+// plugins/searchreplace.js
 ///import core
 ///commands 查找替换
 ///commandsName  SearchReplace
@@ -22961,38 +23322,30 @@ UE.plugin.register('searchreplace',function(){
     var me = this;
 
     var _blockElm = {'table':1,'tbody':1,'tr':1,'ol':1,'ul':1};
-
-    var lastRng = null;
-
-    function getText(node){
-        var text = node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent'];
-        return text.replace(domUtils.fillChar,'')
-    }
-
+    me.ready(function (){
+        me.addListener('keydown', function (cmd,evt){
+            // 搜索快捷键设置
+            var keyCode = evt.keyCode || evt.which;
+            if((evt.ctrlKey || evt.metaKey) && evt.keyCode == '70'){
+                me.getDialog('searchreplace').open()
+            }
+        })
+    })
     function findTextInString(textContent,opt,currentIndex){
         var str = opt.searchStr;
-
-        var reg = new RegExp(str,'g' + (opt.casesensitive ? '' : 'i')),
-            match;
-
         if(opt.dir == -1){
-
-            textContent = textContent.substr(0,currentIndex);
             textContent = textContent.split('').reverse().join('');
             str = str.split('').reverse().join('');
-            match = reg.exec(textContent);
-            if(match){
-                return currentIndex - match.index - str.length;
-            }
+            currentIndex = textContent.length - currentIndex;
 
-        }else{
-            textContent = textContent.substr(currentIndex);
-            match = reg.exec(textContent);
-            if(match){
-                return match.index + currentIndex;
+        }
+        var reg = new RegExp(str,'g' + (opt.casesensitive ? '' : 'i')),match;
+
+        while(match = reg.exec(textContent)){
+            if(match.index >= currentIndex){
+                return opt.dir == -1 ? textContent.length - match.index - opt.searchStr.length : match.index;
             }
         }
-
         return  -1
     }
     function findTextBlockElm(node,currentIndex,opt){
@@ -23002,7 +23355,7 @@ UE.plugin.register('searchreplace',function(){
         }
         var first = 1;
         while(node){
-            textContent = getText(node);
+            textContent = node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent'];
             index = findTextInString(textContent,opt,currentIndex );
             first = 0;
             if(index!=-1){
@@ -23016,7 +23369,7 @@ UE.plugin.register('searchreplace',function(){
                 node = domUtils[methodName](node,true);
             }
             if(node){
-                currentIndex = opt.dir == -1 ? getText(node).length : 0;
+                currentIndex = opt.dir == -1 ? (node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent']).length : 0;
             }
 
         }
@@ -23028,7 +23381,7 @@ UE.plugin.register('searchreplace',function(){
             result;
         while(currentNode){
             if(currentNode.nodeType == 3){
-                currentNodeLength = getText(currentNode).replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
+                currentNodeLength = currentNode.nodeValue.replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
                 currentIndex += currentNodeLength;
                 if(currentIndex >= index){
                     return {
@@ -23037,7 +23390,7 @@ UE.plugin.register('searchreplace',function(){
                     }
                 }
             }else if(!dtd.$empty[currentNode.tagName]){
-                currentNodeLength = getText(currentNode).replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
+                currentNodeLength = currentNode[browser.ie ? 'innerText' : 'textContent'].replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length
                 currentIndex += currentNodeLength;
                 if(currentIndex >= index){
                     result = findNTextInBlockElm(currentNode,currentNodeLength - (currentIndex - index),str);
@@ -23053,7 +23406,7 @@ UE.plugin.register('searchreplace',function(){
 
     function searchReplace(me,opt){
 
-        var rng = lastRng || me.selection.getRange(),
+        var rng = me.selection.getRange(),
             startBlockNode,
             searchStr = opt.searchStr,
             span = me.document.createElement('span');
@@ -23067,9 +23420,14 @@ UE.plugin.register('searchreplace',function(){
             var rngText = me.selection.getText();
             if(new RegExp('^' + opt.searchStr + '$',(opt.casesensitive ? '' : 'i')).test(rngText)){
                 if(opt.replaceStr != undefined){
-                    replaceText(rng,opt.replaceStr);
-                    rng.select();
-                    return true;
+                    if(rngEnd.node.parentElement.parentElement.className.startsWith('live') || (rngEnd.node.parentElement.parentElement.tagName ==='XNODE')) {
+                        rng.select();
+                        return true;
+                    }else {
+                        replaceText(rng,opt.replaceStr)
+                        rng.select();
+                        return true;
+                    }
                 }else{
                     rng.collapse(opt.dir == -1)
                 }
@@ -23081,20 +23439,31 @@ UE.plugin.register('searchreplace',function(){
         rng.insertNode(span);
         rng.enlargeToBlockElm(true);
         startBlockNode = rng.startContainer;
-        var currentIndex = getText(startBlockNode).indexOf('$$ueditor_searchreplace_key$$');
+        var currentIndex = startBlockNode[browser.ie ? 'innerText' : 'textContent'].indexOf('$$ueditor_searchreplace_key$$');
         rng.setStartBefore(span);
         domUtils.remove(span);
         var result = findTextBlockElm(startBlockNode,currentIndex,opt);
         if(result){
-            var rngStart = findNTextInBlockElm(result.node,result.index,searchStr);
-            var rngEnd = findNTextInBlockElm(result.node,result.index + searchStr.length,searchStr);
-            rng.setStart(rngStart.node,rngStart.index).setEnd(rngEnd.node,rngEnd.index);
-
-            if(opt.replaceStr !== undefined){
-                replaceText(rng,opt.replaceStr)
+            if(result.node.tagName!=='XNODE'){
+                var rngStart = findNTextInBlockElm(result.node,result.index,searchStr);
+                var rngEnd = findNTextInBlockElm(result.node,result.index + searchStr.length,searchStr);
+                rng.setStart(rngStart.node,rngStart.index).setEnd(rngEnd.node,rngEnd.index);
+                rng.scrollToView(me, 500);
+                if(opt.replaceStr !== undefined){
+                    if(rngEnd.node.parentElement.parentElement.className.startsWith('live') || (rngEnd.node.parentElement.parentElement.tagName ==='XNODE')) {
+                        rng.select();
+                        return true;
+                    }else {
+                        replaceText(rng,opt.replaceStr)
+                        rng.select();
+                        return true;
+                    }
+                }
+                rng.select();
+                return true;
+            } else {
+                rng.setCursor()
             }
-            rng.select();
-            return true;
         }else{
             rng.setCursor()
         }
@@ -23117,7 +23486,7 @@ UE.plugin.register('searchreplace',function(){
                     },true);
                     var num = 0;
                     if(opt.all){
-                        lastRng = null;
+
                         var rng = me.selection.getRange(),
                             first = me.body.firstChild;
                         if(first && first.nodeType == 1){
@@ -23132,8 +23501,6 @@ UE.plugin.register('searchreplace',function(){
                         }
                         while(searchReplace(this,opt)){
                             num++;
-                            lastRng = me.selection.getRange();
-                            lastRng.collapse(opt.dir == -1)
                         }
                         if(num){
                             me.fireEvent('saveScene');
@@ -23143,9 +23510,7 @@ UE.plugin.register('searchreplace',function(){
                             me.fireEvent('saveScene');
                         }
                         if(searchReplace(this,opt)){
-                            num++;
-                            lastRng = me.selection.getRange();
-                            lastRng.collapse(opt.dir == -1)
+                            num++
                         }
                         if(num){
                             me.fireEvent('saveScene');
@@ -23156,11 +23521,6 @@ UE.plugin.register('searchreplace',function(){
                     return num;
                 },
                 notNeedUndo:1
-            }
-        },
-        bindEvents:{
-            clearlastSearchResult:function(){
-                lastRng = null;
             }
         }
     }
@@ -26017,13 +26377,13 @@ UE.ui = baidu.editor.ui = {};
 ///import core
 ///import uicore
 ///import ui/stateful.js
-(function (){
+(function() {
     var utils = baidu.editor.utils,
         uiUtils = baidu.editor.ui.uiUtils,
         domUtils = baidu.editor.dom.domUtils,
         UIBase = baidu.editor.ui.UIBase,
         Stateful = baidu.editor.ui.Stateful,
-        SplitButton = baidu.editor.ui.SplitButton = function (options){
+        SplitButton = baidu.editor.ui.SplitButton = function(options) {
             this.initOptions(options);
             this.initSplitButton();
         };
@@ -26031,7 +26391,7 @@ UE.ui = baidu.editor.ui = {};
         popup: null,
         uiName: 'splitbutton',
         title: '',
-        initSplitButton: function (){
+        initSplitButton: function() {
             this.initUIBase();
             this.Stateful_init();
             var me = this;
@@ -26042,56 +26402,60 @@ UE.ui = baidu.editor.ui = {};
             }
         },
         _UIBase_postRender: UIBase.prototype.postRender,
-        postRender: function (){
+        postRender: function() {
             this.Stateful_postRender();
             this._UIBase_postRender();
         },
-        setPopup: function (popup){
+        setPopup: function(popup) {
             if (this.popup === popup) return;
             if (this.popup != null) {
                 this.popup.dispose();
             }
             popup.addListener('show', utils.bind(this._onPopupShow, this));
             popup.addListener('hide', utils.bind(this._onPopupHide, this));
-            popup.addListener('postrender', utils.bind(function (){
+            popup.addListener('postrender', utils.bind(function() {
                 popup.getDom('body').appendChild(
                     uiUtils.createElementByHtml('<div id="' +
                         this.popup.id + '_bordereraser" class="edui-bordereraser edui-background" style="width:' +
                         (uiUtils.getClientRect(this.getDom()).width + 20) + 'px"></div>')
-                    );
+                );
                 popup.getDom().className += ' ' + this.className;
             }, this));
             this.popup = popup;
         },
-        _onPopupShow: function (){
+        _onPopupShow: function() {
             this.addState('opened');
         },
-        _onPopupHide: function (){
+        _onPopupHide: function() {
             this.removeState('opened');
         },
-        getHtmlTpl: function (){
-            return '<div id="##" class="edui-box %%">' +
-                '<div '+ (this.title ? 'title="' + this.title + '"' : '') +' id="##_state" stateful><div class="%%-body">' +
+        getHtmlTpl: function() {
+            return '<div id="##" class="edui-box %%" onclick="$$._onArrowClick();">' +
+                '<div ' + (this.title ? 'title="' + this.title + '"' : '') + ' id="##_state" stateful><div class="%%-body">' +
                 '<div id="##_button_body" class="edui-box edui-button-body" onclick="$$._onButtonClick(event, this);">' +
                 '<div class="edui-box edui-icon" style="' + this.cssRules + '"></div>' +
                 '</div>' +
+                // weknow patch begin
+                (this.tip ? '<span class="tip" style="font-size: 12px; margin-left: 3px;">' + this.tip + '</span>' : '') +
+                // weknow patch end
                 '<div class="edui-box edui-splitborder"></div>' +
                 '<div class="edui-box edui-arrow" onclick="$$._onArrowClick();"></div>' +
                 '</div></div></div>';
         },
-        showPopup: function (){
+        //
+        showPopup: function() {
             // 当popup往上弹出的时候，做特殊处理
             var rect = uiUtils.getClientRect(this.getDom());
             rect.top -= this.popup.SHADOW_RADIUS;
             rect.height += this.popup.SHADOW_RADIUS;
             this.popup.showAnchorRect(rect);
         },
-        _onArrowClick: function (event, el){
+        _onArrowClick: function(event, el) {
             if (!this.isDisabled()) {
                 this.showPopup();
             }
         },
-        _onButtonClick: function (){
+        _onButtonClick: function() {
             if (!this.isDisabled()) {
                 this.fireEvent('buttonclick');
             }
@@ -26101,7 +26465,6 @@ UE.ui = baidu.editor.ui = {};
     utils.extend(SplitButton.prototype, Stateful, true);
 
 })();
-
 
 // ui/colorbutton.js
 ///import core
@@ -27075,8 +27438,10 @@ UE.ui = baidu.editor.ui = {};
                 className: 'edui-dialog-dragmask',
                 theme:theme
             })));
+            var userAgent = navigator.userAgent;
+            var isMac = userAgent.indexOf('Mac') !== -1 ? true : false;
             this.closeButton = new Button({
-                className: 'edui-dialog-closebutton',
+                className: isMac ? 'edui-dialog-closebutton' : 'edui-dialog-closebutton-win',
                 title: me.closeDialog,
                 theme:theme,
                 onclick: function (){
@@ -27937,9 +28302,6 @@ UE.ui = baidu.editor.ui = {};
                     showText:false
                 });
                 editorui.buttons[cmd] = ui;
-                if (editor.options.exceptSelection && editor.options.exceptSelection.indexOf(cmd) !== -1) {
-                    return ui;
-                }
                 editor.addListener('selectionchange', function (type, causeByUi, uiReady) {
                     var state = editor.queryCommandState(cmd);
                     if (state == -1) {
@@ -28031,9 +28393,6 @@ UE.ui = baidu.editor.ui = {};
                     }
                 });
                 editorui.buttons[cmd] = ui;
-                if (editor.options.exceptSelection && editor.options.exceptSelection.indexOf(cmd) !== -1) {
-                    return;
-                }
                 editor.addListener('selectionchange', function () {
                     ui.setDisabled(editor.queryCommandState(cmd) == -1);
                 });
@@ -28807,14 +29166,14 @@ UE.ui = baidu.editor.ui = {};
             editor.addListener("afterpaste", function () {
                 if(editor.queryCommandState('pasteplain'))
                     return;
-                if(baidu.editor.ui.PastePicker){
-                    pastePop = new baidu.editor.ui.Popup({
-                        content:new baidu.editor.ui.PastePicker({editor:editor}),
-                        editor:editor,
-                        className:'edui-wordpastepop'
-                    });
-                    pastePop.render();
-                }
+                // if(baidu.editor.ui.PastePicker){
+                //     pastePop = new baidu.editor.ui.Popup({
+                //         content:new baidu.editor.ui.PastePicker({editor:editor}),
+                //         editor:editor,
+                //         className:'edui-wordpastepop'
+                //     });
+                //     pastePop.render();
+                // }
                 isPaste = true;
             });
 
@@ -28846,15 +29205,6 @@ UE.ui = baidu.editor.ui = {};
             editor.addListener('keydown', function (t, evt) {
                 if (pastePop)    pastePop.dispose(evt);
                 var keyCode = evt.keyCode || evt.which;
-                if (evt.keyCode == 13) {//回车
-                    let rng = me.selection.getRange();
-                    let xnode = domUtils.findParentByTagName(rng.startContainer,'xnode',true);
-                    if (xnode) {
-                        evt.stopPropagation();
-                        domUtils.preventDefault(evt);
-                        return;
-                    }
-                }
                 if(evt.altKey&&keyCode==90){
                     UE.ui.buttons['fullscreen'].onclick();
                 }
@@ -28903,9 +29253,11 @@ UE.ui = baidu.editor.ui = {};
                     this.hide();
                     editor.ui._dialogs.linkDialog.open();
                 },
-                _onHrefButtonClick:function (url) {
-                    editor.trigger('linkClick', url);
+                 // weknow  start  
+                _onHrefButtonClick: function(url) {
+                    editor.trigger('registerFunc', 'linkClick', url);
                 },
+                // weknow  end
                 _onImgEditButtonClick:function (name) {
                     this.hide();
                     editor.ui._dialogs[name] && editor.ui._dialogs[name].open();
@@ -29037,11 +29389,13 @@ UE.ui = baidu.editor.ui = {};
                             if (html) {
                                 html += '<div style="height:5px;"></div>'
                             }
+                            // weknow  start 
                             html += popup.formatHtml(
                                 '<nobr>' + editor.getLang("anthorMsg") + ': <a target="_blank" onclick="$$._onHrefButtonClick(\'' + url + '\');" title="' + url + '" >' + txt + '</a>' +
-                                    ' <span class="edui-clickable" onclick="$$._onEditButtonClick();">' + editor.getLang("modify") + '</span>' +
-                                    ' <span class="edui-clickable" onclick="$$._onRemoveButtonClick(\'unlink\');"> ' + editor.getLang("clear") + '</span></nobr>');
+                                ' <span class="edui-clickable" onclick="$$._onEditButtonClick();">' + editor.getLang("modify") + '</span>' +
+                                ' <span class="edui-clickable" onclick="$$._onRemoveButtonClick(\'unlink\');"> ' + editor.getLang("clear") + '</span></nobr>');
                             popup.showAnchor(link);
+                            // weknow  end
                         }
                     }
 
@@ -29125,7 +29479,7 @@ UE.ui = baidu.editor.ui = {};
             this.toolbars = toolbarUis;
         },
         getHtmlTpl:function () {
-            return '<div id="##" class="%%">' +
+            return '<div id="##" class="%%" style="height: 100%;">' +
                 '<div id="##_toolbarbox" class="%%-toolbarbox">' +
                 (this.toolbars.length ?
                     '<div id="##_toolbarboxouter" class="%%-toolbarboxouter"><div class="%%-toolbarboxinner">' +
@@ -29527,9 +29881,9 @@ UE.ui = baidu.editor.ui = {};
                     }
                     //编辑器最外容器设置了高度，会导致，编辑器不占位
                     //todo 先去掉，没有找到原因
-                    if(holder.style.height){
-                        holder.style.height = ''
-                    }
+                    // if(holder.style.height){
+                    //     holder.style.height = ''
+                    // }
                     editor.container.style.width = opt.initialFrameWidth + (/%$/.test(opt.initialFrameWidth) ? '' : 'px');
                     editor.container.style.zIndex = opt.zIndex;
                     oldRender.call(editor, editor.ui.getDom('iframeholder'));
@@ -29683,4 +30037,3 @@ UE.registerUI('autosave', function(editor) {
 
 
 })();
-module.exports = window.UE;

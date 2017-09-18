@@ -204,6 +204,18 @@ div.edui-box {
     /*_position: static !important;*/
 }
 
+.edui-default .edui-editor-iframeholder::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
+}
+.edui-default .edui-editor-iframeholder::-webkit-scrollbar-thumb {
+    border-radius: 0 !important;
+    background-color: transparent !important;
+}
+.edui-default .edui-editor-iframeholder::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
 .edui-default .edui-editor-iframeholder textarea {
     font-family: consolas, "Courier New", "lucida console", monospace;
     font-size: 12px;
