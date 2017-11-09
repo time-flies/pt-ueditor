@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Thu Aug 31 2017 09:12:42 GMT+0800 (CST)
+ * build: Sat Nov 04 2017 17:25:28 GMT+0800 (CST)
  */
 
 (function(){
@@ -10014,13 +10014,15 @@ UE.plugins['defaultfilter'] = function () {
                         }
                         break;
                     case 'img':
+                        // weknow path begin by shirley
                         //todo base64暂时去掉，后边做远程图片上传后，干掉这个
-                        if (val = node.getAttr('src')) {
-                            if (/^data:/.test(val)) {
-                                node.parentNode.removeChild(node);
-                                break;
-                            }
-                        }
+                        // if (val = node.getAttr('src')) {
+                        //     if (/^data:/.test(val)) {
+                        //         node.parentNode.removeChild(node);
+                        //         break;
+                        //     }
+                        // }
+                        // weknow path end by shirley
                         node.setAttr('_src', node.getAttr('src'));
                         break;
                     case 'span':
@@ -14753,7 +14755,10 @@ UE.plugins['paste'] = function () {
                     }
                 })
             }
-            html = {'html': root.toHtml()};
+           // weknow start 修改 导致节点文件复制粘贴以后图片出错
+            //html = {'html': root.toHtml()};
+            html = {'html': html};
+            // weknow end
             me.fireEvent('beforepaste', html, root);
             //抢了默认的粘贴，那后边的内容就不执行了，比如表格粘贴
             if(!html.html){
@@ -16583,7 +16588,8 @@ UE.plugins['enterkey'] = function() {
             }
         }
         var dom = findId(start);
-        if(dom) {
+        // 避免删掉OL的ID
+        if(dom && dom.tagName !== 'OL') {
             if(dom.previousSibling && dom.previousSibling.textContent.length < 1){
                 dom.previousSibling.removeAttribute('id');
             }else{
@@ -17213,8 +17219,8 @@ UE.plugins['fiximgclick'] = (function () {
 
                 var range = me.selection.getRange(),
                     img = range.getClosedNode();
-
-                if (img && img.tagName == 'IMG' && me.body.contentEditable!="false") {
+                // wekonw patch 屏蔽掉节点中的图片可以修改大小
+                if (img && img.tagName == 'IMG' && me.body.contentEditable!="false" && !img.className) {
 
                     if (img.className.indexOf("edui-faked-music") != -1 ||
                         img.getAttribute("anchorname") ||
@@ -17261,7 +17267,7 @@ UE.plugins['fiximgclick'] = (function () {
                                 timer = setTimeout(function () {
                                     imageScale.hide();
                                     if(imageScale.target) me.selection.getRange().selectNode(ele).select();
-                                }, 200);
+                                }, 50);
                             }
                         });
                         domUtils.on(imageScale.resizer, 'mouseup', function (e) {
@@ -22350,10 +22356,10 @@ UE.plugins['contextmenu'] = function () {
             //     cmdName: 'copy'
             // },
             // weknow patch end
-            {
-                label: lang['paste'],
-                cmdName: 'paste'
-            },
+            // {
+            //     label: lang['paste'],
+            //     cmdName: 'paste'
+            // },
             { label: lang['selectall'], cmdName: 'selectall' },
             // weknow patch begin
             // 0005305: [客户反馈]富文本右键菜单-清空文档功能去掉
