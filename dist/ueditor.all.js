@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Sat Nov 04 2017 17:25:28 GMT+0800 (CST)
+ * build: Thu Nov 23 2017 18:23:43 GMT+0800 (CST)
  */
 
 (function(){
@@ -14756,8 +14756,31 @@ UE.plugins['paste'] = function () {
                 })
             }
            // weknow start 修改 导致节点文件复制粘贴以后图片出错
-            //html = {'html': root.toHtml()};
-            html = {'html': html};
+            html = {'html': root.toHtml()};
+            let tempHtml = html.html;
+            let temp;
+            let newHtml;
+            if(tempHtml.indexOf('<br') > 0){
+                temp = tempHtml.split('<br');
+                for(let i = 0; i<temp.length; i ++){
+                    if(i ===0){
+                        newHtml += temp[i] + '</p>';
+                    } else {
+                        let index = temp[i].indexOf('/>');
+                        if(index === -1){
+                            index = temp[i].indexOf('>');
+                            newHtml +='<p>' + temp[i].slice(index,temp[i].length) + '</p>';
+                        }else {
+                            index = temp[i].indexOf('>');
+                            newHtml +='<p>' + temp[i].slice(index+1,temp[i].length) + '</p>';
+                        }
+                    }
+                }
+            }
+            if(newHtml && newHtml.length>0){
+                html.html = newHtml;
+            }
+            //html = {'html': html};
             // weknow end
             me.fireEvent('beforepaste', html, root);
             //抢了默认的粘贴，那后边的内容就不执行了，比如表格粘贴
@@ -14897,8 +14920,6 @@ UE.plugins['paste'] = function () {
     }
     // weknow  end
 };
-
-
 
 // plugins/puretxtpaste.js
 /**
