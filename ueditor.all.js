@@ -1,7 +1,7 @@
 /*!
  * ueditor
  * version: 2.0.0
- * build: Thu Nov 23 2017 18:23:43 GMT+0800 (CST)
+ * build: Fri Nov 24 2017 16:04:00 GMT+0800 (CST)
  */
 
 (function(){
@@ -14757,16 +14757,16 @@ UE.plugins['paste'] = function () {
             }
            // weknow start 修改 导致节点文件复制粘贴以后图片出错
             html = {'html': root.toHtml()};
-            let tempHtml = html.html;
-            let temp;
-            let newHtml;
+            var tempHtml = html.html;
+            var temp;
+            var newHtml;
             if(tempHtml.indexOf('<br') > 0){
                 temp = tempHtml.split('<br');
-                for(let i = 0; i<temp.length; i ++){
+                for(var i = 0; i<temp.length; i ++){
                     if(i ===0){
-                        newHtml += temp[i] + '</p>';
+                        newHtml = temp[i] + '</p>';
                     } else {
-                        let index = temp[i].indexOf('/>');
+                        var index = temp[i].indexOf('/>');
                         if(index === -1){
                             index = temp[i].indexOf('>');
                             newHtml +='<p>' + temp[i].slice(index,temp[i].length) + '</p>';
@@ -14863,7 +14863,7 @@ UE.plugins['paste'] = function () {
 
             }
 
-            range.deleteContents();
+            range.devareContents();
             range.select(true);
             me.__hasEnterExecCommand = true;
             var html = htmlContent;
